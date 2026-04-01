@@ -1,0 +1,192 @@
+<template>
+  <div class="position-view">
+    <el-card>
+      <template #header>
+        <div class="card-header">
+          <span>岗位管理</span>
+          <el-button type="primary" @click="handleAdd">新增岗位</el-button>
+        </div>
+      </template>
+
+      <el-table :data="tableData" v-loading="loading" stripe>
+        <el-table-column prop="positionCode" label="岗位编码" width="150" />
+        <el-table-column prop="positionName" label="岗位名称" width="200" />
+        <el-table-column prop="positionLevel" label="级别" width="100">
+          <template #default="{ row }">
+            {{ getLevelText(row.positionLevel) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="status" label="状态" width="100">
+          <template #default="{ row }">
+            <el-tag :type="row.status === 1 ? 'success' : 'danger'">
+              {{ row.status === 1 ? '启用' : '禁用' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="sort" label="排序" width="80" />
+        <el-table-column label="操作" width="140" fixed="right">
+          <template #default="{ row }">
+            <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
+            <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
+
+    <!-- 新增/编辑对话框 -->
+    <el-dialog v-model="dialogVisible" :title="editForm.id ? '编辑岗位' : '新增岗位'" width="500px">
+      <el-form ref="formRef" :model="editForm" :rules="formRules" label-width="100px">
+        <el-form-item label="岗位编码" prop="positionCode">
+          <el-input v-model="editForm.positionCode" placeholder="请输入岗位编码" />
+        </el-form-item>
+        <el-form-item label="岗位名称" prop="positionName">
+          <el-input v-model="editForm.positionName" placeholder="请输入岗位名称" />
+        </el-form-item>
+        <el-form-item label="岗位级别" prop="positionLevel">
+          <el-select v-model="editForm.positionLevel" placeholder="请选择级别" style="width: 100%">
+            <el-option label="初级" :value="1" />
+            <el-option label="中级" :value="2" />
+            <el-option label="高级" :value="3" />
+            <el-option label="专家" :value="4" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="排序">
+          <el-input-number v-model="editForm.sort" :min="0" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-radio-group v-model="editForm.status">
+            <el-radio :value="1">启用</el-radio>
+            <el-radio :value="0">禁用</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="岗位描述">
+          <el-input
+            v-model="editForm.description"
+            type="textarea"
+            rows="3"
+            placeholder="请输入岗位描述"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleSubmit" :loading="submitting">确定</el-button>
+      </template>
+    </el-dialog>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, onMounted } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { listPosition, addPosition, updatePosition, deletePosition } from '@/api/position'
+
+const loading = ref(false)
+const submitting = ref(false)
+const dialogVisible = ref(false)
+const tableData = ref([])
+const formRef = ref(null)
+
+const editForm = reactive({
+  id: null,
+  positionCode: '',
+  positionName: '',
+  positionLevel: null,
+  sort: 0,
+  status: 1,
+  description: '',
+})
+
+const formRules = {
+  positionCode: [{ required: true, message: '请输入岗位编码', trigger: 'blur' }],
+  positionName: [{ required: true, message: '请输入岗位名称', trigger: 'blur' }],
+}
+
+const getLevelText = (level) => {
+  const map = { 1: '初级', 2: '中级', 3: '高级', 4: '专家' }
+  return map[level] || '-'
+}
+
+const fetchData = async () => {
+  loading.value = true
+  try {
+    const res = await listPosition()
+    tableData.value = res.data || []
+  } catch (error) {
+    console.error(error)
+  } finally {
+    loading.value = false
+  }
+}
+
+const resetForm = () => {
+  Object.assign(editForm, {
+    id: null,
+    positionCode: '',
+    positionName: '',
+    positionLevel: null,
+    sort: 0,
+    status: 1,
+    description: '',
+  })
+}
+
+const handleAdd = () => {
+  resetForm()
+  dialogVisible.value = true
+}
+
+const handleEdit = (row) => {
+  Object.assign(editForm, {
+    id: row.id,
+    positionCode: row.positionCode,
+    positionName: row.positionName,
+    positionLevel: row.positionLevel,
+    sort: row.sort,
+    status: row.status,
+    description: row.description,
+  })
+  dialogVisible.value = true
+}
+
+const handleSubmit = async () => {
+  try {
+    await formRef.value.validate()
+    submitting.value = true
+    if (editForm.id) {
+      await updatePosition(editForm)
+      ElMessage.success('更新成功')
+    } else {
+      await addPosition(editForm)
+      ElMessage.success('新增成功')
+    }
+    dialogVisible.value = false
+    fetchData()
+  } catch (error) {
+    console.error(error)
+  } finally {
+    submitting.value = false
+  }
+}
+
+const handleDelete = async (row) => {
+  await ElMessageBox.confirm('确定要删除该岗位吗？', '提示', { type: 'warning' })
+  try {
+    await deletePosition(row.id)
+    ElMessage.success('删除成功')
+    fetchData()
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+onMounted(fetchData)
+</script>
+
+<style scoped>
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+</style>

@@ -1,0 +1,16 @@
+package cn.edu.ccst.manpower_resource.service;
+
+import cn.edu.ccst.manpower_resource.entity.AttDeptRule;
+import com.baomidou.mybatisplus.extension.service.IService;
+
+/**
+ * <p>
+ * 部门考勤规则关联表 服务类
+ * </p>
+ *
+ * @author 
+ * @since 2025-12-17
+ */
+public interface IAttDeptRuleService extends IService<AttDeptRule> {
+
+}

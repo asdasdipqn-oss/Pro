@@ -1,0 +1,671 @@
+2026-02-03 21:37:36.109 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
+2026-02-03 21:37:36.148 [restartedMain] INFO  c.e.c.m.ManpowerResourceApplication - Starting ManpowerResourceApplication using Java 21.0.2 with PID 3172 (D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes started by LuoXinYu in D:\项目合集\中小型企业人力资源管理系统\manpower_resource)
+2026-02-03 21:37:36.148 [restartedMain] DEBUG c.e.c.m.ManpowerResourceApplication - Running with Spring Boot v3.5.7, Spring v6.2.12
+2026-02-03 21:37:36.149 [restartedMain] INFO  c.e.c.m.ManpowerResourceApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-03 21:37:36.183 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-02-03 21:37:36.183 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-02-03 21:37:37.572 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 9090 (http)
+2026-02-03 21:37:37.585 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-9090"]
+2026-02-03 21:37:37.587 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-03 21:37:37.587 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.48]
+2026-02-03 21:37:37.640 [restartedMain] INFO  o.a.c.c.C.[.[localhost].[/api] - Initializing Spring embedded WebApplicationContext
+2026-02-03 21:37:37.641 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1457 ms
+2026-02-03 21:37:37.687 [restartedMain] INFO  c.a.d.s.b.a.DruidDataSourceAutoConfigure - Init DruidDataSource
+2026-02-03 21:37:40.612 [restartedMain] INFO  c.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2026-02-03 21:37:40.717 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Registered plugin: 'com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor@6b4731e8'
+2026-02-03 21:37:40.831 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\ApprovalFlowMapper.xml]'
+2026-02-03 21:37:40.862 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\ApprovalFlowNodeMapper.xml]'
+2026-02-03 21:37:40.901 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\ApprovalRecordMapper.xml]'
+2026-02-03 21:37:40.935 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AssessIndicatorMapper.xml]'
+2026-02-03 21:37:40.961 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AssessPlanMapper.xml]'
+2026-02-03 21:37:41.007 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AssessResultMapper.xml]'
+2026-02-03 21:37:41.045 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AssessScoreDetailMapper.xml]'
+2026-02-03 21:37:41.093 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AttAppealMapper.xml]'
+2026-02-03 21:37:41.123 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AttClockRecordMapper.xml]'
+2026-02-03 21:37:41.149 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AttDailyStatMapper.xml]'
+2026-02-03 21:37:41.170 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AttDeptRuleMapper.xml]'
+2026-02-03 21:37:41.198 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AttMonthlyStatMapper.xml]'
+2026-02-03 21:37:41.244 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AttRuleMapper.xml]'
+2026-02-03 21:37:41.270 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\EmpEmployeeMapper.xml]'
+2026-02-03 21:37:41.293 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\EmpTransferRecordMapper.xml]'
+2026-02-03 21:37:41.314 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\LeaveApplicationMapper.xml]'
+2026-02-03 21:37:41.336 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\LeaveBalanceMapper.xml]'
+2026-02-03 21:37:41.369 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\LeaveTypeMapper.xml]'
+2026-02-03 21:37:41.389 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\OrgDepartmentMapper.xml]'
+2026-02-03 21:37:41.411 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\OrgPositionMapper.xml]'
+2026-02-03 21:37:41.434 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\RecruitInterviewMapper.xml]'
+2026-02-03 21:37:41.452 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\RecruitJobMapper.xml]'
+2026-02-03 21:37:41.510 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\RecruitResumeMapper.xml]'
+2026-02-03 21:37:41.532 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SalaryDetailMapper.xml]'
+2026-02-03 21:37:41.552 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SalaryItemMapper.xml]'
+2026-02-03 21:37:41.574 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SalaryRecordMapper.xml]'
+2026-02-03 21:37:41.592 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SalaryStandardMapper.xml]'
+2026-02-03 21:37:41.610 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysConfigMapper.xml]'
+2026-02-03 21:37:41.626 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysDictDataMapper.xml]'
+2026-02-03 21:37:41.639 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysDictTypeMapper.xml]'
+2026-02-03 21:37:41.648 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysHolidayMapper.xml]'
+2026-02-03 21:37:41.672 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysMenuMapper.xml]'
+2026-02-03 21:37:41.682 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysOperationLogMapper.xml]'
+2026-02-03 21:37:41.698 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysRoleMapper.xml]'
+2026-02-03 21:37:41.706 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysRoleMenuMapper.xml]'
+2026-02-03 21:37:41.713 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysUserMapper.xml]'
+2026-02-03 21:37:41.719 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysUserRoleMapper.xml]'
+2026-02-03 21:37:41.730 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\TrainParticipantMapper.xml]'
+2026-02-03 21:37:41.741 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\TrainPlanMapper.xml]'
+2026-02-03 21:37:41.746 [restartedMain] DEBUG c.b.m.core.toolkit.Sequence - Initialization Sequence datacenterId:0 workerId:9
+2026-02-03 21:37:41.841 [restartedMain] DEBUG c.e.c.m.s.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-02-03 21:37:42.357 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-03 21:37:43.725 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2026-02-03 21:37:43.767 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-9090"]
+2026-02-03 21:37:43.783 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 9090 (http) with context path '/api'
+2026-02-03 21:37:43.789 [restartedMain] INFO  c.e.c.m.ManpowerResourceApplication - Started ManpowerResourceApplication in 8.136 seconds (process running for 8.79)
+2026-02-03 21:37:43.792 [restartedMain] DEBUG c.b.m.a.DdlApplicationRunner -   ...  DDL start create  ...  
+2026-02-03 21:37:43.792 [restartedMain] DEBUG c.b.m.a.DdlApplicationRunner -   ...  DDL end create  ...  
+2026-02-03 21:38:50.910 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-03 21:38:50.918 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-02-03 21:38:50.928 [SpringApplicationShutdownHook] INFO  c.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
+2026-02-03 21:38:50.939 [SpringApplicationShutdownHook] INFO  c.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed
+2026-02-03 21:40:33.074 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
+2026-02-03 21:40:33.110 [restartedMain] INFO  c.e.c.m.ManpowerResourceApplication - Starting ManpowerResourceApplication using Java 21.0.2 with PID 31048 (D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes started by LuoXinYu in D:\项目合集\中小型企业人力资源管理系统\manpower_resource)
+2026-02-03 21:40:33.111 [restartedMain] DEBUG c.e.c.m.ManpowerResourceApplication - Running with Spring Boot v3.5.7, Spring v6.2.12
+2026-02-03 21:40:33.111 [restartedMain] INFO  c.e.c.m.ManpowerResourceApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-03 21:40:33.146 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-02-03 21:40:33.146 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-02-03 21:40:34.109 [restartedMain] DEBUG o.apache.ibatis.logging.LogFactory - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2026-02-03 21:40:34.111 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\ApprovalFlowMapper.class]
+2026-02-03 21:40:34.112 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\ApprovalFlowNodeMapper.class]
+2026-02-03 21:40:34.112 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\ApprovalLogMapper.class]
+2026-02-03 21:40:34.112 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\ApprovalRecordMapper.class]
+2026-02-03 21:40:34.112 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\AssessIndicatorMapper.class]
+2026-02-03 21:40:34.112 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\AssessPlanMapper.class]
+2026-02-03 21:40:34.112 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\AssessResultMapper.class]
+2026-02-03 21:40:34.112 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\AssessScoreDetailMapper.class]
+2026-02-03 21:40:34.112 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\AttAppealMapper.class]
+2026-02-03 21:40:34.112 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\AttClockLocationMapper.class]
+2026-02-03 21:40:34.113 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\AttClockRecordMapper.class]
+2026-02-03 21:40:34.113 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\AttDailyStatMapper.class]
+2026-02-03 21:40:34.113 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\AttDeptRuleMapper.class]
+2026-02-03 21:40:34.113 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\AttMonthlyStatMapper.class]
+2026-02-03 21:40:34.113 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\AttRuleMapper.class]
+2026-02-03 21:40:34.113 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\EmpEmployeeMapper.class]
+2026-02-03 21:40:34.113 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\EmpTransferRecordMapper.class]
+2026-02-03 21:40:34.113 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\LeaveApplicationMapper.class]
+2026-02-03 21:40:34.113 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\LeaveBalanceMapper.class]
+2026-02-03 21:40:34.113 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\LeaveTypeMapper.class]
+2026-02-03 21:40:34.113 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\OrgDepartmentMapper.class]
+2026-02-03 21:40:34.114 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\OrgPositionMapper.class]
+2026-02-03 21:40:34.114 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\RecruitInterviewMapper.class]
+2026-02-03 21:40:34.114 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\RecruitJobMapper.class]
+2026-02-03 21:40:34.114 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\RecruitResumeMapper.class]
+2026-02-03 21:40:34.114 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\ResignationApplicationMapper.class]
+2026-02-03 21:40:34.114 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\SalaryDetailMapper.class]
+2026-02-03 21:40:34.114 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\SalaryItemMapper.class]
+2026-02-03 21:40:34.114 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\SalaryRecordMapper.class]
+2026-02-03 21:40:34.114 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\SalaryStandardMapper.class]
+2026-02-03 21:40:34.114 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\SysConfigMapper.class]
+2026-02-03 21:40:34.114 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\SysDictDataMapper.class]
+2026-02-03 21:40:34.114 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\SysDictTypeMapper.class]
+2026-02-03 21:40:34.114 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\SysHolidayMapper.class]
+2026-02-03 21:40:34.114 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\SysMenuMapper.class]
+2026-02-03 21:40:34.115 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\SysOperationLogMapper.class]
+2026-02-03 21:40:34.115 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\SysRoleMapper.class]
+2026-02-03 21:40:34.115 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\SysRoleMenuMapper.class]
+2026-02-03 21:40:34.115 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\SysUserMapper.class]
+2026-02-03 21:40:34.115 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\SysUserRoleMapper.class]
+2026-02-03 21:40:34.115 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\TrainParticipantMapper.class]
+2026-02-03 21:40:34.115 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\cn\edu\ccst\manpower_resource\mapper\TrainPlanMapper.class]
+2026-02-03 21:40:34.117 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'approvalFlowMapper' and 'cn.edu.ccst.manpower_resource.mapper.ApprovalFlowMapper' mapperInterface
+2026-02-03 21:40:34.119 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'approvalFlowMapper'.
+2026-02-03 21:40:34.119 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'approvalFlowNodeMapper' and 'cn.edu.ccst.manpower_resource.mapper.ApprovalFlowNodeMapper' mapperInterface
+2026-02-03 21:40:34.121 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'approvalFlowNodeMapper'.
+2026-02-03 21:40:34.121 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'approvalLogMapper' and 'cn.edu.ccst.manpower_resource.mapper.ApprovalLogMapper' mapperInterface
+2026-02-03 21:40:34.122 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'approvalLogMapper'.
+2026-02-03 21:40:34.122 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'approvalRecordMapper' and 'cn.edu.ccst.manpower_resource.mapper.ApprovalRecordMapper' mapperInterface
+2026-02-03 21:40:34.123 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'approvalRecordMapper'.
+2026-02-03 21:40:34.123 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'assessIndicatorMapper' and 'cn.edu.ccst.manpower_resource.mapper.AssessIndicatorMapper' mapperInterface
+2026-02-03 21:40:34.124 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'assessIndicatorMapper'.
+2026-02-03 21:40:34.124 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'assessPlanMapper' and 'cn.edu.ccst.manpower_resource.mapper.AssessPlanMapper' mapperInterface
+2026-02-03 21:40:34.124 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'assessPlanMapper'.
+2026-02-03 21:40:34.124 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'assessResultMapper' and 'cn.edu.ccst.manpower_resource.mapper.AssessResultMapper' mapperInterface
+2026-02-03 21:40:34.125 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'assessResultMapper'.
+2026-02-03 21:40:34.125 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'assessScoreDetailMapper' and 'cn.edu.ccst.manpower_resource.mapper.AssessScoreDetailMapper' mapperInterface
+2026-02-03 21:40:34.126 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'assessScoreDetailMapper'.
+2026-02-03 21:40:34.126 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'attAppealMapper' and 'cn.edu.ccst.manpower_resource.mapper.AttAppealMapper' mapperInterface
+2026-02-03 21:40:34.127 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'attAppealMapper'.
+2026-02-03 21:40:34.127 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'attClockLocationMapper' and 'cn.edu.ccst.manpower_resource.mapper.AttClockLocationMapper' mapperInterface
+2026-02-03 21:40:34.128 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'attClockLocationMapper'.
+2026-02-03 21:40:34.128 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'attClockRecordMapper' and 'cn.edu.ccst.manpower_resource.mapper.AttClockRecordMapper' mapperInterface
+2026-02-03 21:40:34.128 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'attClockRecordMapper'.
+2026-02-03 21:40:34.128 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'attDailyStatMapper' and 'cn.edu.ccst.manpower_resource.mapper.AttDailyStatMapper' mapperInterface
+2026-02-03 21:40:34.129 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'attDailyStatMapper'.
+2026-02-03 21:40:34.129 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'attDeptRuleMapper' and 'cn.edu.ccst.manpower_resource.mapper.AttDeptRuleMapper' mapperInterface
+2026-02-03 21:40:34.129 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'attDeptRuleMapper'.
+2026-02-03 21:40:34.129 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'attMonthlyStatMapper' and 'cn.edu.ccst.manpower_resource.mapper.AttMonthlyStatMapper' mapperInterface
+2026-02-03 21:40:34.129 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'attMonthlyStatMapper'.
+2026-02-03 21:40:34.129 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'attRuleMapper' and 'cn.edu.ccst.manpower_resource.mapper.AttRuleMapper' mapperInterface
+2026-02-03 21:40:34.131 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'attRuleMapper'.
+2026-02-03 21:40:34.131 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'empEmployeeMapper' and 'cn.edu.ccst.manpower_resource.mapper.EmpEmployeeMapper' mapperInterface
+2026-02-03 21:40:34.131 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'empEmployeeMapper'.
+2026-02-03 21:40:34.131 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'empTransferRecordMapper' and 'cn.edu.ccst.manpower_resource.mapper.EmpTransferRecordMapper' mapperInterface
+2026-02-03 21:40:34.132 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'empTransferRecordMapper'.
+2026-02-03 21:40:34.132 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'leaveApplicationMapper' and 'cn.edu.ccst.manpower_resource.mapper.LeaveApplicationMapper' mapperInterface
+2026-02-03 21:40:34.132 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'leaveApplicationMapper'.
+2026-02-03 21:40:34.132 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'leaveBalanceMapper' and 'cn.edu.ccst.manpower_resource.mapper.LeaveBalanceMapper' mapperInterface
+2026-02-03 21:40:34.133 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'leaveBalanceMapper'.
+2026-02-03 21:40:34.133 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'leaveTypeMapper' and 'cn.edu.ccst.manpower_resource.mapper.LeaveTypeMapper' mapperInterface
+2026-02-03 21:40:34.134 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'leaveTypeMapper'.
+2026-02-03 21:40:34.134 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'orgDepartmentMapper' and 'cn.edu.ccst.manpower_resource.mapper.OrgDepartmentMapper' mapperInterface
+2026-02-03 21:40:34.134 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'orgDepartmentMapper'.
+2026-02-03 21:40:34.134 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'orgPositionMapper' and 'cn.edu.ccst.manpower_resource.mapper.OrgPositionMapper' mapperInterface
+2026-02-03 21:40:34.134 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'orgPositionMapper'.
+2026-02-03 21:40:34.134 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'recruitInterviewMapper' and 'cn.edu.ccst.manpower_resource.mapper.RecruitInterviewMapper' mapperInterface
+2026-02-03 21:40:34.135 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'recruitInterviewMapper'.
+2026-02-03 21:40:34.135 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'recruitJobMapper' and 'cn.edu.ccst.manpower_resource.mapper.RecruitJobMapper' mapperInterface
+2026-02-03 21:40:34.136 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'recruitJobMapper'.
+2026-02-03 21:40:34.136 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'recruitResumeMapper' and 'cn.edu.ccst.manpower_resource.mapper.RecruitResumeMapper' mapperInterface
+2026-02-03 21:40:34.136 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'recruitResumeMapper'.
+2026-02-03 21:40:34.136 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'resignationApplicationMapper' and 'cn.edu.ccst.manpower_resource.mapper.ResignationApplicationMapper' mapperInterface
+2026-02-03 21:40:34.137 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'resignationApplicationMapper'.
+2026-02-03 21:40:34.137 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'salaryDetailMapper' and 'cn.edu.ccst.manpower_resource.mapper.SalaryDetailMapper' mapperInterface
+2026-02-03 21:40:34.137 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'salaryDetailMapper'.
+2026-02-03 21:40:34.137 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'salaryItemMapper' and 'cn.edu.ccst.manpower_resource.mapper.SalaryItemMapper' mapperInterface
+2026-02-03 21:40:34.138 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'salaryItemMapper'.
+2026-02-03 21:40:34.138 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'salaryRecordMapper' and 'cn.edu.ccst.manpower_resource.mapper.SalaryRecordMapper' mapperInterface
+2026-02-03 21:40:34.138 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'salaryRecordMapper'.
+2026-02-03 21:40:34.138 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'salaryStandardMapper' and 'cn.edu.ccst.manpower_resource.mapper.SalaryStandardMapper' mapperInterface
+2026-02-03 21:40:34.139 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'salaryStandardMapper'.
+2026-02-03 21:40:34.139 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'sysConfigMapper' and 'cn.edu.ccst.manpower_resource.mapper.SysConfigMapper' mapperInterface
+2026-02-03 21:40:34.139 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'sysConfigMapper'.
+2026-02-03 21:40:34.139 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'sysDictDataMapper' and 'cn.edu.ccst.manpower_resource.mapper.SysDictDataMapper' mapperInterface
+2026-02-03 21:40:34.140 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'sysDictDataMapper'.
+2026-02-03 21:40:34.140 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'sysDictTypeMapper' and 'cn.edu.ccst.manpower_resource.mapper.SysDictTypeMapper' mapperInterface
+2026-02-03 21:40:34.141 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'sysDictTypeMapper'.
+2026-02-03 21:40:34.141 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'sysHolidayMapper' and 'cn.edu.ccst.manpower_resource.mapper.SysHolidayMapper' mapperInterface
+2026-02-03 21:40:34.142 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'sysHolidayMapper'.
+2026-02-03 21:40:34.142 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'sysMenuMapper' and 'cn.edu.ccst.manpower_resource.mapper.SysMenuMapper' mapperInterface
+2026-02-03 21:40:34.144 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'sysMenuMapper'.
+2026-02-03 21:40:34.144 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'sysOperationLogMapper' and 'cn.edu.ccst.manpower_resource.mapper.SysOperationLogMapper' mapperInterface
+2026-02-03 21:40:34.144 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'sysOperationLogMapper'.
+2026-02-03 21:40:34.144 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'sysRoleMapper' and 'cn.edu.ccst.manpower_resource.mapper.SysRoleMapper' mapperInterface
+2026-02-03 21:40:34.145 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'sysRoleMapper'.
+2026-02-03 21:40:34.145 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'sysRoleMenuMapper' and 'cn.edu.ccst.manpower_resource.mapper.SysRoleMenuMapper' mapperInterface
+2026-02-03 21:40:34.146 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'sysRoleMenuMapper'.
+2026-02-03 21:40:34.146 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'sysUserMapper' and 'cn.edu.ccst.manpower_resource.mapper.SysUserMapper' mapperInterface
+2026-02-03 21:40:34.147 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'sysUserMapper'.
+2026-02-03 21:40:34.147 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'sysUserRoleMapper' and 'cn.edu.ccst.manpower_resource.mapper.SysUserRoleMapper' mapperInterface
+2026-02-03 21:40:34.149 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'sysUserRoleMapper'.
+2026-02-03 21:40:34.149 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'trainParticipantMapper' and 'cn.edu.ccst.manpower_resource.mapper.TrainParticipantMapper' mapperInterface
+2026-02-03 21:40:34.149 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'trainParticipantMapper'.
+2026-02-03 21:40:34.149 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'trainPlanMapper' and 'cn.edu.ccst.manpower_resource.mapper.TrainPlanMapper' mapperInterface
+2026-02-03 21:40:34.150 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'trainPlanMapper'.
+2026-02-03 21:40:34.590 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 9090 (http)
+2026-02-03 21:40:34.601 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-9090"]
+2026-02-03 21:40:34.603 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-03 21:40:34.603 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.48]
+2026-02-03 21:40:34.657 [restartedMain] INFO  o.a.c.c.C.[.[localhost].[/api] - Initializing Spring embedded WebApplicationContext
+2026-02-03 21:40:34.657 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1510 ms
+2026-02-03 21:40:34.714 [restartedMain] INFO  c.a.d.s.b.a.DruidDataSourceAutoConfigure - Init DruidDataSource
+2026-02-03 21:40:36.942 [restartedMain] INFO  c.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+2026-02-03 21:40:37.014 [restartedMain] DEBUG o.apache.ibatis.logging.LogFactory - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2026-02-03 21:40:37.059 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Registered plugin: 'com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor@6c8916f8'
+2026-02-03 21:40:37.170 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\ApprovalFlowMapper.xml]'
+2026-02-03 21:40:37.200 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\ApprovalFlowNodeMapper.xml]'
+2026-02-03 21:40:37.231 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\ApprovalRecordMapper.xml]'
+2026-02-03 21:40:37.259 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AssessIndicatorMapper.xml]'
+2026-02-03 21:40:37.280 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AssessPlanMapper.xml]'
+2026-02-03 21:40:37.294 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AssessResultMapper.xml]'
+2026-02-03 21:40:37.306 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AssessScoreDetailMapper.xml]'
+2026-02-03 21:40:37.319 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AttAppealMapper.xml]'
+2026-02-03 21:40:37.331 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AttClockRecordMapper.xml]'
+2026-02-03 21:40:37.343 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AttDailyStatMapper.xml]'
+2026-02-03 21:40:37.355 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AttDeptRuleMapper.xml]'
+2026-02-03 21:40:37.371 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AttMonthlyStatMapper.xml]'
+2026-02-03 21:40:37.386 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\AttRuleMapper.xml]'
+2026-02-03 21:40:37.400 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\EmpEmployeeMapper.xml]'
+2026-02-03 21:40:37.415 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\EmpTransferRecordMapper.xml]'
+2026-02-03 21:40:37.435 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\LeaveApplicationMapper.xml]'
+2026-02-03 21:40:37.446 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\LeaveBalanceMapper.xml]'
+2026-02-03 21:40:37.458 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\LeaveTypeMapper.xml]'
+2026-02-03 21:40:37.468 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\OrgDepartmentMapper.xml]'
+2026-02-03 21:40:37.479 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\OrgPositionMapper.xml]'
+2026-02-03 21:40:37.492 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\RecruitInterviewMapper.xml]'
+2026-02-03 21:40:37.505 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\RecruitJobMapper.xml]'
+2026-02-03 21:40:37.517 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\RecruitResumeMapper.xml]'
+2026-02-03 21:40:37.527 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SalaryDetailMapper.xml]'
+2026-02-03 21:40:37.536 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SalaryItemMapper.xml]'
+2026-02-03 21:40:37.547 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SalaryRecordMapper.xml]'
+2026-02-03 21:40:37.555 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SalaryStandardMapper.xml]'
+2026-02-03 21:40:37.563 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysConfigMapper.xml]'
+2026-02-03 21:40:37.573 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysDictDataMapper.xml]'
+2026-02-03 21:40:37.582 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysDictTypeMapper.xml]'
+2026-02-03 21:40:37.590 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysHolidayMapper.xml]'
+2026-02-03 21:40:37.604 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysMenuMapper.xml]'
+2026-02-03 21:40:37.614 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysOperationLogMapper.xml]'
+2026-02-03 21:40:37.633 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysRoleMapper.xml]'
+2026-02-03 21:40:37.665 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysRoleMenuMapper.xml]'
+2026-02-03 21:40:37.674 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysUserMapper.xml]'
+2026-02-03 21:40:37.681 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\SysUserRoleMapper.xml]'
+2026-02-03 21:40:37.690 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\TrainParticipantMapper.xml]'
+2026-02-03 21:40:37.701 [restartedMain] DEBUG c.b.m.e.s.MybatisSqlSessionFactoryBean - Parsed mapper file: 'file [D:\项目合集\中小型企业人力资源管理系统\manpower_resource\target\classes\mapper\TrainPlanMapper.xml]'
+2026-02-03 21:40:37.705 [restartedMain] DEBUG c.b.m.core.toolkit.Sequence - Initialization Sequence datacenterId:0 workerId:6
+2026-02-03 21:40:37.788 [restartedMain] DEBUG c.e.c.m.s.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-02-03 21:40:37.788 [restartedMain] DEBUG c.e.c.m.config.RequestLoggingFilter - Filter 'requestLoggingFilter' configured for use
+2026-02-03 21:40:37.788 [restartedMain] DEBUG o.s.web.filter.CorsFilter - Filter 'corsFilter' configured for use
+2026-02-03 21:40:38.118 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-03 21:40:38.955 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 177 mappings in 'requestMappingHandlerMapping'
+2026-02-03 21:40:39.046 [restartedMain] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**, /swagger-ui*/*swagger-initializer.js, /swagger-ui*/**] in 'resourceHandlerMapping'
+2026-02-03 21:40:39.210 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2026-02-03 21:40:39.252 [restartedMain] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 2 @ExceptionHandler, 1 ResponseBodyAdvice
+2026-02-03 21:40:39.526 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2026-02-03 21:40:39.573 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-9090"]
+2026-02-03 21:40:39.588 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 9090 (http) with context path '/api'
+2026-02-03 21:40:39.595 [restartedMain] INFO  c.e.c.m.ManpowerResourceApplication - Started ManpowerResourceApplication in 6.965 seconds (process running for 7.578)
+2026-02-03 21:40:39.598 [restartedMain] DEBUG c.b.m.a.DdlApplicationRunner -   ...  DDL start create  ...  
+2026-02-03 21:40:39.598 [restartedMain] DEBUG c.b.m.a.DdlApplicationRunner -   ...  DDL end create  ...  
+2026-02-03 21:42:13.565 [http-nio-9090-exec-5] INFO  o.a.c.c.C.[.[localhost].[/api] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-03 21:42:13.565 [http-nio-9090-exec-5] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-02-03 21:42:13.565 [http-nio-9090-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+2026-02-03 21:42:13.565 [http-nio-9090-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Detected AcceptHeaderLocaleResolver
+2026-02-03 21:42:13.565 [http-nio-9090-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Detected FixedThemeResolver
+2026-02-03 21:42:13.567 [http-nio-9090-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@6496f37f
+2026-02-03 21:42:13.567 [http-nio-9090-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@3c72db59
+2026-02-03 21:42:13.567 [http-nio-9090-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+2026-02-03 21:42:13.567 [http-nio-9090-exec-5] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-02-03 21:42:13.870 [http-nio-9090-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:13.870 [http-nio-9090-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:13.870 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:13.870 [http-nio-9090-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:13.879 [http-nio-9090-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@654f74bc] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:13.879 [http-nio-9090-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4c1b3454] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:13.879 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@27bfb618] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:13.879 [http-nio-9090-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@71b9b517] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:13.993 [http-nio-9090-exec-7] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.805, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.985}] will not be managed by Spring
+2026-02-03 21:42:13.993 [http-nio-9090-exec-4] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:13.993 [http-nio-9090-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.42, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.985}] will not be managed by Spring
+2026-02-03 21:42:13.993 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:35.669, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.986}] will not be managed by Spring
+2026-02-03 21:42:14.001 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.SysUserMapper.selectList - ==>  Preparing: SELECT id,username,password,employee_id,status,last_login_time,last_login_ip,pwd_update_time,create_time,update_time,deleted FROM sys_user WHERE deleted=0 AND (username = ? AND deleted = ?)
+2026-02-03 21:42:14.001 [http-nio-9090-exec-7] DEBUG c.e.c.m.m.SysUserMapper.selectList - ==>  Preparing: SELECT id,username,password,employee_id,status,last_login_time,last_login_ip,pwd_update_time,create_time,update_time,deleted FROM sys_user WHERE deleted=0 AND (username = ? AND deleted = ?)
+2026-02-03 21:42:14.001 [http-nio-9090-exec-4] DEBUG c.e.c.m.m.SysUserMapper.selectList - ==>  Preparing: SELECT id,username,password,employee_id,status,last_login_time,last_login_ip,pwd_update_time,create_time,update_time,deleted FROM sys_user WHERE deleted=0 AND (username = ? AND deleted = ?)
+2026-02-03 21:42:14.001 [http-nio-9090-exec-3] DEBUG c.e.c.m.m.SysUserMapper.selectList - ==>  Preparing: SELECT id,username,password,employee_id,status,last_login_time,last_login_ip,pwd_update_time,create_time,update_time,deleted FROM sys_user WHERE deleted=0 AND (username = ? AND deleted = ?)
+2026-02-03 21:42:14.107 [http-nio-9090-exec-4] DEBUG c.e.c.m.m.SysUserMapper.selectList - ==> Parameters: admin(String), 0(Integer)
+2026-02-03 21:42:14.107 [http-nio-9090-exec-3] DEBUG c.e.c.m.m.SysUserMapper.selectList - ==> Parameters: admin(String), 0(Integer)
+2026-02-03 21:42:14.107 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.SysUserMapper.selectList - ==> Parameters: admin(String), 0(Integer)
+2026-02-03 21:42:14.107 [http-nio-9090-exec-7] DEBUG c.e.c.m.m.SysUserMapper.selectList - ==> Parameters: admin(String), 0(Integer)
+2026-02-03 21:42:14.178 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.SysUserMapper.selectList - <==      Total: 1
+2026-02-03 21:42:14.178 [http-nio-9090-exec-7] DEBUG c.e.c.m.m.SysUserMapper.selectList - <==      Total: 1
+2026-02-03 21:42:14.178 [http-nio-9090-exec-3] DEBUG c.e.c.m.m.SysUserMapper.selectList - <==      Total: 1
+2026-02-03 21:42:14.178 [http-nio-9090-exec-4] DEBUG c.e.c.m.m.SysUserMapper.selectList - <==      Total: 1
+2026-02-03 21:42:14.182 [http-nio-9090-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4c1b3454]
+2026-02-03 21:42:14.182 [http-nio-9090-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@71b9b517]
+2026-02-03 21:42:14.182 [http-nio-9090-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@654f74bc]
+2026-02-03 21:42:14.182 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@27bfb618]
+2026-02-03 21:42:14.184 [http-nio-9090-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:14.184 [http-nio-9090-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:14.184 [http-nio-9090-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:14.184 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:14.184 [http-nio-9090-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@289f86a7] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:14.184 [http-nio-9090-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@510e06f0] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:14.184 [http-nio-9090-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@566158c4] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:14.185 [http-nio-9090-exec-7] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:35.669, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.986}] will not be managed by Spring
+2026-02-03 21:42:14.185 [http-nio-9090-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:14.185 [http-nio-9090-exec-4] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.42, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.985}] will not be managed by Spring
+2026-02-03 21:42:14.185 [http-nio-9090-exec-7] DEBUG c.e.c.m.m.S.selectRolesByUserId - ==>  Preparing: SELECT r.* FROM sys_role r INNER JOIN sys_user_role ur ON r.id = ur.role_id WHERE ur.user_id = ? AND r.status = 1 AND r.deleted = 0
+2026-02-03 21:42:14.185 [http-nio-9090-exec-3] DEBUG c.e.c.m.m.S.selectRolesByUserId - ==>  Preparing: SELECT r.* FROM sys_role r INNER JOIN sys_user_role ur ON r.id = ur.role_id WHERE ur.user_id = ? AND r.status = 1 AND r.deleted = 0
+2026-02-03 21:42:14.185 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@51f6a540] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:14.185 [http-nio-9090-exec-4] DEBUG c.e.c.m.m.S.selectRolesByUserId - ==>  Preparing: SELECT r.* FROM sys_role r INNER JOIN sys_user_role ur ON r.id = ur.role_id WHERE ur.user_id = ? AND r.status = 1 AND r.deleted = 0
+2026-02-03 21:42:14.185 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.805, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.985}] will not be managed by Spring
+2026-02-03 21:42:14.186 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.S.selectRolesByUserId - ==>  Preparing: SELECT r.* FROM sys_role r INNER JOIN sys_user_role ur ON r.id = ur.role_id WHERE ur.user_id = ? AND r.status = 1 AND r.deleted = 0
+2026-02-03 21:42:14.205 [http-nio-9090-exec-4] DEBUG c.e.c.m.m.S.selectRolesByUserId - ==> Parameters: 1(Long)
+2026-02-03 21:42:14.205 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.S.selectRolesByUserId - ==> Parameters: 1(Long)
+2026-02-03 21:42:14.205 [http-nio-9090-exec-7] DEBUG c.e.c.m.m.S.selectRolesByUserId - ==> Parameters: 1(Long)
+2026-02-03 21:42:14.205 [http-nio-9090-exec-3] DEBUG c.e.c.m.m.S.selectRolesByUserId - ==> Parameters: 1(Long)
+2026-02-03 21:42:14.249 [http-nio-9090-exec-3] DEBUG c.e.c.m.m.S.selectRolesByUserId - <==      Total: 1
+2026-02-03 21:42:14.249 [http-nio-9090-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@566158c4]
+2026-02-03 21:42:14.249 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.S.selectRolesByUserId - <==      Total: 1
+2026-02-03 21:42:14.249 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@51f6a540]
+2026-02-03 21:42:14.251 [http-nio-9090-exec-7] DEBUG c.e.c.m.m.S.selectRolesByUserId - <==      Total: 1
+2026-02-03 21:42:14.251 [http-nio-9090-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@510e06f0]
+2026-02-03 21:42:14.252 [http-nio-9090-exec-4] DEBUG c.e.c.m.m.S.selectRolesByUserId - <==      Total: 1
+2026-02-03 21:42:14.252 [http-nio-9090-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@289f86a7]
+2026-02-03 21:42:14.252 [http-nio-9090-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:14.252 [http-nio-9090-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:14.252 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:14.252 [http-nio-9090-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@48f98186] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:14.252 [http-nio-9090-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:14.252 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4017a281] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:14.252 [http-nio-9090-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@25902dd7] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:14.253 [http-nio-9090-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@245a11c4] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:14.253 [http-nio-9090-exec-7] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.42, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.985}] will not be managed by Spring
+2026-02-03 21:42:14.253 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:35.669, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.986}] will not be managed by Spring
+2026-02-03 21:42:14.253 [http-nio-9090-exec-7] DEBUG c.e.c.m.m.S.selectMenusByUserId - ==>  Preparing: SELECT DISTINCT m.* FROM sys_menu m INNER JOIN sys_role_menu rm ON m.id = rm.menu_id INNER JOIN sys_user_role ur ON rm.role_id = ur.role_id WHERE ur.user_id = ? AND m.status = 1 AND m.deleted = 0 ORDER BY m.sort
+2026-02-03 21:42:14.253 [http-nio-9090-exec-4] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:14.253 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.S.selectMenusByUserId - ==>  Preparing: SELECT DISTINCT m.* FROM sys_menu m INNER JOIN sys_role_menu rm ON m.id = rm.menu_id INNER JOIN sys_user_role ur ON rm.role_id = ur.role_id WHERE ur.user_id = ? AND m.status = 1 AND m.deleted = 0 ORDER BY m.sort
+2026-02-03 21:42:14.253 [http-nio-9090-exec-4] DEBUG c.e.c.m.m.S.selectMenusByUserId - ==>  Preparing: SELECT DISTINCT m.* FROM sys_menu m INNER JOIN sys_role_menu rm ON m.id = rm.menu_id INNER JOIN sys_user_role ur ON rm.role_id = ur.role_id WHERE ur.user_id = ? AND m.status = 1 AND m.deleted = 0 ORDER BY m.sort
+2026-02-03 21:42:14.253 [http-nio-9090-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.805, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.985}] will not be managed by Spring
+2026-02-03 21:42:14.253 [http-nio-9090-exec-3] DEBUG c.e.c.m.m.S.selectMenusByUserId - ==>  Preparing: SELECT DISTINCT m.* FROM sys_menu m INNER JOIN sys_role_menu rm ON m.id = rm.menu_id INNER JOIN sys_user_role ur ON rm.role_id = ur.role_id WHERE ur.user_id = ? AND m.status = 1 AND m.deleted = 0 ORDER BY m.sort
+2026-02-03 21:42:14.263 [http-nio-9090-exec-4] DEBUG c.e.c.m.m.S.selectMenusByUserId - ==> Parameters: 1(Long)
+2026-02-03 21:42:14.263 [http-nio-9090-exec-3] DEBUG c.e.c.m.m.S.selectMenusByUserId - ==> Parameters: 1(Long)
+2026-02-03 21:42:14.263 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.S.selectMenusByUserId - ==> Parameters: 1(Long)
+2026-02-03 21:42:14.263 [http-nio-9090-exec-7] DEBUG c.e.c.m.m.S.selectMenusByUserId - ==> Parameters: 1(Long)
+2026-02-03 21:42:14.332 [http-nio-9090-exec-3] DEBUG c.e.c.m.m.S.selectMenusByUserId - <==      Total: 48
+2026-02-03 21:42:14.333 [http-nio-9090-exec-4] DEBUG c.e.c.m.m.S.selectMenusByUserId - <==      Total: 48
+2026-02-03 21:42:14.333 [http-nio-9090-exec-7] DEBUG c.e.c.m.m.S.selectMenusByUserId - <==      Total: 48
+2026-02-03 21:42:14.333 [http-nio-9090-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@25902dd7]
+2026-02-03 21:42:14.333 [http-nio-9090-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@245a11c4]
+2026-02-03 21:42:14.333 [http-nio-9090-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@48f98186]
+2026-02-03 21:42:14.338 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.S.selectMenusByUserId - <==      Total: 48
+2026-02-03 21:42:14.338 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4017a281]
+2026-02-03 21:42:14.352 [http-nio-9090-exec-7] INFO  c.e.c.m.config.RequestLoggingFilter - 
+========== REQUEST START ==========
+Method      : GET
+URI         : /api/org/position/list
+Remote Addr : 0:0:0:0:0:0:0:1
+Headers     : 
+              host = localhost:9090
+              connection = keep-alive
+              sec-ch-ua-platform = "Windows"
+              user-agent = Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0
+              accept = application/json, text/plain, */*
+              sec-ch-ua = "Not:A-Brand";v="99", "Microsoft Edge";v="145", "Chromium";v="145"
+              sec-ch-ua-mobile = ?0
+              origin = http://localhost:5173
+              sec-fetch-site = same-site
+              sec-fetch-mode = cors
+              sec-fetch-dest = empty
+              referer = http://localhost:5173/
+              accept-encoding = gzip, deflate, br, zstd
+              accept-language = zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,en-GB;q=0.6
+              dnt = 1
+              sec-gpc = 1
+========== REQUEST END ==========
+2026-02-03 21:42:14.352 [http-nio-9090-exec-3] INFO  c.e.c.m.config.RequestLoggingFilter - 
+========== REQUEST START ==========
+Method      : GET
+URI         : /api/notification/unread-count
+Remote Addr : 0:0:0:0:0:0:0:1
+Headers     : 
+              host = localhost:9090
+              connection = keep-alive
+              sec-ch-ua-platform = "Windows"
+              user-agent = Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0
+              accept = application/json, text/plain, */*
+              sec-ch-ua = "Not:A-Brand";v="99", "Microsoft Edge";v="145", "Chromium";v="145"
+              sec-ch-ua-mobile = ?0
+              origin = http://localhost:5173
+              sec-fetch-site = same-site
+              sec-fetch-mode = cors
+              sec-fetch-dest = empty
+              referer = http://localhost:5173/
+              accept-encoding = gzip, deflate, br, zstd
+              accept-language = zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,en-GB;q=0.6
+              dnt = 1
+              sec-gpc = 1
+========== REQUEST END ==========
+2026-02-03 21:42:14.352 [http-nio-9090-exec-4] INFO  c.e.c.m.config.RequestLoggingFilter - 
+========== REQUEST START ==========
+Method      : GET
+URI         : /api/org/department/tree
+Remote Addr : 0:0:0:0:0:0:0:1
+Headers     : 
+              host = localhost:9090
+              connection = keep-alive
+              sec-ch-ua-platform = "Windows"
+              user-agent = Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0
+              accept = application/json, text/plain, */*
+              sec-ch-ua = "Not:A-Brand";v="99", "Microsoft Edge";v="145", "Chromium";v="145"
+              sec-ch-ua-mobile = ?0
+              origin = http://localhost:5173
+              sec-fetch-site = same-site
+              sec-fetch-mode = cors
+              sec-fetch-dest = empty
+              referer = http://localhost:5173/
+              accept-encoding = gzip, deflate, br, zstd
+              accept-language = zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,en-GB;q=0.6
+              dnt = 1
+              sec-gpc = 1
+========== REQUEST END ==========
+2026-02-03 21:42:14.353 [http-nio-9090-exec-6] INFO  c.e.c.m.config.RequestLoggingFilter - 
+========== REQUEST START ==========
+Method      : GET
+URI         : /api/emp/employee/page
+Remote Addr : 0:0:0:0:0:0:0:1
+Headers     : 
+              host = localhost:9090
+              connection = keep-alive
+              sec-ch-ua-platform = "Windows"
+              user-agent = Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0
+              accept = application/json, text/plain, */*
+              sec-ch-ua = "Not:A-Brand";v="99", "Microsoft Edge";v="145", "Chromium";v="145"
+              sec-ch-ua-mobile = ?0
+              origin = http://localhost:5173
+              sec-fetch-site = same-site
+              sec-fetch-mode = cors
+              sec-fetch-dest = empty
+              referer = http://localhost:5173/
+              accept-encoding = gzip, deflate, br, zstd
+              accept-language = zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,en-GB;q=0.6
+              dnt = 1
+              sec-gpc = 1
+========== REQUEST END ==========
+2026-02-03 21:42:14.356 [http-nio-9090-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/org/position/list", parameters={}
+2026-02-03 21:42:14.356 [http-nio-9090-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/notification/unread-count", parameters={}
+2026-02-03 21:42:14.356 [http-nio-9090-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/org/department/tree", parameters={}
+2026-02-03 21:42:14.356 [http-nio-9090-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/emp/employee/page?empCode=&empName=&pageNum=1&pageSize=10", parameters={masked}
+2026-02-03 21:42:14.357 [http-nio-9090-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to cn.edu.ccst.manpower_resource.controller.OrgDepartmentController#tree()
+2026-02-03 21:42:14.357 [http-nio-9090-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to cn.edu.ccst.manpower_resource.controller.NotificationController#getUnreadCount(LoginUser)
+2026-02-03 21:42:14.358 [http-nio-9090-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to cn.edu.ccst.manpower_resource.controller.EmpEmployeeController#page(EmpEmployeeQuery)
+2026-02-03 21:42:14.358 [http-nio-9090-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to cn.edu.ccst.manpower_resource.controller.OrgPositionController#list()
+2026-02-03 21:42:14.373 [http-nio-9090-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:14.373 [http-nio-9090-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@466f021f] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:14.377 [http-nio-9090-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:14.377 [http-nio-9090-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@f0855d1] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:14.378 [http-nio-9090-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.42, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.985}] will not be managed by Spring
+2026-02-03 21:42:14.378 [http-nio-9090-exec-3] DEBUG c.e.c.m.m.A.selectCount - ==>  Preparing: SELECT COUNT( * ) AS total FROM approval_record WHERE (approver_id = ? AND status = ?)
+2026-02-03 21:42:14.378 [http-nio-9090-exec-4] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:35.669, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.986}] will not be managed by Spring
+2026-02-03 21:42:14.379 [http-nio-9090-exec-4] DEBUG c.e.c.m.m.O.selectList - ==>  Preparing: SELECT id,parent_id,dept_code,dept_name,leader_id,phone,email,sort,status,create_time,update_time,deleted FROM org_department WHERE deleted=0 AND (deleted = ?) ORDER BY sort ASC
+2026-02-03 21:42:14.373 [http-nio-9090-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:14.380 [http-nio-9090-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4868578] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:14.380 [http-nio-9090-exec-7] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:14.380 [http-nio-9090-exec-7] DEBUG c.e.c.m.m.O.selectList - ==>  Preparing: SELECT id,position_code,position_name,dept_id,position_level,description,requirements,sort,status,create_time,update_time,deleted FROM org_position WHERE deleted=0 AND (deleted = ?) ORDER BY sort ASC
+2026-02-03 21:42:14.384 [http-nio-9090-exec-7] DEBUG c.e.c.m.m.O.selectList - ==> Parameters: 0(Integer)
+2026-02-03 21:42:14.385 [http-nio-9090-exec-4] DEBUG c.e.c.m.m.O.selectList - ==> Parameters: 0(Integer)
+2026-02-03 21:42:14.385 [http-nio-9090-exec-3] DEBUG c.e.c.m.m.A.selectCount - ==> Parameters: 1(Long), 0(Integer)
+2026-02-03 21:42:14.410 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:14.411 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@59f194ed] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:14.432 [http-nio-9090-exec-3] DEBUG c.e.c.m.m.A.selectCount - <==      Total: 1
+2026-02-03 21:42:14.432 [http-nio-9090-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@f0855d1]
+2026-02-03 21:42:14.434 [http-nio-9090-exec-4] DEBUG c.e.c.m.m.O.selectList - <==      Total: 10
+2026-02-03 21:42:14.434 [http-nio-9090-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@466f021f]
+2026-02-03 21:42:14.436 [http-nio-9090-exec-7] DEBUG c.e.c.m.m.O.selectList - <==      Total: 14
+2026-02-03 21:42:14.436 [http-nio-9090-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4868578]
+2026-02-03 21:42:14.497 [http-nio-9090-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+2026-02-03 21:42:14.497 [http-nio-9090-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+2026-02-03 21:42:14.497 [http-nio-9090-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+2026-02-03 21:42:14.499 [http-nio-9090-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data={totalCount=0, approvalCount=0}, timestamp=1770126134434)]
+2026-02-03 21:42:14.502 [http-nio-9090-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[DepartmentTreeVO(id=1, parentId=0, deptCode=HQ, deptName=总公司 (truncated)...]
+2026-02-03 21:42:14.503 [http-nio-9090-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[OrgPosition(id=13, positionCode=111, positionName=12, deptId (truncated)...]
+2026-02-03 21:42:14.511 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:14.511 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.E.selectList_mpCount - ==>  Preparing: SELECT COUNT(*) AS total FROM emp_employee WHERE deleted = 0
+2026-02-03 21:42:14.512 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.E.selectList_mpCount - ==> Parameters: 
+2026-02-03 21:42:14.529 [http-nio-9090-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-03 21:42:14.530 [http-nio-9090-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-03 21:42:14.531 [http-nio-9090-exec-3] INFO  c.e.c.m.config.RequestLoggingFilter - 
+========== RESPONSE START ==========
+Status      : 200
+Duration    : 180ms
+Body        : {"code":200,"message":"success","data":{"totalCount":0,"approvalCount":0},"timestamp":1770126134434}
+========== RESPONSE END ==========
+2026-02-03 21:42:14.532 [http-nio-9090-exec-4] INFO  c.e.c.m.config.RequestLoggingFilter - 
+========== RESPONSE START ==========
+Status      : 200
+Duration    : 180ms
+Body        : {"code":200,"message":"success","data":[{"id":1,"parentId":0,"deptCode":"HQ","deptName":"总公司","leaderId":1,"status":1,"sort":1,"children":[{"id":13,"parentId":1,"deptCode":"JF","deptName":"交付中心","status":1,"sort":0,"children":[]},{"id":2,"parentId":1,"deptCode":"TECH","deptName":"技术部","leaderId":2,"status":1,"sort":1,"children":[{"id":7,"parentId":2,"deptCode":"DEV","deptName":"开发组","status":1,"sort":1,"children":[]},{"id":8,"parentId":2,"deptCode":"TEST","deptName":"测试组","status":1,"sort":2,"children":[]},{"id":9,"parentId":2,"deptCode":"OPS","deptName":"运维组","status":1,"sort":3,"children":[]}]},{"id":3,"parentId":1,"deptCode":"HR","deptName":"人力资源部","leaderId":3,"status":1,"sort":2,"children":[]},{"id":4,"parentId":1,"deptCode":"FINANCE","deptName":"财务部","leaderId":4,"status":1,"sort":3,"children":[]},{"id":5,"parentId":1,"deptCode":"SALES","deptName":"销售部","leaderId":5,"status":1,"sort":4,"children":[]},{"id":6,"parentId":1,"deptCode":"ADMIN","deptName":"行政部","status":1,"sort":5,"ch... (truncated)
+========== RESPONSE END ==========
+2026-02-03 21:42:14.532 [http-nio-9090-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-03 21:42:14.532 [http-nio-9090-exec-7] INFO  c.e.c.m.config.RequestLoggingFilter - 
+========== RESPONSE START ==========
+Status      : 200
+Duration    : 181ms
+Body        : {"code":200,"message":"success","data":[{"id":13,"positionCode":"111","positionName":"12","positionLevel":1,"description":"","sort":0,"status":1,"createTime":"2026-01-25T22:42:15","updateTime":"2026-02-03T21:34:20","deleted":0},{"id":14,"positionCode":"JF","positionName":"交付工程师","positionLevel":2,"description":"","sort":0,"status":1,"createTime":"2026-02-03T17:47:10","updateTime":"2026-02-03T17:47:10","deleted":0},{"id":1,"positionCode":"CEO","positionName":"总经理","deptId":1,"positionLevel":4,"description":"公司最高管理者111","sort":1,"status":1,"createTime":"2025-12-17T02:19:54","updateTime":"2026-01-22T20:51:23","deleted":0},{"id":2,"positionCode":"CTO","positionName":"技术总监","deptId":2,"positionLevel":4,"description":"技术部门负责人","sort":1,"status":1,"createTime":"2025-12-17T02:19:54","updateTime":"2025-12-17T02:19:54","deleted":0},{"id":3,"positionCode":"HR_MGR","positionName":"人事经理","deptId":3,"positionLevel":3,"description":"人力资源部门负责人","sort":1,"status":1,"createTime":"2025-12-17T02:19:54","u... (truncated)
+========== RESPONSE END ==========
+2026-02-03 21:42:14.557 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.E.selectList_mpCount - <==      Total: 1
+2026-02-03 21:42:14.561 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.E.selectList - ==>  Preparing: SELECT id,emp_code,emp_name,gender,id_card,birthday,phone,email,avatar,dept_id,position_id,direct_leader_id,emp_status,emp_type,hire_date,regularization_date,leave_date,address,native_place,emergency_contact,emergency_phone,emergency_relation,education,graduate_school,major,graduate_date,bank_name,bank_account,create_time,update_time,deleted FROM emp_employee WHERE deleted=0 ORDER BY create_time DESC LIMIT ?
+2026-02-03 21:42:14.564 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.E.selectList - ==> Parameters: 10(Long)
+2026-02-03 21:42:14.610 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.E.selectList - <==      Total: 10
+2026-02-03 21:42:14.610 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@59f194ed]
+2026-02-03 21:42:14.613 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:14.614 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7848f372] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:14.614 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:14.614 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,parent_id,dept_code,dept_name,leader_id,phone,email,sort,status,create_time,update_time,deleted FROM org_department WHERE id=? AND deleted=0
+2026-02-03 21:42:14.615 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 13(Long)
+2026-02-03 21:42:14.658 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:14.658 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7848f372]
+2026-02-03 21:42:14.658 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:14.658 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@55cc6c89] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:14.659 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:14.659 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,position_code,position_name,dept_id,position_level,description,requirements,sort,status,create_time,update_time,deleted FROM org_position WHERE id=? AND deleted=0
+2026-02-03 21:42:14.660 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 14(Long)
+2026-02-03 21:42:14.702 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:14.703 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@55cc6c89]
+2026-02-03 21:42:14.703 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:14.703 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5f6edd9b] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:14.704 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:14.704 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,parent_id,dept_code,dept_name,leader_id,phone,email,sort,status,create_time,update_time,deleted FROM org_department WHERE id=? AND deleted=0
+2026-02-03 21:42:14.704 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 1(Long)
+2026-02-03 21:42:15.000 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.000 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5f6edd9b]
+2026-02-03 21:42:15.000 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.001 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@414b00af] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.001 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.001 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,position_code,position_name,dept_id,position_level,description,requirements,sort,status,create_time,update_time,deleted FROM org_position WHERE id=? AND deleted=0
+2026-02-03 21:42:15.001 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 2(Long)
+2026-02-03 21:42:15.045 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.045 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@414b00af]
+2026-02-03 21:42:15.045 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.045 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1b9d3675] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.046 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.046 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,parent_id,dept_code,dept_name,leader_id,phone,email,sort,status,create_time,update_time,deleted FROM org_department WHERE id=? AND deleted=0
+2026-02-03 21:42:15.046 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 8(Long)
+2026-02-03 21:42:15.088 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.088 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1b9d3675]
+2026-02-03 21:42:15.088 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.089 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@59d39bfb] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.089 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.089 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,position_code,position_name,dept_id,position_level,description,requirements,sort,status,create_time,update_time,deleted FROM org_position WHERE id=? AND deleted=0
+2026-02-03 21:42:15.089 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 8(Long)
+2026-02-03 21:42:15.133 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.134 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@59d39bfb]
+2026-02-03 21:42:15.134 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.134 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2c036f03] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.135 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.135 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,parent_id,dept_code,dept_name,leader_id,phone,email,sort,status,create_time,update_time,deleted FROM org_department WHERE id=? AND deleted=0
+2026-02-03 21:42:15.135 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 7(Long)
+2026-02-03 21:42:15.177 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.178 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2c036f03]
+2026-02-03 21:42:15.178 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.178 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@c02c4fb] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.179 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.179 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,position_code,position_name,dept_id,position_level,description,requirements,sort,status,create_time,update_time,deleted FROM org_position WHERE id=? AND deleted=0
+2026-02-03 21:42:15.179 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 6(Long)
+2026-02-03 21:42:15.221 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.222 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@c02c4fb]
+2026-02-03 21:42:15.222 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.223 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1b10ee6b] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.223 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.223 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,parent_id,dept_code,dept_name,leader_id,phone,email,sort,status,create_time,update_time,deleted FROM org_department WHERE id=? AND deleted=0
+2026-02-03 21:42:15.223 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 5(Long)
+2026-02-03 21:42:15.265 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.265 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1b10ee6b]
+2026-02-03 21:42:15.265 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.265 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@14625f9d] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.265 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.265 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,position_code,position_name,dept_id,position_level,description,requirements,sort,status,create_time,update_time,deleted FROM org_position WHERE id=? AND deleted=0
+2026-02-03 21:42:15.265 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 12(Long)
+2026-02-03 21:42:15.309 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.309 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@14625f9d]
+2026-02-03 21:42:15.309 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.309 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43b634f6] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.309 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.309 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,parent_id,dept_code,dept_name,leader_id,phone,email,sort,status,create_time,update_time,deleted FROM org_department WHERE id=? AND deleted=0
+2026-02-03 21:42:15.310 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 5(Long)
+2026-02-03 21:42:15.352 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.352 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43b634f6]
+2026-02-03 21:42:15.352 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.352 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@202b0e22] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.352 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.352 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,position_code,position_name,dept_id,position_level,description,requirements,sort,status,create_time,update_time,deleted FROM org_position WHERE id=? AND deleted=0
+2026-02-03 21:42:15.352 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 12(Long)
+2026-02-03 21:42:15.395 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.395 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@202b0e22]
+2026-02-03 21:42:15.395 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.395 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@42c7fcf9] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.395 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.395 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,parent_id,dept_code,dept_name,leader_id,phone,email,sort,status,create_time,update_time,deleted FROM org_department WHERE id=? AND deleted=0
+2026-02-03 21:42:15.395 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 4(Long)
+2026-02-03 21:42:15.436 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.437 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@42c7fcf9]
+2026-02-03 21:42:15.437 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.437 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@57751ba] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.437 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.439 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,position_code,position_name,dept_id,position_level,description,requirements,sort,status,create_time,update_time,deleted FROM org_position WHERE id=? AND deleted=0
+2026-02-03 21:42:15.439 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 11(Long)
+2026-02-03 21:42:15.481 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.482 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@57751ba]
+2026-02-03 21:42:15.482 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.482 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6b618816] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.482 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.482 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,parent_id,dept_code,dept_name,leader_id,phone,email,sort,status,create_time,update_time,deleted FROM org_department WHERE id=? AND deleted=0
+2026-02-03 21:42:15.483 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 9(Long)
+2026-02-03 21:42:15.525 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.526 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6b618816]
+2026-02-03 21:42:15.526 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.526 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1f597c1] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.526 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.526 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,position_code,position_name,dept_id,position_level,description,requirements,sort,status,create_time,update_time,deleted FROM org_position WHERE id=? AND deleted=0
+2026-02-03 21:42:15.527 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 9(Long)
+2026-02-03 21:42:15.568 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.568 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1f597c1]
+2026-02-03 21:42:15.568 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.568 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@148d224a] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.569 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.569 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,parent_id,dept_code,dept_name,leader_id,phone,email,sort,status,create_time,update_time,deleted FROM org_department WHERE id=? AND deleted=0
+2026-02-03 21:42:15.569 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 3(Long)
+2026-02-03 21:42:15.611 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.611 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@148d224a]
+2026-02-03 21:42:15.612 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.612 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3b0309] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.613 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.613 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,position_code,position_name,dept_id,position_level,description,requirements,sort,status,create_time,update_time,deleted FROM org_position WHERE id=? AND deleted=0
+2026-02-03 21:42:15.613 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 10(Long)
+2026-02-03 21:42:15.655 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.656 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3b0309]
+2026-02-03 21:42:15.656 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.656 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@57905538] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.657 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.657 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,parent_id,dept_code,dept_name,leader_id,phone,email,sort,status,create_time,update_time,deleted FROM org_department WHERE id=? AND deleted=0
+2026-02-03 21:42:15.657 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 1(Long)
+2026-02-03 21:42:15.699 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.699 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@57905538]
+2026-02-03 21:42:15.699 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2026-02-03 21:42:15.701 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4ce25dc5] was not registered for synchronization because synchronization is not active
+2026-02-03 21:42:15.701 [http-nio-9090-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [ConnectionProxyImpl{connectedTime=2026-02-03 21:40:36.048, closeCount=0, lastValidateTimeMillis=2026-02-03 21:42:13.984}] will not be managed by Spring
+2026-02-03 21:42:15.701 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==>  Preparing: SELECT id,position_code,position_name,dept_id,position_level,description,requirements,sort,status,create_time,update_time,deleted FROM org_position WHERE id=? AND deleted=0
+2026-02-03 21:42:15.701 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - ==> Parameters: 1(Long)
+2026-02-03 21:42:15.742 [http-nio-9090-exec-6] DEBUG c.e.c.m.m.O.selectById - <==      Total: 1
+2026-02-03 21:42:15.742 [http-nio-9090-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4ce25dc5]
+2026-02-03 21:42:15.744 [http-nio-9090-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+2026-02-03 21:42:15.753 [http-nio-9090-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=PageResult(current=1, size=10, total=17, pages=2, records=[Em (truncated)...]
+2026-02-03 21:42:15.760 [http-nio-9090-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-03 21:42:15.760 [http-nio-9090-exec-6] INFO  c.e.c.m.config.RequestLoggingFilter - 
+========== RESPONSE START ==========
+Status      : 200
+Duration    : 1409ms
+Body        : {"code":200,"message":"success","data":{"current":1,"size":10,"total":17,"pages":2,"records":[{"id":17,"empCode":"111","empName":"1","gender":1,"phone":"1","email":"1","idCard":"1","deptId":13,"departmentName":"交付中心","positionId":14,"positionName":"交付工程师","hireDate":"2026-01-28","empStatus":1,"empType":1,"address":"1","createTime":"2026-02-03T21:11:40"},{"id":16,"empCode":"123","empName":"龙马","gender":1,"phone":"12345678910","email":"1321321","idCard":"1111123213","deptId":1,"departmentName":"总公司","positionId":2,"positionName":"技术总监","hireDate":"2026-01-13","empStatus":1,"empType":1,"address":"11121321312312321321312","createTime":"2026-01-18T19:59:34"},{"id":9,"empCode":"EMP009","empName":"吴磊","gender":1,"phone":"13800138009","email":"wulei@company.com","deptId":8,"departmentName":"测试组","positionId":8,"positionName":"测试工程师","hireDate":"2021-09-01","empStatus":1,"empType":1,"createTime":"2025-12-17T02:19:55"},{"id":15,"empCode":"EMP015","empName":"许静","gender":0,"phone":"13800138015","... (truncated)
+========== RESPONSE END ==========
+2026-02-03 21:42:49.293 [File Watcher] INFO  o.s.b.d.a.LocalDevToolsAutoConfiguration$RestartingClassPathChangeChangedEventListener - Restarting due to 3 class path changes (0 additions, 2 deletions, 1 modification)
+2026-02-03 21:42:49.296 [Thread-5] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-03 21:42:49.296 [tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-9090"]
+2026-02-03 21:42:49.302 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-02-03 21:42:49.302 [Thread-5] INFO  o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-9090"]
+2026-02-03 21:42:49.306 [Thread-5] INFO  c.alibaba.druid.pool.DruidDataSource - {dataSource-1} closing ...
+2026-02-03 21:42:49.311 [Thread-5] INFO  c.alibaba.druid.pool.DruidDataSource - {dataSource-1} closed
