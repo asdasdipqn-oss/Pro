@@ -52,12 +52,12 @@
         </div>
       </div>
 
-      <div class="stat-card">
+      <div class="stat-card clickable" @click="goToPendingLeaves">
         <div class="stat-content">
           <span class="stat-value">{{ stats.pendingLeaves }}</span>
           <span class="stat-label">待审批假期</span>
+          <div class="stat-badge" v-if="stats.pendingLeaves > 0">需处理</div>
         </div>
-        <div class="stat-badge" v-if="stats.pendingLeaves > 0">需处理</div>
       </div>
 
       <div class="stat-card">
@@ -206,6 +206,11 @@ const fetchStats = async () => {
 onMounted(() => {
   fetchStats()
 })
+
+// 跳转到待审批假期列表
+const goToPendingLeaves = () => {
+  router.push('/leave/approve')
+}
 </script>
 
 <style scoped>
@@ -283,6 +288,17 @@ onMounted(() => {
   border-radius: 16px;
   padding: 24px;
   position: relative;
+}
+
+.stat-card.clickable {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.stat-card.clickable:hover {
+  background: #f5f5f7;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .stat-content {

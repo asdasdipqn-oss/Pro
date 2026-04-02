@@ -30,7 +30,11 @@
       <el-table :data="tableData" v-loading="loading" stripe>
         <el-table-column prop="positionCode" label="岗位编码" width="150" />
         <el-table-column prop="positionName" label="岗位名称" width="200" />
-        <el-table-column prop="deptName" label="归属部门" width="200" />
+        <el-table-column prop="deptName" label="归属部门" width="250">
+          <template #default="{ row }">
+            {{ getDeptDisplay(row.deptId) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="positionLevel" label="级别" width="100">
           <template #default="{ row }">
             {{ getLevelText(row.positionLevel) }}
@@ -118,6 +122,7 @@ const dialogVisible = ref(false)
 const tableData = ref([])
 const formRef = ref(null)
 const deptOptions = ref([])
+const deptTree = ref([]) // 保留原始部门树结构
 
 const queryForm = reactive({
   deptId: null,
@@ -144,6 +149,38 @@ const getLevelText = (level) => {
   return map[level] || '-'
 }
 
+// 根据部门ID查找部门路径（主部门（子部门））
+const getDeptPath = (deptId, tree, path = []) => {
+  for (const node of tree) {
+    if (node.id === deptId) {
+      path.unshift(node.deptName)
+      return path
+    }
+    if (node.children && node.children.length > 0) {
+      const result = getDeptPath(deptId, node.children, path)
+      if (result) {
+        path.unshift(node.deptName)
+        return path
+      }
+    }
+  }
+  return null
+}
+
+// 获取部门显示名称（主部门（子部门），忽略总公司
+const getDeptDisplay = (deptId) => {
+  if (!deptId) return '-'
+  const path = getDeptPath(deptId, deptTree.value)
+  // 没有找到部门
+  if (!path || path.length === 0) return '-'
+  // 根部门（总公司）只显示自己
+  if (path.length === 1) return path[0]
+  // 二级部门（总公司直接子部门）只显示自己
+  if (path.length === 2) return path[1]
+  // 三级及以上部门显示"父部门（子部门）"
+  return `${path[path.length - 2]}（${path[path.length - 1]}）`
+}
+
 // 扁平化部门树
 const flattenDepts = (tree) => {
   const result = []
@@ -163,6 +200,7 @@ const flattenDepts = (tree) => {
 const fetchDepts = async () => {
   try {
     const res = await getDepartmentTree()
+    deptTree.value = res.data || []
     deptOptions.value = flattenDepts(res.data || [])
   } catch (error) {
     console.error('获取部门列表失败:', error)

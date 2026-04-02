@@ -24,6 +24,10 @@
               <span class="value">{{ userInfo.employeeId || '未关联' }}</span>
             </div>
             <div class="info-item">
+              <span class="label">岗位</span>
+              <span class="value">{{ userInfo.positionName || '未设置' }}</span>
+            </div>
+            <div class="info-item">
               <span class="label">账号状态</span>
               <el-tag :type="userInfo.status === 1 ? 'success' : 'danger'" size="small">
                 {{ userInfo.status === 1 ? '正常' : '已冻结' }}
@@ -170,6 +174,7 @@ const userInfo = ref({
   id: null,
   status: 1,
   employeeId: null,
+  positionName: null,
   lastLoginTime: null,
   createTime: null,
 })

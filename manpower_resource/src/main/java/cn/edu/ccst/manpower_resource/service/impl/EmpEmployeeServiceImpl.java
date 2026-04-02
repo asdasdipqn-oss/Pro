@@ -98,7 +98,19 @@ public class EmpEmployeeServiceImpl extends ServiceImpl<EmpEmployeeMapper, EmpEm
         if (emp == null) {
             throw new BusinessException(ResultCode.DATA_NOT_EXIST);
         }
-        BeanUtils.copyProperties(dto, emp, "id", "empCode", "deleted", "createTime");
+
+        // 如果修改了工号，检查是否重复
+        if (!emp.getEmpCode().equals(dto.getEmpCode())) {
+            Long count = baseMapper.selectCount(new LambdaQueryWrapper<EmpEmployee>()
+                    .eq(EmpEmployee::getEmpCode, dto.getEmpCode())
+                    .ne(EmpEmployee::getId, dto.getId())
+                    .eq(EmpEmployee::getDeleted, 0));
+            if (count > 0) {
+                throw new BusinessException("工号已存在");
+            }
+        }
+
+        BeanUtils.copyProperties(dto, emp, "id", "deleted", "createTime");
         emp.setUpdateTime(LocalDateTime.now());
         baseMapper.updateById(emp);
     }
@@ -110,7 +122,7 @@ public class EmpEmployeeServiceImpl extends ServiceImpl<EmpEmployeeMapper, EmpEm
         if (emp == null) {
             throw new BusinessException(ResultCode.DATA_NOT_EXIST);
         }
-        
+
         // 检查是否有关联的系统用户
         SysUser sysUser = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getEmployeeId, id)
@@ -118,7 +130,10 @@ public class EmpEmployeeServiceImpl extends ServiceImpl<EmpEmployeeMapper, EmpEm
         if (sysUser != null) {
             throw new BusinessException("该员工已关联系统用户，不能删除");
         }
-        
+
+        // 级联删除所有关联数据
+        deleteAllRelatedData(id);
+
         // 使用 MyBatis Plus 的逻辑删除
         boolean result = removeById(id);
         if (!result) {

@@ -43,8 +43,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useRouter } from 'vue-router'
 import { getPendingLeave, approveLeave } from '@/api/leave'
 
+const router = useRouter()
 const loading = ref(false)
 const tableData = ref([])
 
@@ -84,6 +86,12 @@ const handleApprove = async (row, status) => {
   try {
     await approveLeave(row.id, status, comment)
     ElMessage.success(`${action}成功`)
+
+    // 跳转到请假列表页面（或我的请假页面）
+    router.push({
+      path: '/leave/my'
+    })
+
     fetchData()
   } catch (error) {
     console.error(error)

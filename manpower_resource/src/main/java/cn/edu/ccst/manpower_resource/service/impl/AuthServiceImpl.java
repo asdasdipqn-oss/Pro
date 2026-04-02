@@ -2,9 +2,14 @@ package cn.edu.ccst.manpower_resource.service.impl;
 
 import cn.edu.ccst.manpower_resource.common.ResultCode;
 import cn.edu.ccst.manpower_resource.dto.LoginRequest;
+import cn.edu.ccst.manpower_resource.dto.RegisterRequest;
+import cn.edu.ccst.manpower_resource.entity.EmpEmployee;
+import cn.edu.ccst.manpower_resource.entity.OrgPosition;
 import cn.edu.ccst.manpower_resource.entity.SysUser;
 import cn.edu.ccst.manpower_resource.entity.SysUserRole;
 import cn.edu.ccst.manpower_resource.exception.BusinessException;
+import cn.edu.ccst.manpower_resource.mapper.EmpEmployeeMapper;
+import cn.edu.ccst.manpower_resource.mapper.OrgPositionMapper;
 import cn.edu.ccst.manpower_resource.mapper.SysUserMapper;
 import cn.edu.ccst.manpower_resource.mapper.SysUserRoleMapper;
 import cn.edu.ccst.manpower_resource.security.LoginUser;
@@ -32,6 +37,8 @@ public class AuthServiceImpl implements AuthService {
     private final SysUserRoleMapper userRoleMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final EmpEmployeeMapper empEmployeeMapper;
+    private final OrgPositionMapper orgPositionMapper;
 
     @Override
     public LoginVO login(LoginRequest request, String ip) {
@@ -42,20 +49,21 @@ public class AuthServiceImpl implements AuthService {
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
         SysUser user = loginUser.getUser();
 
-        UserInfoVO vo = new UserInfoVO();
-        vo.setId(user.getId());
-        vo.setUsername(user.getUsername());
-        vo.setEmployeeId(user.getEmployeeId());
-        vo.setStatus(user.getStatus());
+        // 更新最后登录时间和IP
+        user.setLastLoginTime(LocalDateTime.now());
+        user.setLastLoginIp(ip);
+        userMapper.updateById(user);
 
-        // 设置默认岗位名称（"未设置岗位"）
-        vo.setPositionName("未设置岗位");
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
 
-        vo.setRoles(loginUser.getRoles());
-        vo.setPermissions(loginUser.getPermissions());
-        vo.setLastLoginTime(user.getLastLoginTime());
-        vo.setCreateTime(user.getCreateTime());
-        return vo;
+        return LoginVO.builder()
+                .token(token)
+                .tokenType("Bearer")
+                .userId(user.getId())
+                .username(user.getUsername())
+                .roles(loginUser.getRoles())
+                .permissions(loginUser.getPermissions())
+                .build();
     }
 
     @Override
@@ -102,8 +110,22 @@ public class AuthServiceImpl implements AuthService {
         vo.setEmployeeId(user.getEmployeeId());
         vo.setStatus(user.getStatus());
 
-        // 设置默认岗位名称（"未设置岗位"）
-        vo.setPositionName("未设置岗位");
+        // 查询员工岗位信息
+        if (user.getEmployeeId() != null) {
+            EmpEmployee employee = empEmployeeMapper.selectById(user.getEmployeeId());
+            if (employee != null && employee.getPositionId() != null) {
+                OrgPosition position = orgPositionMapper.selectById(employee.getPositionId());
+                if (position != null) {
+                    vo.setPositionName(position.getPositionName());
+                } else {
+                    vo.setPositionName("未设置岗位");
+                }
+            } else {
+                vo.setPositionName("未设置岗位");
+            }
+        } else {
+            vo.setPositionName("未设置岗位");
+        }
 
         vo.setRoles(loginUser.getRoles());
         vo.setPermissions(loginUser.getPermissions());

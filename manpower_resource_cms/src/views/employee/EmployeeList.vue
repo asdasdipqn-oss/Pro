@@ -258,6 +258,7 @@ const formRef = ref(null)
 const uploadRef = ref(null)
 const importFile = ref(null)
 const selectedRows = ref([])
+const previousDeptId = ref(null) // 记录上一次部门ID
 
 const queryForm = reactive({
   empCode: '',
@@ -384,6 +385,7 @@ const resetForm = () => {
 
 const handleAdd = () => {
   resetForm()
+  previousDeptId.value = null
   dialogVisible.value = true
 }
 
@@ -402,6 +404,7 @@ const handleEdit = (row) => {
     email: row.email,
     address: row.address,
   })
+  previousDeptId.value = row.deptId
   dialogVisible.value = true
 }
 
@@ -553,7 +556,11 @@ const handleBatchUpdateStatus = async (status) => {
 watch(
   () => editForm.deptId,
   (newDeptId) => {
-    editForm.positionId = null
+    // 只在部门真正变化时清空岗位（不是新增或编辑对话框打开时）
+    if (newDeptId !== previousDeptId.value) {
+      editForm.positionId = null
+      previousDeptId.value = newDeptId
+    }
     fetchPositions(newDeptId)
   }
 )
