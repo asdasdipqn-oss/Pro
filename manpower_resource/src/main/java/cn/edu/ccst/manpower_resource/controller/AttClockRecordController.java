@@ -3,12 +3,15 @@ package cn.edu.ccst.manpower_resource.controller;
 import cn.edu.ccst.manpower_resource.common.Result;
 import cn.edu.ccst.manpower_resource.dto.ClockInDTO;
 import cn.edu.ccst.manpower_resource.entity.AttClockRecord;
+import cn.edu.ccst.manpower_resource.entity.AttRule;
 import cn.edu.ccst.manpower_resource.entity.EmpEmployee;
 import cn.edu.ccst.manpower_resource.entity.LeaveApplication;
 import cn.edu.ccst.manpower_resource.security.LoginUser;
 import cn.edu.ccst.manpower_resource.service.IAttClockRecordService;
+import cn.edu.ccst.manpower_resource.service.IAttRuleService;
 import cn.edu.ccst.manpower_resource.service.IEmpEmployeeService;
 import cn.edu.ccst.manpower_resource.service.ILeaveApplicationService;
+import cn.edu.ccst.manpower_resource.vo.AttClockRecordVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,7 +30,9 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,6 +45,7 @@ public class AttClockRecordController {
     private final IAttClockRecordService clockRecordService;
     private final IEmpEmployeeService employeeService;
     private final ILeaveApplicationService leaveApplicationService;
+    private final IAttRuleService attRuleService;
 
     @Operation(summary = "员工打卡")
     @PostMapping
@@ -52,28 +58,84 @@ public class AttClockRecordController {
 
     @Operation(summary = "获取今日打卡记录")
     @GetMapping("/today")
-    public Result<List<AttClockRecord>> getTodayRecords(@AuthenticationPrincipal LoginUser loginUser) {
+    public Result<List<AttClockRecordVO>> getTodayRecords(@AuthenticationPrincipal LoginUser loginUser) {
         Long employeeId = loginUser.getUser().getEmployeeId();
-        return Result.success(clockRecordService.getTodayRecords(employeeId));
+        List<AttClockRecord> records = clockRecordService.getTodayRecords(employeeId);
+        AttRule rule = attRuleService.getDefaultRule();
+        List<AttClockRecordVO> voList = records.stream()
+                .map(r -> toVO(r, rule))
+                .collect(Collectors.toList());
+        return Result.success(voList);
     }
 
     @Operation(summary = "获取指定日期打卡记录")
     @GetMapping("/date")
-    public Result<List<AttClockRecord>> getRecordsByDate(
+    public Result<List<AttClockRecordVO>> getRecordsByDate(
             @AuthenticationPrincipal LoginUser loginUser,
             @Parameter(description = "日期") @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         Long employeeId = loginUser.getUser().getEmployeeId();
-        return Result.success(clockRecordService.getRecordsByDate(employeeId, date));
+        List<AttClockRecord> records = clockRecordService.getRecordsByDate(employeeId, date);
+        AttRule rule = attRuleService.getDefaultRule();
+        List<AttClockRecordVO> voList = records.stream()
+                .map(r -> toVO(r, rule))
+                .collect(Collectors.toList());
+        return Result.success(voList);
     }
 
     @Operation(summary = "获取月度打卡记录")
     @GetMapping("/month")
-    public Result<List<AttClockRecord>> getRecordsByMonth(
+    public Result<List<AttClockRecordVO>> getRecordsByMonth(
             @AuthenticationPrincipal LoginUser loginUser,
             @Parameter(description = "年份") @RequestParam Integer year,
             @Parameter(description = "月份") @RequestParam Integer month) {
         Long employeeId = loginUser.getUser().getEmployeeId();
-        return Result.success(clockRecordService.getRecordsByMonth(employeeId, year, month));
+        List<AttClockRecord> records = clockRecordService.getRecordsByMonth(employeeId, year, month);
+        AttRule rule = attRuleService.getDefaultRule();
+        List<AttClockRecordVO> voList = records.stream()
+                .map(r -> toVO(r, rule))
+                .collect(Collectors.toList());
+        return Result.success(voList);
+    }
+
+    /**
+     * 将实体转换为VO，并计算迟到和早退时间
+     */
+    private AttClockRecordVO toVO(AttClockRecord record, AttRule rule) {
+        AttClockRecordVO vo = new AttClockRecordVO();
+        vo.setId(record.getId());
+        vo.setEmployeeId(record.getEmployeeId());
+        vo.setClockDate(record.getClockDate());
+        vo.setClockType(record.getClockType());
+        vo.setClockTime(record.getClockTime());
+        vo.setClockLatitude(record.getClockLatitude());
+        vo.setClockLongitude(record.getClockLongitude());
+        vo.setClockAddress(record.getClockAddress());
+        vo.setLocationStatus(record.getLocationStatus());
+        vo.setDeviceInfo(record.getDeviceInfo());
+        vo.setRemark(record.getRemark());
+
+        // 计算迟到和早退时间
+        if (rule != null && rule.getWorkStartTime() != null && rule.getWorkEndTime() != null) {
+            LocalTime workStart = rule.getWorkStartTime();
+            LocalTime workEnd = rule.getWorkEndTime();
+            LocalTime actualTime = record.getClockTime().toLocalTime();
+
+            if (record.getClockType() == 1) {
+                // 上班打卡，计算迟到
+                if (actualTime.isAfter(workStart)) {
+                    int lateMinutes = (int) ChronoUnit.MINUTES.between(workStart, actualTime);
+                    vo.setLateMinutes(lateMinutes);
+                }
+            } else if (record.getClockType() == 2) {
+                // 下班打卡，计算早退
+                if (actualTime.isBefore(workEnd)) {
+                    int earlyMinutes = (int) ChronoUnit.MINUTES.between(actualTime, workEnd);
+                    vo.setEarlyMinutes(earlyMinutes);
+                }
+            }
+        }
+
+        return vo;
     }
 
     @Operation(summary = "获取考勤日历数据", description = "返回所有员工的月度考勤矩阵数据")

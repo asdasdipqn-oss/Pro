@@ -401,27 +401,6 @@ const handleClock = async (clockType) => {
     return
   }
 
-  // 上班打卡时间检查
-  if (clockType === 1 && attRule.value?.workStartTime) {
-    const now = new Date()
-    const currentMinutes = now.getHours() * 60 + now.getMinutes()
-
-    // 解析上班时间
-    const workStartTime = attRule.value.workStartTime // 格式为 "HH:mm"
-    const [hours, minutes] = workStartTime.split(':').map(Number)
-    const workStartMinutes = hours * 60 + minutes
-
-    // 如果当前时间超过上班时间，显示提示框
-    if (currentMinutes > workStartMinutes) {
-      await ElMessageBox.alert(
-        `当前时间已超过上班时间 (${workStartTime})，不能进行上班打卡`,
-        '提示',
-        { type: 'warning' }
-      )
-      return
-    }
-  }
-
   try {
     await clockIn({
       clockType,

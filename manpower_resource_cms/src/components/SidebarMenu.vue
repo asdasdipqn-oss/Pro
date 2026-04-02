@@ -1,15 +1,15 @@
 <template>
 <nav class="nav-menu">
     <!-- 动态菜单 -->
-    <template v-for="menu in menuTree" :key="menu.id">
+    <template v-for="menu in filteredMenuTree" :key="menu.id">
       <!-- 目录类型（有子菜单） -->
       <div v-if="menu.menuType === 1 && menu.children && menu.children.length > 0" class="nav-group">
         <div class="nav-group-title" v-show="!collapsed">{{ menu.menuName }}</div>
         <template v-for="child in menu.children" :key="child.id">
-          <router-link 
-            v-if="child.menuType === 2 && child.visible === 1" 
-            :to="child.path" 
-            class="nav-item" 
+          <router-link
+            v-if="child.menuType === 2 && child.visible === 1"
+            :to="child.path"
+            class="nav-item"
             :class="{ active: isActive(child.path) }"
           >
             <IconComponent :icon="getIcon(child.menuName)" class="nav-icon" />
@@ -17,12 +17,12 @@
           </router-link>
         </template>
       </div>
-      
+
       <!-- 菜单类型（无子菜单） -->
-      <router-link 
-        v-else-if="menu.menuType === 2 && menu.visible === 1" 
-        :to="menu.path" 
-        class="nav-item" 
+      <router-link
+        v-else-if="menu.menuType === 2 && menu.visible === 1"
+        :to="menu.path"
+        class="nav-item"
         :class="{ active: isActive(menu.path) }"
       >
         <IconComponent :icon="getIcon(menu.menuName)" class="nav-icon" />
@@ -49,6 +49,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useMenuStore } from '@/stores/menu'
+import { useUserStore } from '@/stores/user'
 import IconComponent from './IconComponent.vue'
 
 const props = defineProps({
@@ -60,8 +61,50 @@ const props = defineProps({
 
 const route = useRoute()
 const menuStore = useMenuStore()
+const userStore = useUserStore()
 
 const menuTree = computed(() => menuStore.menuTree)
+
+// 过滤菜单：管理员显示所有，普通员工隐藏工作台
+const filteredMenuTree = computed(() => {
+  const isAdmin = userStore.roles?.includes('ADMIN')
+  if (isAdmin) {
+    return menuTree.value
+  }
+
+  // 递归过滤掉工作台菜单
+  const filterMenu = (menus) => {
+    return menus
+      .filter(menu => {
+        // 隐藏工作台菜单
+        if (menu.path === '/dashboard') {
+          return false
+        }
+        // 隐藏工作台子菜单
+        if (menu.path?.startsWith('/dashboard')) {
+          return false
+        }
+        return true
+      })
+      .map(menu => {
+        // 如果有子菜单，递归过滤
+        if (menu.children && menu.children.length > 0) {
+          const filteredChildren = filterMenu(menu.children)
+          return {
+            ...menu,
+            children: filteredChildren
+          }
+        }
+        return menu
+      })
+      .filter(menu => {
+        // 如果是目录类型且过滤后没有子菜单，也隐藏该目录
+        return !(menu.menuType === 1 && (!menu.children || menu.children.length === 0))
+      })
+  }
+
+  return filterMenu(menuTree.value)
+})
 
 const isActive = (path) => {
   if (!path) return false

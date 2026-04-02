@@ -102,12 +102,13 @@ const router = createRouter({
           component: () => import('@/views/attendance/AttDailyStatView.vue'),
           meta: { title: '日考勤统计' },
         },
-        {
-          path: 'attendance/monthly-stat',
-          name: 'attendanceMonthlyStat',
-          component: () => import('@/views/attendance/AttMonthlyStatView.vue'),
-          meta: { title: '月度考勤统计' },
-        },
+        // 月度考勤统计（暂时隐藏）
+        // {
+        //   path: 'attendance/monthly-stat',
+        //   name: 'attendanceMonthlyStat',
+        //   component: () => import('@/views/attendance/AttMonthlyStatView.vue'),
+        //   meta: { title: '月度考勤统计' },
+        // },
         // 假期管理
         {
           path: 'leave/apply',

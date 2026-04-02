@@ -2,7 +2,10 @@
   <div class="att-monthly-stat-view">
     <el-card>
       <template #header>
-        <div class="card-header"><span>月度考勤统计</span></div>
+        <div class="card-header">
+          <span>月度考勤统计</span>
+          <el-button type="success" size="small" @click="handleGenerate" :loading="generating">生成统计数据</el-button>
+        </div>
       </template>
 
       <el-form :inline="true" class="search-form">
@@ -55,10 +58,12 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { pageMonthlyStat } from '@/api/att-stat'
+import { ElMessage } from 'element-plus'
+import { pageMonthlyStat, generateMonthlyStats } from '@/api/att-stat'
 import { listEmployee } from '@/api/employee'
 
 const loading = ref(false)
+const generating = ref(false)
 const tableData = ref([])
 const employeeList = ref([])
 
@@ -84,6 +89,22 @@ const fetchData = async () => {
 const handleReset = () => {
   searchForm.employeeId = null; searchForm.statYear = null; searchForm.statMonth = null
   pagination.pageNum = 1; fetchData()
+}
+
+const handleGenerate = async () => {
+  generating.value = true
+  try {
+    const res = await generateMonthlyStats({
+      employeeId: searchForm.employeeId
+    })
+    ElMessage.success(`成功生成 ${res.data || 0} 条统计数据`)
+    fetchData()
+  } catch (e) {
+    console.error(e)
+    ElMessage.error('生成统计数据失败')
+  } finally {
+    generating.value = false
+  }
 }
 
 onMounted(async () => {

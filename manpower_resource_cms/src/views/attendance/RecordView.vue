@@ -29,6 +29,20 @@
             {{ row.clockTime ? row.clockTime.substring(11, 19) : '-' }}
           </template>
         </el-table-column>
+        <el-table-column prop="lateMinutes" label="迟到(分)" width="90" align="center">
+          <template #default="{ row }">
+            <span :class="{ 'late-text': row.lateMinutes > 0 }">
+              {{ row.lateMinutes ? row.lateMinutes : '-' }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="earlyMinutes" label="早退(分)" width="90" align="center">
+          <template #default="{ row }">
+            <span :class="{ 'early-text': row.earlyMinutes > 0 }">
+              {{ row.earlyMinutes ? row.earlyMinutes : '-' }}
+            </span>
+          </template>
+        </el-table-column>
         <el-table-column prop="clockAddress" label="打卡地点" />
         <el-table-column prop="locationStatus" label="定位状态" width="100">
           <template #default="{ row }">
@@ -70,5 +84,10 @@ onMounted(fetchData)
 <style scoped>
 .search-form {
   margin-bottom: 20px;
+}
+.late-text,
+.early-text {
+  color: #e6a23c;
+  font-weight: bold;
 }
 </style>

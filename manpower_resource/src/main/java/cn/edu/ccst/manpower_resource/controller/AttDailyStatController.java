@@ -63,4 +63,14 @@ public class AttDailyStatController {
     public Result<AttDailyStat> getById(@PathVariable Long id) {
         return Result.success(attDailyStatService.getById(id));
     }
+
+    @Operation(summary = "生成日度考勤统计数据")
+    @PostMapping("/generate")
+    public Result<Integer> generate(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            @RequestParam(required = false) Long employeeId) {
+        int count = attDailyStatService.generateDailyStats(startDate, endDate, employeeId);
+        return Result.success(count);
+    }
 }

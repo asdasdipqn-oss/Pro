@@ -8,9 +8,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Tag(name = "月度考勤统计", description = "月度考勤汇总查询")
@@ -58,5 +60,15 @@ public class AttMonthlyStatController {
     @PreAuthorize("hasAnyRole('ADMIN','HR','MANAGER')")
     public Result<AttMonthlyStat> getById(@PathVariable Long id) {
         return Result.success(attMonthlyStatService.getById(id));
+    }
+
+    @Operation(summary = "生成月度考勤统计数据")
+    @PostMapping("/generate")
+    public Result<Integer> generate(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            @RequestParam(required = false) Long employeeId) {
+        int count = attMonthlyStatService.generateMonthlyStats(startDate, endDate, employeeId);
+        return Result.success(count);
     }
 }
