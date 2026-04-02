@@ -27,4 +27,12 @@ public interface IAttAppealService extends IService<AttAppeal> {
     void approve(Long id, Long approverId, Integer status, String comment);
 
     PageResult<AttAppealVO> pageAll(PageQuery query, Integer status);
+
+    /**
+     * 获取指定月份已通过的申诉列表
+     * @param year 年份
+     * @param month 月份
+     * @return 已通过的申诉列表
+     */
+    List<AttAppealVO> getApprovedAppeals(Integer year, Integer month);
 }

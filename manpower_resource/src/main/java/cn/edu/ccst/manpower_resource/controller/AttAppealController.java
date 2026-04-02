@@ -84,4 +84,12 @@ public class AttAppealController {
                                                 @RequestParam(required = false) Integer status) {
         return Result.success(appealService.pageAll(query, status));
     }
+
+    @Operation(summary = "获取已通过的申诉列表（用于考勤日历显示）")
+    @GetMapping("/approved")
+    public Result<List<AttAppealVO>> getApprovedAppeals(
+            @Parameter(description = "年份") @RequestParam Integer year,
+            @Parameter(description = "月份") @RequestParam Integer month) {
+        return Result.success(appealService.getApprovedAppeals(year, month));
+    }
 }

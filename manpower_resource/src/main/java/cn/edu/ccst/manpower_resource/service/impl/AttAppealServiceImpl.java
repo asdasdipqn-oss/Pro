@@ -271,6 +271,18 @@ public class AttAppealServiceImpl extends ServiceImpl<AttAppealMapper, AttAppeal
         return PageResult.of(result.getCurrent(), result.getSize(), result.getTotal(), voList);
     }
 
+    @Override
+    public List<AttAppealVO> getApprovedAppeals(Integer year, Integer month) {
+        LambdaQueryWrapper<AttAppeal> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(AttAppeal::getStatus, 2) // 已通过
+                .and(w -> {
+                    w.apply("YEAR(appeal_date) = {0}", year)
+                     .apply("MONTH(appeal_date) = {0}", month);
+                });
+        List<AttAppeal> list = baseMapper.selectList(wrapper);
+        return list.stream().map(this::toVO).collect(Collectors.toList());
+    }
+
     private AttAppealVO toVO(AttAppeal appeal) {
         AttAppealVO vo = new AttAppealVO();
         BeanUtils.copyProperties(appeal, vo);

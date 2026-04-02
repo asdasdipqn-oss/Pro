@@ -132,9 +132,10 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { listEnabledLocation } from '@/api/location'
 import { getTodayRecords, clockIn } from '@/api/attendance'
+import { getDefaultAttRule } from '@/api/att-rule'
 import { wgs84ToGcj02 } from '@/utils/coordTransform'
 
 // OpenLayers imports
@@ -161,6 +162,7 @@ const currentAddress = ref('')
 const matchedLocation = ref(null)
 const isInRange = ref(false)
 const locationLoading = ref(true)
+const attRule = ref(null) // 考勤规则
 let timer = null
 let map = null
 let positionFeature = null
@@ -374,6 +376,16 @@ const fetchClockLocations = async () => {
   }
 }
 
+// 获取考勤规则
+const fetchAttRule = async () => {
+  try {
+    const res = await getDefaultAttRule()
+    attRule.value = res.data
+  } catch (error) {
+    console.error('获取考勤规则失败:', error)
+  }
+}
+
 const fetchTodayRecords = async () => {
   try {
     const res = await getTodayRecords()
@@ -387,6 +399,27 @@ const handleClock = async (clockType) => {
   if (!currentPosition.value) {
     ElMessage.warning('请先获取位置信息')
     return
+  }
+
+  // 上班打卡时间检查
+  if (clockType === 1 && attRule.value?.workStartTime) {
+    const now = new Date()
+    const currentMinutes = now.getHours() * 60 + now.getMinutes()
+
+    // 解析上班时间
+    const workStartTime = attRule.value.workStartTime // 格式为 "HH:mm"
+    const [hours, minutes] = workStartTime.split(':').map(Number)
+    const workStartMinutes = hours * 60 + minutes
+
+    // 如果当前时间超过上班时间，显示提示框
+    if (currentMinutes > workStartMinutes) {
+      await ElMessageBox.alert(
+        `当前时间已超过上班时间 (${workStartTime})，不能进行上班打卡`,
+        '提示',
+        { type: 'warning' }
+      )
+      return
+    }
   }
 
   try {
@@ -408,6 +441,7 @@ onMounted(async () => {
   timer = setInterval(updateTime, 1000)
 
   await fetchClockLocations()
+  await fetchAttRule() // 获取考勤规则
   await fetchTodayRecords()
 
   await nextTick()

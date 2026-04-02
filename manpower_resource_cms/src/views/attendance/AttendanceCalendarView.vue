@@ -65,10 +65,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getCalendarData, exportAttendance } from '@/api/attendance'
+import { getApprovedAppeals } from '@/api/appeal'
 
 const loading = ref(false)
 const monthPicker = ref(new Date())
 const calendarData = ref(null)
+const approvedAppeals = ref([]) // 已通过的申诉记录
 
 const year = computed(() =>
   monthPicker.value ? new Date(monthPicker.value).getFullYear() : new Date().getFullYear(),
@@ -142,6 +144,25 @@ const fetchData = async () => {
   try {
     const res = await getCalendarData(year.value, month.value)
     calendarData.value = res.data
+
+    // 获取已通过的申诉记录
+    const appealsRes = await getApprovedAppeals(year.value, month.value)
+    approvedAppeals.value = appealsRes.data || []
+
+    // 处理已通过的申诉记录，将对应的日期标记为正常状态
+    if (approvedAppeals.value.length > 0 && calendarData.value?.rows) {
+      calendarData.value.rows.forEach(row => {
+        approvedAppeals.value.forEach(appeal => {
+          if (appeal.employeeId === row.employeeId) {
+            const day = appeal.appealDate?.split('-')[2]
+            if (day && row.days[day] !== undefined) {
+              // 将申诉成功的日期状态改为正常（1）
+              row.days[day] = 1
+            }
+          }
+        })
+      })
+    }
   } catch (error) {
     console.error(error)
   } finally {

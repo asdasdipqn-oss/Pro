@@ -131,9 +131,6 @@ public class EmpEmployeeServiceImpl extends ServiceImpl<EmpEmployeeMapper, EmpEm
             throw new BusinessException("该员工已关联系统用户，不能删除");
         }
 
-        // 级联删除所有关联数据
-        deleteAllRelatedData(id);
-
         // 使用 MyBatis Plus 的逻辑删除
         boolean result = removeById(id);
         if (!result) {

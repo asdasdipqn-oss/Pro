@@ -34,3 +34,8 @@ export function approveAppeal(id, status, comment) {
 export function getAppealPage(params) {
   return request.get('/att/appeal/page', { params })
 }
+
+// 获取已通过的申诉列表（用于考勤日历显示）
+export function getApprovedAppeals(year, month) {
+  return request.get('/att/appeal/approved', { params: { year, month } })
+}
