@@ -2,7 +2,6 @@ package cn.edu.ccst.manpower_resource.service.impl;
 
 import cn.edu.ccst.manpower_resource.common.ResultCode;
 import cn.edu.ccst.manpower_resource.dto.LoginRequest;
-import cn.edu.ccst.manpower_resource.dto.RegisterRequest;
 import cn.edu.ccst.manpower_resource.entity.SysUser;
 import cn.edu.ccst.manpower_resource.entity.SysUserRole;
 import cn.edu.ccst.manpower_resource.exception.BusinessException;
@@ -22,7 +21,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 
 @Service
@@ -44,24 +42,20 @@ public class AuthServiceImpl implements AuthService {
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
         SysUser user = loginUser.getUser();
 
-        if (user.getStatus() == 0) {
-            throw new BusinessException(ResultCode.USER_ACCOUNT_FORBIDDEN);
-        }
+        UserInfoVO vo = new UserInfoVO();
+        vo.setId(user.getId());
+        vo.setUsername(user.getUsername());
+        vo.setEmployeeId(user.getEmployeeId());
+        vo.setStatus(user.getStatus());
 
-        user.setLastLoginTime(LocalDateTime.now());
-        user.setLastLoginIp(ip);
-        userMapper.updateById(user);
+        // 设置默认岗位名称（"未设置岗位"）
+        vo.setPositionName("未设置岗位");
 
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
-
-        return LoginVO.builder()
-                .token(token)
-                .tokenType("Bearer")
-                .userId(user.getId())
-                .username(user.getUsername())
-                .roles(loginUser.getRoles())
-                .permissions(loginUser.getPermissions())
-                .build();
+        vo.setRoles(loginUser.getRoles());
+        vo.setPermissions(loginUser.getPermissions());
+        vo.setLastLoginTime(user.getLastLoginTime());
+        vo.setCreateTime(user.getCreateTime());
+        return vo;
     }
 
     @Override
@@ -107,6 +101,10 @@ public class AuthServiceImpl implements AuthService {
         vo.setUsername(user.getUsername());
         vo.setEmployeeId(user.getEmployeeId());
         vo.setStatus(user.getStatus());
+
+        // 设置默认岗位名称（"未设置岗位"）
+        vo.setPositionName("未设置岗位");
+
         vo.setRoles(loginUser.getRoles());
         vo.setPermissions(loginUser.getPermissions());
         vo.setLastLoginTime(user.getLastLoginTime());

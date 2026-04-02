@@ -34,6 +34,9 @@ public class UserInfoVO {
     @Schema(description = "状态")
     private Integer status;
 
+    @Schema(description = "岗位名称")
+    private String positionName;
+
     @Schema(description = "最后登录时间")
     private LocalDateTime lastLoginTime;
 
