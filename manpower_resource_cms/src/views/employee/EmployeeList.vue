@@ -88,7 +88,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="岗位" prop="positionId">
-              <el-select v-model="editForm.positionId" placeholder="请选择岗位" style="width: 100%">
+              <el-select v-model="editForm.positionId" placeholder="请选择岗位" style="width: 100%" clearable @clear="editForm.positionId = null">
                 <el-option
                   v-for="pos in positionList"
                   :key="pos.id"
@@ -228,7 +228,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { Plus, UploadFilled } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
@@ -243,7 +243,7 @@ import {
   importEmployee,
 } from '@/api/employee'
 import { getDepartmentTree } from '@/api/department'
-import { listPosition } from '@/api/position'
+import { listPosition, listPositionByDept } from '@/api/position'
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -352,9 +352,11 @@ const handleReset = () => {
   fetchData()
 }
 
-const fetchPositions = async () => {
+const fetchPositions = async (deptId = null) => {
   try {
-    const res = await listPosition()
+    const res = deptId
+      ? await listPositionByDept(deptId)
+      : await listPosition()
     positionList.value = res.data || []
   } catch (error) {
     if (error.message !== 'cancel') {
@@ -546,6 +548,15 @@ const handleBatchUpdateStatus = async (status) => {
     console.error(error)
   }
 }
+
+// 监听部门变化，动态加载该部门的岗位
+watch(
+  () => editForm.deptId,
+  (newDeptId) => {
+    editForm.positionId = null
+    fetchPositions(newDeptId)
+  }
+)
 
 onMounted(() => {
   fetchData()

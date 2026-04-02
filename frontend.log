@@ -1,0 +1,23 @@
+
+> manpower_resource_cms@0.0.0 dev
+> vite
+
+
+  VITE v7.3.0  ready in 471 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  Vue DevTools: Open http://localhost:5173/__devtools__/ as a separate window
+  ➜  Vue DevTools: Press Option(⌥)+Shift(⇧)+D in App to toggle the Vue DevTools
+12:59:32 [vite] (client) hmr update /src/views/system/UserView.vue
+13:00:17 [vite] (client) hmr update /src/views/system/UserView.vue
+13:00:25 [vite] (client) hmr update /src/views/system/UserView.vue
+13:14:34 [vite] (client) hmr update /src/views/system/UserView.vue
+13:14:56 [vite] (client) hmr update /src/views/system/UserView.vue?vue&type=style&index=0&scoped=b4ecd3dc&lang.css
+13:18:53 [vite] (client) hmr update /src/views/system/UserView.vue
+13:23:29 [vite] (client) hmr update /src/views/org/PositionView.vue, /src/views/org/PositionView.vue?vue&type=style&index=0&scoped=cc83f98e&lang.css
+13:23:59 [vite] (client) hmr update /src/views/employee/EmployeeList.vue, /src/views/org/PositionView.vue
+13:24:43 [vite] (client) hmr update /src/views/org/PositionView.vue
+13:25:28 [vite] (client) hmr update /src/views/org/PositionView.vue
+13:31:14 [vite] (client) hmr update /src/views/employee/EmployeeList.vue, /src/views/org/PositionView.vue, /src/views/employee/TransferView.vue
+13:35:27 [vite] (client) hmr update /src/views/org/PositionView.vue

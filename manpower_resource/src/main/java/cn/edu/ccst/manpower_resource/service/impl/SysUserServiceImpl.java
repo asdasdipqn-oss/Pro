@@ -4,15 +4,18 @@ import cn.edu.ccst.manpower_resource.common.PageResult;
 import cn.edu.ccst.manpower_resource.common.ResultCode;
 import cn.edu.ccst.manpower_resource.dto.SysUserDTO;
 import cn.edu.ccst.manpower_resource.dto.SysUserQuery;
+import cn.edu.ccst.manpower_resource.entity.EmpEmployee;
 import cn.edu.ccst.manpower_resource.entity.SysRole;
 import cn.edu.ccst.manpower_resource.entity.SysUser;
 import cn.edu.ccst.manpower_resource.entity.SysUserRole;
 import cn.edu.ccst.manpower_resource.exception.BusinessException;
+import cn.edu.ccst.manpower_resource.mapper.EmpEmployeeMapper;
 import cn.edu.ccst.manpower_resource.mapper.SysRoleMapper;
 import cn.edu.ccst.manpower_resource.mapper.SysUserMapper;
 import cn.edu.ccst.manpower_resource.mapper.SysUserRoleMapper;
 import cn.edu.ccst.manpower_resource.service.ISysUserService;
 import cn.edu.ccst.manpower_resource.vo.UserInfoVO;
+import cn.edu.ccst.manpower_resource.vo.UserWithEmployeeVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -33,6 +36,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private final SysUserRoleMapper userRoleMapper;
     private final SysRoleMapper roleMapper;
     private final PasswordEncoder passwordEncoder;
+    private final EmpEmployeeMapper employeeMapper;
 
     @Override
     public List<SysRole> getUserRoles(Long userId) {
@@ -48,6 +52,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 .eq(SysUser::getDeleted, 0)
                 .orderByDesc(SysUser::getCreateTime);
 
+        // 如果有角色筛选，需要通过子查询或使用自定义SQL
+        if (query.getRoleId() != null) {
+            wrapper.apply("id IN (SELECT user_id FROM sys_user_role WHERE role_id = {0})", query.getRoleId());
+        }
+
         Page<SysUser> result = baseMapper.selectPage(page, wrapper);
         List<UserInfoVO> voList = result.getRecords().stream().map(this::toUserInfoVO).collect(Collectors.toList());
         return PageResult.of(result.getCurrent(), result.getSize(), result.getTotal(), voList);
@@ -59,7 +68,30 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (user == null || user.getDeleted() == 1) {
             throw new BusinessException(ResultCode.USER_NOT_EXIST);
         }
-        return toUserInfoVO(user);
+
+        UserInfoVO vo = new UserInfoVO();
+        vo.setId(user.getId());
+        vo.setUsername(user.getUsername());
+        vo.setEmployeeId(user.getEmployeeId());
+        vo.setStatus(user.getStatus());
+        vo.setLastLoginTime(user.getLastLoginTime());
+        vo.setCreateTime(user.getCreateTime());
+
+        // 获取员工名称
+        if (user.getEmployeeId() != null) {
+            EmpEmployee employee = employeeMapper.selectById(user.getEmployeeId());
+            if (employee != null) {
+                vo.setEmployeeName(employee.getEmpName());
+            }
+        }
+
+        // 获取角色名称
+        List<SysRole> roles = roleMapper.selectRolesByUserId(user.getId());
+        if (roles != null && !roles.isEmpty()) {
+            vo.setRoleNames(roles.stream().map(SysRole::getRoleName).collect(Collectors.toList()));
+        }
+
+        return vo;
     }
 
     @Override
@@ -207,6 +239,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
         List<SysRole> roles = roleMapper.selectRolesByUserId(user.getId());
         vo.setRoles(roles.stream().map(SysRole::getRoleCode).collect(Collectors.toList()));
+        vo.setRoleNames(roles.stream().map(SysRole::getRoleName).collect(Collectors.toList()));
+
+        // 获取员工名称
+        if (user.getEmployeeId() != null) {
+            EmpEmployee employee = employeeMapper.selectById(user.getEmployeeId());
+            if (employee != null) {
+                vo.setEmployeeName(employee.getEmpName());
+            }
+        }
+
         return vo;
     }
 }

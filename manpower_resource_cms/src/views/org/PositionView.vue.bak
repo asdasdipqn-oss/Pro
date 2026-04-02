@@ -10,7 +10,7 @@
 
       <el-form :inline="true" :model="queryForm" class="search-form">
         <el-form-item label="部门">
-          <el-select v-model="queryForm.deptId" placeholder="全部" clearable style="width: 150px">
+          <el-select v-model="queryForm.deptId" placeholder="全部" clearable>
             <el-option label="全部" :value="null" />
             <el-option
               v-for="dept in deptOptions"
@@ -20,7 +20,6 @@
             />
           </el-select>
         </el-form-item>
-        <div class="spacer"></div>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">查询</el-button>
           <el-button @click="handleReset">重置</el-button>
@@ -172,7 +171,7 @@ const fetchDepts = async () => {
 const fetchData = async () => {
   loading.value = true
   try {
-    const res = queryForm.deptId ? await listPositionByDept(queryForm.deptId) : await listPosition(queryForm)
+    const res = await listPosition(queryForm)
     tableData.value = res.data || []
   } catch (error) {
     console.error(error)

@@ -5,6 +5,11 @@ export function pageUser(params) {
   return request.get('/sys/user/page', { params })
 }
 
+// 获取用户详情
+export function getUserDetail(id) {
+  return request.get(`/sys/user/${id}`)
+}
+
 // 新增用户
 export function addUser(data) {
   return request.post('/sys/user', data)

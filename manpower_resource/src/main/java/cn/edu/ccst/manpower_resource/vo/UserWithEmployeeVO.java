@@ -4,11 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
-@Schema(description = "用户信息")
-public class UserInfoVO {
+@Schema(description = "用户信息（含员工和角色）")
+public class UserWithEmployeeVO {
 
     @Schema(description = "用户ID")
     private Long id;
@@ -22,16 +21,10 @@ public class UserInfoVO {
     @Schema(description = "员工姓名")
     private String employeeName;
 
-    @Schema(description = "角色列表")
-    private List<String> roles;
+    @Schema(description = "角色名称")
+    private String roleName;
 
-    @Schema(description = "角色名称列表")
-    private List<String> roleNames;
-
-    @Schema(description = "权限列表")
-    private List<String> permissions;
-
-    @Schema(description = "状态")
+    @Schema(description = "状态：0-冻结 1-正常")
     private Integer status;
 
     @Schema(description = "最后登录时间")

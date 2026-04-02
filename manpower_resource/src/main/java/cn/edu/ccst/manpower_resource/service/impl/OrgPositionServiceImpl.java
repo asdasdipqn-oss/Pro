@@ -7,6 +7,7 @@ import cn.edu.ccst.manpower_resource.exception.BusinessException;
 import cn.edu.ccst.manpower_resource.mapper.EmpEmployeeMapper;
 import cn.edu.ccst.manpower_resource.mapper.OrgPositionMapper;
 import cn.edu.ccst.manpower_resource.service.IOrgPositionService;
+import cn.edu.ccst.manpower_resource.vo.PositionVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -23,18 +24,13 @@ public class OrgPositionServiceImpl extends ServiceImpl<OrgPositionMapper, OrgPo
     private final EmpEmployeeMapper employeeMapper;
 
     @Override
-    public List<OrgPosition> listByDeptId(Long deptId) {
-        return baseMapper.selectList(new LambdaQueryWrapper<OrgPosition>()
-                .eq(OrgPosition::getDeptId, deptId)
-                .eq(OrgPosition::getDeleted, 0)
-                .orderByAsc(OrgPosition::getSort));
+    public List<PositionVO> listByDeptId(Long deptId) {
+        return baseMapper.selectPositionWithDept(deptId);
     }
 
     @Override
-    public List<OrgPosition> listAll() {
-        return baseMapper.selectList(new LambdaQueryWrapper<OrgPosition>()
-                .eq(OrgPosition::getDeleted, 0)
-                .orderByAsc(OrgPosition::getSort));
+    public List<PositionVO> listAll() {
+        return baseMapper.selectPositionWithDept(null);
     }
 
     @Override

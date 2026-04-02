@@ -1,15 +1,22 @@
 package cn.edu.ccst.manpower_resource.service;
 
 import cn.edu.ccst.manpower_resource.entity.OrgPosition;
+import cn.edu.ccst.manpower_resource.vo.PositionVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
 
 public interface IOrgPositionService extends IService<OrgPosition> {
 
-    List<OrgPosition> listByDeptId(Long deptId);
+    /**
+     * 根据部门查询岗位列表（含部门名称）
+     */
+    List<PositionVO> listByDeptId(Long deptId);
 
-    List<OrgPosition> listAll();
+    /**
+     * 查询所有岗位列表（含部门名称）
+     */
+    List<PositionVO> listAll();
 
     void createPosition(OrgPosition position);
 

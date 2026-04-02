@@ -2,5 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.edu.ccst.manpower_resource.mapper.OrgPositionMapper">
 
+    <select id="selectPositionWithDept" resultType="cn.edu.ccst.manpower_resource.vo.PositionVO">
+        SELECT
+            p.id,
+            p.position_code AS positionCode,
+            p.position_name AS positionName,
+            p.dept_id AS deptId,
+            d.dept_name AS deptName,
+            p.position_level AS positionLevel,
+            p.description,
+            p.requirements,
+            p.sort,
+            p.status,
+            p.create_time AS createTime,
+            p.update_time AS updateTime
+        FROM org_position p
+        LEFT JOIN org_department d ON p.dept_id = d.id AND d.deleted = 0
+        WHERE p.deleted = 0
+        <if test="deptId != null">
+            AND p.dept_id = #{deptId}
+        </if>
+        ORDER BY p.sort ASC
+    </select>
+
 </mapper>
 

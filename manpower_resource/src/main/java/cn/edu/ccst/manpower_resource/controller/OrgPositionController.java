@@ -3,6 +3,7 @@ package cn.edu.ccst.manpower_resource.controller;
 import cn.edu.ccst.manpower_resource.common.Result;
 import cn.edu.ccst.manpower_resource.entity.OrgPosition;
 import cn.edu.ccst.manpower_resource.service.IOrgPositionService;
+import cn.edu.ccst.manpower_resource.vo.PositionVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,13 +24,13 @@ public class OrgPositionController {
 
     @Operation(summary = "获取所有岗位列表")
     @GetMapping("/list")
-    public Result<List<OrgPosition>> list() {
+    public Result<List<PositionVO>> list() {
         return Result.success(positionService.listAll());
     }
 
     @Operation(summary = "根据部门获取岗位列表")
     @GetMapping("/list/{deptId}")
-    public Result<List<OrgPosition>> listByDept(@Parameter(description = "部门ID") @PathVariable Long deptId) {
+    public Result<List<PositionVO>> listByDept(@Parameter(description = "部门ID") @PathVariable Long deptId) {
         return Result.success(positionService.listByDeptId(deptId));
     }
 

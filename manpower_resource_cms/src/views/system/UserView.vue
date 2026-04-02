@@ -10,10 +10,21 @@
 
       <el-form :inline="true" :model="queryForm" class="search-form">
         <el-form-item label="用户名">
-          <el-input v-model="queryForm.username" placeholder="请输入用户名" clearable />
+          <el-input v-model="queryForm.username" placeholder="请输入用户名" clearable style="width: 150px" />
         </el-form-item>
+        <el-form-item label="角色">
+          <el-select v-model="queryForm.roleId" placeholder="全部" clearable style="width: 150px">
+            <el-option
+              v-for="role in roleList"
+              :key="role.id"
+              :label="role.roleName"
+              :value="role.id"
+            />
+          </el-select>
+        </el-form-item>
+        <div class="spacer"></div>
         <el-form-item label="状态">
-          <el-select v-model="queryForm.status" placeholder="全部" clearable>
+          <el-select v-model="queryForm.status" placeholder="全部" clearable style="width: 150px">
             <el-option label="正常" :value="1" />
             <el-option label="冻结" :value="0" />
           </el-select>
@@ -27,6 +38,12 @@
       <el-table :data="tableData" v-loading="loading" stripe>
         <el-table-column prop="id" label="ID" width="60" />
         <el-table-column prop="username" label="用户名" width="120" />
+        <el-table-column prop="employeeName" label="关联员工" width="150" />
+        <el-table-column prop="roleNames" label="角色" width="150">
+          <template #default="{ row }">
+            {{ row.roleNames ? row.roleNames.join(', ') : '-' }}
+          </template>
+        </el-table-column>
         <el-table-column prop="status" label="状态" width="80">
           <template #default="{ row }">
             <el-tag :type="row.status === 1 ? 'success' : 'danger'">
@@ -81,7 +98,7 @@
             placeholder="请输入密码"
           />
         </el-form-item>
-        <el-form-item label="关联员工">
+        <el-form-item label="关联员工" prop="employeeId">
           <el-select
             v-model="editForm.employeeId"
             placeholder="请选择员工"
@@ -136,6 +153,7 @@ import {
   updateUser,
   deleteUser,
   getUserRoles,
+  getUserDetail,
   resetPassword,
   changeUserStatus,
 } from '@/api/user-manage'
@@ -153,6 +171,7 @@ const formRef = ref(null)
 
 const queryForm = reactive({
   username: '',
+  roleId: null,
   status: null,
   pageNum: 1,
   pageSize: 10,
@@ -170,6 +189,8 @@ const editForm = reactive({
 const formRules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+  employeeId: [{ required: true, message: '请选择关联员工', trigger: 'change', type: 'number' }],
+  roleIds: [{ required: true, message: '请选择角色', trigger: 'change', type: 'array' }],
 }
 
 const fetchData = async () => {
@@ -185,6 +206,15 @@ const fetchData = async () => {
   }
 }
 
+const fetchUsers = async () => {
+  try {
+    const res = await pageEmployee({ pageNum: 1, pageSize: 1000 })
+    employeeList.value = res.data?.records || []
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 const handleSearch = () => {
   queryForm.pageNum = 1
   fetchData()
@@ -192,6 +222,7 @@ const handleSearch = () => {
 
 const handleReset = () => {
   queryForm.username = ''
+  queryForm.roleId = null
   queryForm.status = null
   queryForm.pageNum = 1
   fetchData()
@@ -239,10 +270,10 @@ const handleEdit = async (row) => {
     employeeId: row.employeeId,
     status: row.status,
   })
-  // 获取用户角色
+  // 获取用户角色ID列表
   try {
-    const res = await getUserRoles(row.id)
-    editForm.roleIds = (res.data || []).map((r) => r.id)
+    const roles = await getUserRoles(row.id)
+    editForm.roleIds = roles.map(r => r.id) || []
   } catch (error) {
     console.error(error)
   }
@@ -324,6 +355,10 @@ onMounted(() => {
 
 .search-form {
   margin-bottom: 20px;
+}
+
+.search-form .spacer {
+  width: 30px;
 }
 
 .pagination {

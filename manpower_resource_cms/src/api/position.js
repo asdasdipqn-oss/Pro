@@ -1,8 +1,13 @@
 import request from '@/utils/request'
 
 // 获取岗位列表
-export function listPosition() {
-  return request.get('/org/position/list')
+export function listPosition(params) {
+  return request.get('/org/position/list', { params })
+}
+
+// 根据部门获取岗位列表
+export function listPositionByDept(deptId) {
+  return request.get(`/org/position/list/${deptId}`)
 }
 
 // 新增岗位

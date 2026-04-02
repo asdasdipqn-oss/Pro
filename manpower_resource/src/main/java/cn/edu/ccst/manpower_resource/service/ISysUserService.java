@@ -6,6 +6,7 @@ import cn.edu.ccst.manpower_resource.dto.SysUserQuery;
 import cn.edu.ccst.manpower_resource.entity.SysRole;
 import cn.edu.ccst.manpower_resource.entity.SysUser;
 import cn.edu.ccst.manpower_resource.vo.UserInfoVO;
+import cn.edu.ccst.manpower_resource.vo.UserWithEmployeeVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
