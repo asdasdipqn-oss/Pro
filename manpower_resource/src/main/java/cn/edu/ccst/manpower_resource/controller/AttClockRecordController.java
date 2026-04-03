@@ -143,14 +143,33 @@ public class AttClockRecordController {
     @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
     public Result<Map<String, Object>> getCalendarData(
             @Parameter(description = "年份") @RequestParam Integer year,
-            @Parameter(description = "月份") @RequestParam Integer month) {
-        
+            @Parameter(description = "月份") @RequestParam Integer month,
+            @AuthenticationPrincipal LoginUser loginUser) {
+
+        // 检查当前用户是否是经理
+        boolean isManager = loginUser.getRoles().contains("MANAGER");
+        Long managerDeptId = null;
+
+        // 如果是经理，获取其所属部门ID
+        if (isManager && loginUser.getUser().getEmployeeId() != null) {
+            EmpEmployee managerEmp = employeeService.getById(loginUser.getUser().getEmployeeId());
+            if (managerEmp != null) {
+                managerDeptId = managerEmp.getDeptId();
+            }
+        }
+
         // 获取所有在职员工
-        List<EmpEmployee> employees = employeeService.list(
-                new LambdaQueryWrapper<EmpEmployee>()
-                        .eq(EmpEmployee::getEmpStatus, 1)
-                        .orderByAsc(EmpEmployee::getDeptId)
-                        .orderByAsc(EmpEmployee::getEmpCode));
+        LambdaQueryWrapper<EmpEmployee> empQuery = new LambdaQueryWrapper<EmpEmployee>()
+                .eq(EmpEmployee::getEmpStatus, 1)
+                .orderByAsc(EmpEmployee::getDeptId)
+                .orderByAsc(EmpEmployee::getEmpCode);
+
+        // 如果是经理，只查询本部门员工
+        if (isManager && managerDeptId != null) {
+            empQuery.eq(EmpEmployee::getDeptId, managerDeptId);
+        }
+
+        List<EmpEmployee> employees = employeeService.list(empQuery);
         
         // 获取该月所有打卡记录
         LocalDate startDate = LocalDate.of(year, month, 1);
@@ -254,18 +273,37 @@ public class AttClockRecordController {
 
     @Operation(summary = "导出考勤记录", description = "导出指定月份所有员工考勤记录Excel")
     @GetMapping("/export")
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'MANAGER')")
     public void exportAttendance(
             @Parameter(description = "年份") @RequestParam Integer year,
             @Parameter(description = "月份") @RequestParam Integer month,
+            @AuthenticationPrincipal LoginUser loginUser,
             HttpServletResponse response) throws IOException {
-        
+
+        // 检查当前用户是否是经理
+        boolean isManager = loginUser.getRoles().contains("MANAGER");
+        Long managerDeptId = null;
+
+        // 如果是经理，获取其所属部门ID
+        if (isManager && loginUser.getUser().getEmployeeId() != null) {
+            EmpEmployee managerEmp = employeeService.getById(loginUser.getUser().getEmployeeId());
+            if (managerEmp != null) {
+                managerDeptId = managerEmp.getDeptId();
+            }
+        }
+
         // 获取所有在职员工
-        List<EmpEmployee> employees = employeeService.list(
-                new LambdaQueryWrapper<EmpEmployee>()
-                        .eq(EmpEmployee::getEmpStatus, 1)
-                        .orderByAsc(EmpEmployee::getDeptId)
-                        .orderByAsc(EmpEmployee::getEmpCode));
+        LambdaQueryWrapper<EmpEmployee> empQuery = new LambdaQueryWrapper<EmpEmployee>()
+                .eq(EmpEmployee::getEmpStatus, 1)
+                .orderByAsc(EmpEmployee::getDeptId)
+                .orderByAsc(EmpEmployee::getEmpCode);
+
+        // 如果是经理，只查询本部门员工
+        if (isManager && managerDeptId != null) {
+            empQuery.eq(EmpEmployee::getDeptId, managerDeptId);
+        }
+
+        List<EmpEmployee> employees = employeeService.list(empQuery);
         
         // 获取该月所有打卡记录
         LocalDate startDate = LocalDate.of(year, month, 1);

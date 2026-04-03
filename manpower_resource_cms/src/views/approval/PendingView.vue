@@ -2,16 +2,16 @@
   <div class="pending-view">
     <el-card>
       <template #header>待我审批</template>
-      
+
       <el-form :inline="true" class="search-form">
-        <el-form-item label="业务类型">
-          <el-select v-model="searchForm.businessType" placeholder="全部" clearable @change="fetchData">
+        <el-form-item class="business-type-item" label="业务类型" style="width: 150px;">
+          <el-select v-model="searchForm.businessType" placeholder="全部" clearable @change="fetchData" size="large">
             <el-option label="请假申请" :value="1" />
             <el-option label="考勤异常" :value="2" />
           </el-select>
         </el-form-item>
       </el-form>
-      
+
       <el-table :data="tableData" v-loading="loading" stripe>
         <el-table-column prop="businessType" label="业务类型" width="100">
           <template #default="{ row }">
@@ -30,7 +30,7 @@
           </template>
         </el-table-column>
       </el-table>
-      
+
       <div class="pagination-wrap">
         <el-pagination
           v-model:current-page="pagination.pageNum"
@@ -42,8 +42,7 @@
           @current-change="fetchData"
         />
       </div>
-    </el-card>
-    
+
     <!-- 审批对话框 -->
     <el-dialog v-model="dialogVisible" :title="approveStatus === 1 ? '审批通过' : '审批驳回'" width="500px">
       <el-form :model="approveForm" label-width="80px">
@@ -58,6 +57,7 @@
         </el-button>
       </template>
     </el-dialog>
+    </el-card>
   </div>
 </template>
 
@@ -137,9 +137,14 @@ onMounted(fetchData)
 .search-form {
   margin-bottom: 20px;
 }
+
 .pagination-wrap {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
+}
+
+.pagination {
+  margin-left: auto;
 }
 </style>

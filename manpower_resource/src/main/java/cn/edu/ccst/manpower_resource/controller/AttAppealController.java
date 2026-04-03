@@ -63,7 +63,7 @@ public class AttAppealController {
     @GetMapping("/pending")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or hasRole('HR')")
     public Result<List<AttAppealVO>> getPendingList(@AuthenticationPrincipal LoginUser loginUser) {
-        return Result.success(appealService.getPendingApprovals());
+        return Result.success(appealService.getPendingApprovals(loginUser.getUserId()));
     }
 
     @Operation(summary = "审批申诉")

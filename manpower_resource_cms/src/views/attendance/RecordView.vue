@@ -13,6 +13,17 @@
             @change="fetchData"
           />
         </el-form-item>
+        <el-form-item label="日期">
+          <el-date-picker
+            v-model="dateRange"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            format="YYYY-MM-DD"
+            @change="handleDateChange"
+          />
+        </el-form-item>
       </el-form>
 
       <el-table :data="tableData" v-loading="loading" stripe>
@@ -63,6 +74,8 @@ import { getMonthRecords } from '@/api/attendance'
 const loading = ref(false)
 const tableData = ref([])
 const month = ref(new Date())
+const dateRange = ref([])
+const allMonthData = ref([])
 
 const fetchData = async () => {
   if (!month.value) return
@@ -70,12 +83,33 @@ const fetchData = async () => {
   try {
     const date = new Date(month.value)
     const res = await getMonthRecords(date.getFullYear(), date.getMonth() + 1)
-    tableData.value = res.data || []
+    allMonthData.value = res.data || []
+    filterByDateRange()
   } catch (error) {
     console.error(error)
   } finally {
     loading.value = false
   }
+}
+
+const handleDateChange = () => {
+  filterByDateRange()
+}
+
+const filterByDateRange = () => {
+  if (!dateRange.value || dateRange.value.length === 0) {
+    tableData.value = allMonthData.value
+    return
+  }
+
+  const [startDate, endDate] = dateRange.value
+  const start = new Date(startDate).setHours(0, 0, 0, 0)
+  const end = new Date(endDate).setHours(23, 59, 59, 999)
+
+  tableData.value = allMonthData.value.filter(row => {
+    const rowDate = new Date(row.clockDate).getTime()
+    return rowDate >= start && rowDate <= end
+  })
 }
 
 onMounted(fetchData)

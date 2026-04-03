@@ -8,11 +8,15 @@ import cn.edu.ccst.manpower_resource.entity.AttAppeal;
 import cn.edu.ccst.manpower_resource.entity.AttClockRecord;
 import cn.edu.ccst.manpower_resource.entity.EmpEmployee;
 import cn.edu.ccst.manpower_resource.entity.OrgDepartment;
+import cn.edu.ccst.manpower_resource.entity.SysRole;
+import cn.edu.ccst.manpower_resource.entity.SysUser;
 import cn.edu.ccst.manpower_resource.exception.BusinessException;
 import cn.edu.ccst.manpower_resource.mapper.AttAppealMapper;
 import cn.edu.ccst.manpower_resource.mapper.AttClockRecordMapper;
 import cn.edu.ccst.manpower_resource.mapper.EmpEmployeeMapper;
 import cn.edu.ccst.manpower_resource.mapper.OrgDepartmentMapper;
+import cn.edu.ccst.manpower_resource.mapper.SysRoleMapper;
+import cn.edu.ccst.manpower_resource.mapper.SysUserMapper;
 import cn.edu.ccst.manpower_resource.service.IAttAppealService;
 import cn.edu.ccst.manpower_resource.service.IApprovalLogService;
 import cn.edu.ccst.manpower_resource.vo.AttAppealVO;
@@ -43,11 +47,13 @@ import java.util.stream.Collectors;
 public class AttAppealServiceImpl extends ServiceImpl<AttAppealMapper, AttAppeal> implements IAttAppealService {
 
     private static final Logger log = LoggerFactory.getLogger(AttAppealServiceImpl.class);
-    
+
     private final EmpEmployeeMapper employeeMapper;
     private final OrgDepartmentMapper departmentMapper;
     private final AttClockRecordMapper clockRecordMapper;
     private final IApprovalLogService approvalLogService;
+    private final SysUserMapper userMapper;
+    private final SysRoleMapper roleMapper;
 
     @Override
     @Transactional
@@ -56,7 +62,7 @@ public class AttAppealServiceImpl extends ServiceImpl<AttAppealMapper, AttAppeal
         if (dto.getAppealDate().isAfter(LocalDate.now())) {
             throw new BusinessException("申诉日期不能晚于今天");
         }
-        
+
         // 如果是漏打卡申诉，需要检查打卡类型和现有打卡记录
         if (dto.getAppealType() == 1) {
             if (dto.getClockType() == null) {
@@ -72,7 +78,7 @@ public class AttAppealServiceImpl extends ServiceImpl<AttAppealMapper, AttAppeal
                 throw new BusinessException("该日期已有" + clockTypeName + "打卡记录，无法申诉");
             }
         }
-        
+
         AttAppeal appeal = new AttAppeal();
         appeal.setAppealCode("AP" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
                 + UUID.randomUUID().toString().substring(0, 4).toUpperCase());
@@ -127,10 +133,44 @@ public class AttAppealServiceImpl extends ServiceImpl<AttAppealMapper, AttAppeal
     }
 
     @Override
-    public List<AttAppealVO> getPendingApprovals() {
+    public List<AttAppealVO> getPendingApprovals(Long approverId) {
+        // 获取审批人信息
+        SysUser approverUser = userMapper.selectById(approverId);
+        if (approverUser == null) {
+            return List.of();
+        }
+
+        // 获取审批人角色
+        List<SysRole> roles = roleMapper.selectRolesByUserId(approverId);
+        boolean isManager = roles.stream()
+                .anyMatch(r -> "MANAGER".equals(r.getRoleCode()));
+
+        // 如果是经理，获取其部门ID
+        Long finalManagerDeptId;
+        if (isManager && approverUser.getEmployeeId() != null) {
+            EmpEmployee managerEmp = employeeMapper.selectById(approverUser.getEmployeeId());
+            finalManagerDeptId = managerEmp != null ? managerEmp.getDeptId() : null;
+        } else {
+            finalManagerDeptId = null;
+        }
+
         List<AttAppeal> list = baseMapper.selectList(new LambdaQueryWrapper<AttAppeal>()
                 .in(AttAppeal::getStatus, 0, 1)
                 .orderByAsc(AttAppeal::getCreateTime));
+
+        // 如果是经理，只显示本部门的申诉申请
+        if (isManager && finalManagerDeptId != null) {
+            list = list.stream()
+                    .filter(appeal -> {
+                        if (appeal.getEmployeeId() == null) {
+                            return false;
+                        }
+                        EmpEmployee emp = employeeMapper.selectById(appeal.getEmployeeId());
+                        return emp != null && emp.getDeptId().equals(finalManagerDeptId);
+                    })
+                    .toList();
+        }
+
         return list.stream().map(this::toVO).collect(Collectors.toList());
     }
 
@@ -147,33 +187,33 @@ public class AttAppealServiceImpl extends ServiceImpl<AttAppealMapper, AttAppeal
         appeal.setStatus(status);
         appeal.setUpdateTime(LocalDateTime.now());
         baseMapper.updateById(appeal);
-        
+
         // 如果审批通过，处理打卡记录
         if (status == 2) {
             handleClockRecordOnApproval(appeal);
         }
-        
+
         // 记录审批日志
         approvalLogService.log("考勤申诉", id, approverId, status == 2 ? "通过" : "驳回", comment);
     }
-    
+
     /**
      * 审批通过后处理打卡记录
      */
     private void handleClockRecordOnApproval(AttAppeal appeal) {
-        log.info("审批通过，处理打卡记录。申诉ID: {}, 类型: {}, 日期: {}", 
+        log.info("审批通过，处理打卡记录。申诉ID: {}, 类型: {}, 日期: {}",
                 appeal.getId(), appeal.getAppealType(), appeal.getAppealDate());
-        
+
         // 查询当天是否已有打卡记录
         List<AttClockRecord> existingRecords = clockRecordMapper.selectList(
                 new LambdaQueryWrapper<AttClockRecord>()
                         .eq(AttClockRecord::getEmployeeId, appeal.getEmployeeId())
                         .eq(AttClockRecord::getClockDate, appeal.getAppealDate()));
-        
+
         if (appeal.getAppealType() == 1) {
             // 漏打卡：创建指定类型的打卡记录
             if (appeal.getClockType() != null) {
-                createClockRecord(appeal.getEmployeeId(), appeal.getAppealDate(), 
+                createClockRecord(appeal.getEmployeeId(), appeal.getAppealDate(),
                         appeal.getClockType(), appeal.getAppealCode(), appeal.getAppealReason());
             } else {
                 // 旧数据没有clockType，创建上下班两条记录
@@ -184,7 +224,7 @@ public class AttAppealServiceImpl extends ServiceImpl<AttAppealMapper, AttAppeal
             if (!existingRecords.isEmpty()) {
                 for (AttClockRecord record : existingRecords) {
                     record.setLocationStatus(1);
-                    record.setRemark((record.getRemark() != null ? record.getRemark() + "; " : "") 
+                    record.setRemark((record.getRemark() != null ? record.getRemark() + "; " : "")
                             + "申诉通过，编号：" + appeal.getAppealCode());
                     clockRecordMapper.updateById(record);
                 }
@@ -208,37 +248,37 @@ public class AttAppealServiceImpl extends ServiceImpl<AttAppealMapper, AttAppeal
             }
         }
     }
-    
+
     /**
      * 创建上班和下班两条打卡记录（跳过已存在的）
      */
     private void createBothClockRecords(AttAppeal appeal, List<AttClockRecord> existingRecords) {
         boolean hasClockIn = existingRecords.stream().anyMatch(r -> r.getClockType() == 1);
         boolean hasClockOut = existingRecords.stream().anyMatch(r -> r.getClockType() == 2);
-        
+
         if (!hasClockIn) {
-            createClockRecord(appeal.getEmployeeId(), appeal.getAppealDate(), 1, 
-                    appeal.getAppealCode(), appeal.getAppealReason());
+            createClockRecord(appeal.getEmployeeId(), appeal.getAppealDate(), 1,
+                        appeal.getAppealCode(), appeal.getAppealReason());
         }
         if (!hasClockOut) {
-            createClockRecord(appeal.getEmployeeId(), appeal.getAppealDate(), 2, 
-                    appeal.getAppealCode(), appeal.getAppealReason());
+            createClockRecord(appeal.getEmployeeId(), appeal.getAppealDate(), 2,
+                        appeal.getAppealCode(), appeal.getAppealReason());
         }
     }
-    
+
     /**
      * 创建单条打卡记录
      */
-    private void createClockRecord(Long employeeId, LocalDate clockDate, Integer clockType, 
+    private void createClockRecord(Long employeeId, LocalDate clockDate, Integer clockType,
             String appealCode, String appealReason) {
-        log.info("开始创建补卡记录，员工ID: {}, 日期: {}, 打卡类型: {}", 
+        log.info("开始创建补卡记录，员工ID: {}, 日期: {}, 打卡类型: {}",
                 employeeId, clockDate, clockType);
-        
+
         AttClockRecord record = new AttClockRecord();
         record.setEmployeeId(employeeId);
         record.setClockDate(clockDate);
         record.setClockType(clockType);
-        
+
         // 根据打卡类型设置默认时间（上班卡9点，下班卡18点）
         LocalDateTime clockTime;
         if (clockType == 1) {
@@ -247,7 +287,7 @@ public class AttAppealServiceImpl extends ServiceImpl<AttAppealMapper, AttAppeal
             clockTime = clockDate.atTime(18, 0, 0);
         }
         record.setClockTime(clockTime);
-        
+
         // 设置默认地址信息
         record.setClockLatitude(new BigDecimal("39.908823"));
         record.setClockLongitude(new BigDecimal("116.397470"));
@@ -255,7 +295,7 @@ public class AttAppealServiceImpl extends ServiceImpl<AttAppealMapper, AttAppeal
         record.setLocationStatus(1); // 正常
         record.setRemark("申诉补卡，申诉编号：" + appealCode);
         record.setCreateTime(LocalDateTime.now());
-        
+
         int rows = clockRecordMapper.insert(record);
         log.info("补卡记录创建完成，插入行数: {}, 记录ID: {}", rows, record.getId());
     }
@@ -286,7 +326,7 @@ public class AttAppealServiceImpl extends ServiceImpl<AttAppealMapper, AttAppeal
     private AttAppealVO toVO(AttAppeal appeal) {
         AttAppealVO vo = new AttAppealVO();
         BeanUtils.copyProperties(appeal, vo);
-        
+
         // 填充申诉人信息
         if (appeal.getEmployeeId() != null) {
             EmpEmployee emp = employeeMapper.selectById(appeal.getEmployeeId());
@@ -300,11 +340,11 @@ public class AttAppealServiceImpl extends ServiceImpl<AttAppealMapper, AttAppeal
                 }
             }
         }
-        
+
         // 填充类型名称
         vo.setAppealTypeName(getAppealTypeName(appeal.getAppealType()));
         vo.setStatusName(getStatusName(appeal.getStatus()));
-        
+
         return vo;
     }
 

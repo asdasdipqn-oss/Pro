@@ -22,7 +22,7 @@ public interface IAttAppealService extends IService<AttAppeal> {
 
     AttAppealVO getDetail(Long id);
 
-    List<AttAppealVO> getPendingApprovals();
+    List<AttAppealVO> getPendingApprovals(Long approverId);
 
     void approve(Long id, Long approverId, Integer status, String comment);
 

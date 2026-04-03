@@ -184,9 +184,42 @@ public class LeaveApplicationServiceImpl extends ServiceImpl<LeaveApplicationMap
 
     @Override
     public List<LeaveApplication> getPendingApprovals(Long approverId) {
+        // 获取审批人信息
+        SysUser approverUser = userMapper.selectById(approverId);
+        if (approverUser == null) {
+            return List.of();
+        }
+
+        // 获取审批人角色
+        List<SysRole> roles = roleMapper.selectRolesByUserId(approverId);
+        boolean isManager = roles.stream()
+                .anyMatch(r -> "MANAGER".equals(r.getRoleCode()));
+
+        // 如果是经理，获取其部门ID
+        Long finalManagerDeptId;
+        if (isManager && approverUser.getEmployeeId() != null) {
+            EmpEmployee managerEmp = employeeMapper.selectById(approverUser.getEmployeeId());
+            finalManagerDeptId = managerEmp != null ? managerEmp.getDeptId() : null;
+        } else {
+            finalManagerDeptId = null;
+        }
+
         List<LeaveApplication> list = baseMapper.selectList(new LambdaQueryWrapper<LeaveApplication>()
                 .in(LeaveApplication::getStatus, 0, 1)
                 .orderByAsc(LeaveApplication::getCreateTime));
+
+        // 如果是经理，只显示本部门的请假申请
+        if (isManager && finalManagerDeptId != null) {
+            list = list.stream()
+                    .filter(app -> {
+                        if (app.getEmployeeId() == null) {
+                            return false;
+                        }
+                        EmpEmployee emp = employeeMapper.selectById(app.getEmployeeId());
+                        return emp != null && emp.getDeptId().equals(finalManagerDeptId);
+                    })
+                    .toList();
+        }
         
         // 填充申请人姓名
         for (LeaveApplication app : list) {
