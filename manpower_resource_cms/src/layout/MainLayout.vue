@@ -263,7 +263,15 @@
             </span>
             <span v-show="!isCollapse" class="nav-text">我的培训</span>
           </router-link>
-          <router-link v-if="hasRole('ADMIN') || hasRole('HR')" to="/train/list" class="nav-item" :class="{ active: route.path === '/train/list' }">
+          <router-link to="/train/request" class="nav-item" :class="{ active: isActive('/train/request') }">
+            <span class="nav-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a1 1 0 112.828 0l-4.586 4.586a1 1 0 01-1.414 0H4a2 2 0 00-2 2v12a2 2 0 002 2h8a1 1 0 001-1V5.414a1 1 0 00-.586-.828zM4 4h8v12H4V4zm3 5a1 1 0 011-1h4a1 1 0 110 2H7a1 1 0 01-1-1zm2 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
+              </svg>
+            </span>
+            <span v-show="!isCollapse" class="nav-text">培训需求</span>
+          </router-link>
+          <router-link v-if="hasRole('ADMIN') || hasRole('HR') || hasRole('MANAGER')" to="/train/list" class="nav-item" :class="{ active: route.path === '/train/list' }">
             <span class="nav-icon">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
@@ -271,7 +279,15 @@
             </span>
             <span v-show="!isCollapse" class="nav-text">培训计划</span>
           </router-link>
-          <router-link v-if="hasRole('ADMIN') || hasRole('HR')" to="/assess/plan" class="nav-item" :class="{ active: isActive('/assess') }">
+          <router-link v-if="hasRole('ADMIN') || hasRole('HR') || hasRole('MANAGER')" to="/train/approval" class="nav-item" :class="{ active: isActive('/train/approval') }">
+            <span class="nav-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </span>
+            <span v-show="!isCollapse" class="nav-text">培训审核</span>
+          </router-link>
+          <router-link v-if="hasRole('ADMIN') || hasRole('HR') || hasRole('MANAGER')" to="/assess/plan" class="nav-item" :class="{ active: isActive('/assess') }">
             <span class="nav-icon">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm2 10a1 1 0 10-2 0v3a1 1 0 102 0v-3zm2-3a1 1 0 011 1v5a1 1 0 11-2 0v-5a1 1 0 011-1zm4-1a1 1 0 10-2 0v7a1 1 0 102 0V8z" clip-rule="evenodd"/>

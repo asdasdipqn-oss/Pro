@@ -230,6 +230,18 @@ const router = createRouter({
           component: () => import('@/views/train/MyTrainView.vue'),
           meta: { title: '我的培训' },
         },
+        {
+          path: 'train/request',
+          name: 'trainRequest',
+          component: () => import('@/views/train/MyTrainRequestView.vue'),
+          meta: { title: '培训需求' },
+        },
+        {
+          path: 'train/approval',
+          name: 'trainApproval',
+          component: () => import('@/views/train/TrainApprovalView.vue'),
+          meta: { title: '培训审核' },
+        },
         // 考核管理
         {
           path: 'assess/plan',

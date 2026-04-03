@@ -53,7 +53,45 @@ export function signIn(planId) {
 
 // 录入考核成绩
 export function recordScore(participantId, score, evaluation) {
-  return request.put(`/train/plan/participant/${participantId}/score`, null, { 
-    params: { score, evaluation } 
+  return request.put(`/train/plan/participant/${participantId}/score`, null, {
+    params: { score, evaluation }
   })
+}
+
+// ====== 培训需求管理 ======
+// 提交培训需求
+export function submitTrainRequest(data) {
+  return request.post('/train/request', data)
+}
+
+// 撤回培训需求
+export function cancelTrainRequest(id) {
+  return request.put(`/train/request/${id}/cancel`)
+}
+
+// 获取我的培训需求
+export function getMyTrainRequests() {
+  return request.get('/train/request/my')
+}
+
+// 获取培训需求详情
+export function getTrainRequestDetail(id) {
+  return request.get(`/train/request/${id}`)
+}
+
+// 获取待审批的培训需求
+export function getPendingTrainRequests() {
+  return request.get('/train/request/pending')
+}
+
+// 审批培训需求
+export function approveTrainRequest(id, status, comment) {
+  return request.put(`/train/request/${id}/approve`, null, {
+    params: { status, comment }
+  })
+}
+
+// 分页查询所有培训需求
+export function pageTrainRequests(params) {
+  return request.get('/train/request/page', { params })
 }

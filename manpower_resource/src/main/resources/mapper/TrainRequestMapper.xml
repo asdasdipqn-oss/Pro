@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.ccst.manpower_resource.mapper.TrainRequestMapper">
+
+    <select id="selectByUserId" resultType="cn.edu.ccst.manpower_resource.entity.TrainRequest">
+        SELECT * FROM train_request
+        WHERE applicant_id = #{userId}
+        AND deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectPendingApprovals" resultType="cn.edu.ccst.manpower_resource.entity.TrainRequest">
+        SELECT * FROM train_request
+        WHERE status = 0
+        AND deleted = 0
+        ORDER BY create_time ASC
+    </select>
+
+</mapper>
