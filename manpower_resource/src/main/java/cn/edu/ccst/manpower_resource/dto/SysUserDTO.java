@@ -4,8 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 @Schema(description = "用户DTO")
 public class SysUserDTO {
@@ -26,6 +24,6 @@ public class SysUserDTO {
     @Schema(description = "状态：0-冻结 1-正常")
     private Integer status;
 
-    @Schema(description = "角色ID列表")
-    private List<Long> roleIds;
+    @Schema(description = "角色ID")
+    private Long roleId;
 }

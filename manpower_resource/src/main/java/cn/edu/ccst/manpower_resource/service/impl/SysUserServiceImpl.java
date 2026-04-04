@@ -112,8 +112,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         user.setUpdateTime(LocalDateTime.now());
         baseMapper.insert(user);
 
-        if (dto.getRoleIds() != null && !dto.getRoleIds().isEmpty()) {
-            saveUserRoles(user.getId(), dto.getRoleIds());
+        if (dto.getRoleId() != null) {
+            saveUserRoles(user.getId(), List.of(dto.getRoleId()));
         }
     }
 
@@ -144,11 +144,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         user.setUpdateTime(LocalDateTime.now());
         baseMapper.updateById(user);
 
-        if (dto.getRoleIds() != null) {
+        if (dto.getRoleId() != null) {
             userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, dto.getId()));
-            if (!dto.getRoleIds().isEmpty()) {
-                saveUserRoles(dto.getId(), dto.getRoleIds());
-            }
+            saveUserRoles(dto.getId(), List.of(dto.getRoleId()));
         }
     }
 
