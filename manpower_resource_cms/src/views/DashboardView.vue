@@ -159,6 +159,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { getNotifications, getUnreadCount, markNotificationRead, markAllNotificationRead } from '@/api/notification'
+import { getDashboardStats } from '@/api/dashboard'
 import { ElMessage } from 'element-plus'
 import { Bell, Document, Calendar, Wallet, Checked, ArrowRight } from '@element-plus/icons-vue'
 
@@ -170,13 +171,13 @@ const notifications = ref([])
 const unreadCount = ref(0)
 
 const stats = ref({
-  employees: 156,
-  departments: 8,
+  employees: 0,
+  departments: 0,
   pendingLeaves: 0,
-  todayAttendance: 142
+  todayAttendance: 0
 })
 
-const attendanceRate = ref(91)
+const attendanceRate = ref(0)
 
 const greeting = computed(() => {
   const hour = new Date().getHours()
@@ -222,12 +223,28 @@ const formatTime = (time) => {
 const fetchData = async () => {
   loading.value = true
   try {
-    const [listRes, countRes] = await Promise.all([getNotifications(), getUnreadCount()])
+    const [listRes, countRes, statsRes] = await Promise.all([
+      getNotifications(),
+      getUnreadCount(),
+      getDashboardStats()
+    ])
     notifications.value = listRes.data || []
     unreadCount.value = countRes.data?.totalCount || 0
-    stats.value.pendingLeaves = unreadCount.value
+
+    // 更新统计数据
+    if (statsRes.data) {
+      stats.value.employees = statsRes.data.employees || 0
+      stats.value.departments = statsRes.data.departments || 0
+      stats.value.pendingLeaves = statsRes.data.pendingLeaves || 0
+      stats.value.todayAttendance = statsRes.data.todayAttendance || 0
+
+      // 计算出勤率
+      if (stats.value.employees > 0) {
+        attendanceRate.value = Math.round((stats.value.todayAttendance / stats.value.employees) * 100)
+      }
+    }
   } catch (error) {
-    console.error('获取消息列表失败:', error)
+    console.error('获取数据失败:', error)
   } finally {
     loading.value = false
   }
