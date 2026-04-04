@@ -1,183 +1,185 @@
 <template>
 	<nav class="nav-menu">
-		    <!-- 动态菜单 -->
-		    <template v-for="menu in filteredMenuTree" :key="menu.id">
-		      <!-- 目录类型（有子菜单） -->
-		      <div v-if="menu.menuType === 1 && menu.children && menu.children.length > 0" class="nav-group">
-		        <div class="nav-group-title" v-show="!collapsed">{{ menu.menuName }}</div>
-		        <template v-for="child in getFilteredChildren(menu.children)" :key="child.id">
-		          <router-link
-		            v-if="child.menuType === 2 && child.visible === 1"
-		            :to="child.path"
-		            class="nav-item"
-		            :class="{ active: isActive(child.path) }"
-		          >
-		            <IconComponent :icon="getIcon(child.menuName)" class="nav-icon" />
-		            <span v-show="!collapsed" class="nav-text">{{ child.menuName }}</span>
-		          </router-link>
-		        </template>
-		      </div>
+	    <!-- 动态菜单 -->
+	    <template v-for="menu in filteredMenuTree" :key="menu.id">
+	      <!-- 目录类型（有子菜单） -->
+	      <div v-if="menu.menuType === 1 && menu.children && menu.children.length > 0" class="nav-group">
+	        <div class="nav-group-title" v-show="!collapsed">{{ menu.menuName }}</div>
+	        <template v-for="child in getFilteredChildren(menu.children)" :key="child.id">
+          <router-link
+	            v-if="child.menuType === 2 && child.visible === 1"
+	            :to="child.path"
+	            class="nav-item"
+	            :class="{ active: isActive(child.path) }"
+          >
+            <IconComponent :icon="getIcon(child.menuName)" class="nav-icon" />
+            <span v-show="!collapsed" class="nav-text">{{ child.menuName }}</span>
+          </router-link>
+        </template>
+      </div>
 
-		      <!-- 菜单类型（无子菜单） -->
-		      <router-link
-		        v-else-if="menu.menuType === 2 && menu.visible === 1"
-		        :to="menu.path"
-		        class="nav-item"
-		        :class="{ active: isActive(menu.path) }"
-		      >
-		        <IconComponent :icon="getIcon(menu.menuName)" class="nav-icon" />
-		        <span v-show="!collapsed" class="nav-text">{{ menu.menuName }}</span>
-		      </router-link>
-		    </template>
+      <!-- 菜单类型（无子菜单） -->
+      <router-link
+        v-else-if="menu.menuType === 2 && menu.visible === 1"
+        :to="menu.path"
+        class="nav-item"
+        :class="{ active: isActive(menu.path) }"
+      >
+        <IconComponent :icon="getIcon(menu.menuName)" class="nav-icon" />
+        <span v-show="!collapsed" class="nav-text">{{ menu.menuName }}</span>
+      </router-link>
+    </template>
 
-		    <!-- 个人中心（所有人可见） -->
-		    <div class="nav-group">
-		      <div class="nav-group-title" v-show="!collapsed">个人</div>
-		      <router-link to="/profile" class="nav-item" :class="{ active: isActive('/profile') }">
-		        <IconComponent icon="user" class="nav-icon" />
-		        <span v-show="!collapsed" class="nav-text">个人中心</span>
-		      </router-link>
-		      <router-link to="/notification" class="nav-item" :class="{ active: isActive('/notification') }">
-		        <IconComponent icon="bell" class="nav-icon" />
-		        <span v-show="!collapsed" class="nav-text">消息通知</span>
-		      </router-link>
-		    </div>
-		  </nav>
-	</template>
+    <!-- 个人中心（所有人可见） -->
+    <div class="nav-group">
+      <div class="nav-group-title" v-show="!collapsed">个人</div>
+      <router-link to="/profile" class="nav-item" :class="{ active: isActive('/profile') }">
+        <IconComponent icon="user" class="nav-icon" />
+        <span v-show="!collapsed" class="nav-text">个人中心</span>
+      </router-link>
+      <router-link to="/notification" class="nav-item" :class="{ active: isActive('/notification') }">
+        <IconComponent icon="bell" class="nav-icon" />
+        <span v-show="!collapsed" class="nav-text">消息通知</span>
+      </router-link>
+    </div>
+  </nav>
+</template>
 
-	<script setup>
-		import { computed } from 'vue'
-		import { useRoute } from 'vue-router'
-		import { useMenuStore } from '@/stores/menu'
-		import { useUserStore } from '@/stores/user'
-		import IconComponent from './IconComponent.vue'
+<script setup>
+	import { computed } from 'vue'
+	import { useRoute } from 'vue-router'
+	import { useMenuStore } from '@/stores/menu'
+	import { useUserStore } from '@/stores/user'
+	import IconComponent from './IconComponent.vue'
 
-		const props = defineProps({
-		  collapsed: {
-		    type: Boolean,
-		    default: false
-		  }
-		})
+	const props = defineProps({
+	  collapsed: {
+	    type: Boolean,
+	    default: false
+	  }
+	})
 
-		const route = useRoute()
-		const menuStore = useMenuStore()
-		const userStore = useUserStore()
+	const route = useRoute()
+	const menuStore = useMenuStore()
+	const userStore = useUserStore()
 
-		// 判断是否是管理员
-		const isAdmin = computed(() => {
-			const roles = userStore.roles || []
-			return roles.some(role =>
-				role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'admin' || role === 'super_admin'
-			)
-		})
+	// 判断是否是管理员
+	const isAdmin = computed(() => {
+		const roles = userStore.roles || []
+		return roles.some(role =>
+			role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'admin' || role === 'super_admin'
+		)
+	})
 
-		const menuTree = computed(() => menuStore.menuTree)
+	const menuTree = computed(() => menuStore.menuTree)
 
-		// 过滤子菜单（过滤掉工作台）
-		const getFilteredChildren = (children) => {
-			if (!children) return []
-			return children.filter(child => child.menuName !== '工作台')
+	// 过滤子菜单（过滤掉工作台）
+	const getFilteredChildren = (children) => {
+		if (!children) return []
+		return children.filter(child => child.menuName !== '工作台')
+	}
+
+	// 过滤后的菜单树（普通员工隐藏工作台）
+	const filteredMenuTree = computed(() => {
+		const roles = userStore.roles || []
+		const isAdminOrHr = isAdmin.value || roles.includes('HR')
+		if (isAdminOrHr) {
+			return menuTree.value
 		}
-
-		// 过滤后的菜单树（非管理员隐藏工作台）
-		const filteredMenuTree = computed(() => {
-			if (isAdmin.value) {
-				return menuTree.value
+		// 普通员工：过滤掉工作台菜单
+		return menuTree.value.filter(menu => {
+			// 过滤掉名为"工作台"的顶级菜单
+			if (menu.menuName === '工作台') {
+				return false
 			}
-			// 非管理员：过滤掉工作台菜单
-			return menuTree.value.filter(menu => {
-				// 过滤掉名为"工作台"的顶级菜单
-				if (menu.menuName === '工作台') {
-					return false
-				}
-				return true
-			})
+			return true
 		})
+	})
 
-		const isActive = (path) => {
-		  if (!path) return false
-		  return route.path.startsWith(path)
-		}
+	const isActive = (path) => {
+	  if (!path) return false
+	  return route.path.startsWith(path)
+	}
 
-		// 菜单名称到图标的映射
-		const iconMap = {
-		  '工作台': 'chart',
-		  '员工': 'user',
-		  '员工列表': 'user',
-		  '员工管理': 'user',
-		  '部门': 'building',
-		  '部门管理': 'building',
-		  '岗位': 'briefcase',
-		  '岗位管理': 'briefcase',
-		  '我的打卡': 'clock',
-		  '打卡': 'clock',
-		  '考勤': 'calendar',
-		  '打卡记录': 'file',
-		  '打卡地点': 'location',
-		  '考勤申诉': 'bell',
-		  '申诉审批': 'check',
-		  '考勤日历': 'calendar',
-		  '请假申请': 'calendar',
-		  '请假': 'calendar',
-		  '假期': 'calendar',
-		  '我的假期': 'calendar',
-		  '假期审批': 'check',
-		  '离职申请': 'logout',
-		  '离职': 'logout',
-		  '离职审批': 'check',
-		  '我的薪资': 'money',
-		  '薪资': 'money',
-		  '薪资管理': 'money',
-		  '薪资发放': 'money',
-		  '待我审批': 'check',
-		  '已审批记录': 'check',
-		  '流程配置': 'setting',
-		  '审批': 'check',
-		  '统计报表': 'chart',
-		  '统计': 'chart',
-		  '报表': 'chart',
-		  'AI离职预测': 'chart',
-		  '招聘岗位': 'plus',
-		  '招聘': 'plus',
-		  '简历管理': 'file',
-		  '简历': 'file',
-		  '我的培训': 'play',
-		  '培训需求': 'edit',
-		  '培训': 'play',
-		  '培训计划': 'play',
-		  '培训审核': 'check',
-		  '考核方案': 'book',
-		  '考核': 'book',
-		  '用户管理': 'user',
-		  '角色管理': 'setting',
-		  '菜单管理': 'list',
-		  '字典管理': 'list',
-		  '操作日志': 'file',
-		  '日志': 'file',
-		  '系统管理': 'setting',
-		  '系统': 'setting',
-		  '设置': 'setting'
-		}
+	// 菜单名称到图标的映射
+	const iconMap = {
+	  '工作台': 'chart',
+	  '员工': 'user',
+	  '员工列表': 'user',
+	  '员工管理': 'user',
+	  '部门': 'building',
+	  '部门管理': 'building',
+	  '岗位': 'briefcase',
+	  '岗位管理': 'briefcase',
+	  '我的打卡': 'clock',
+	  '打卡': 'clock',
+	  '考勤': 'calendar',
+	  '打卡记录': 'file',
+	  '打卡地点': 'location',
+	  '考勤申诉': 'bell',
+	  '申诉审批': 'check',
+	  '考勤日历': 'calendar',
+	  '请假申请': 'calendar',
+	  '请假': 'calendar',
+	  '假期': 'calendar',
+	  '我的假期': 'calendar',
+	  '假期审批': 'check',
+	  '离职申请': 'logout',
+	  '离职': 'logout',
+	  '离职审批': 'check',
+	  '我的薪资': 'money',
+	  '薪资': 'money',
+	  '薪资管理': 'money',
+	  '薪资发放': 'money',
+	  '待我审批': 'check',
+	  '已审批记录': 'check',
+	  '流程配置': 'setting',
+	  '审批': 'check',
+	  '统计报表': 'chart',
+	  '统计': 'chart',
+	  '报表': 'chart',
+	  'AI离职预测': 'chart',
+	  '招聘岗位': 'plus',
+	  '招聘': 'plus',
+	  '简历管理': 'file',
+	  '简历': 'file',
+	  '我的培训': 'play',
+	  '培训需求': 'edit',
+	  '培训': 'play',
+	  '培训计划': 'play',
+	  '培训审核': 'check',
+	  '考核方案': 'book',
+	  '考核': 'book',
+	  '用户管理': 'user',
+	  '角色管理': 'setting',
+	  '菜单管理': 'list',
+	  '字典管理': 'list',
+	  '操作日志': 'file',
+	  '日志': 'file',
+	  '系统管理': 'setting',
+	  '系统': 'setting',
+	  '设置': 'setting'
+	}
 
-		const getIcon = (menuName) => {
-		  // 精确匹配
-		  if (iconMap[menuName]) {
-		    return iconMap[menuName]
-		  }
+	const getIcon = (menuName) => {
+	  // 精确匹配
+	  if (iconMap[menuName]) {
+	    return iconMap[menuName]
+	  }
 
-		  // 关键词匹配
-		  for (const [key, icon] of Object.entries(iconMap)) {
-		    if (menuName.includes(key)) {
-		      return icon
-		    }
-		  }
+	  // 关键词匹配
+	  for (const [key, icon] of Object.entries(iconMap)) {
+	    if (menuName.includes(key)) {
+	      return icon
+	    }
+	  }
 
-		  // 默认图标
-		  return 'file'
-		}
-	</script>
+	  // 默认图标
+	  return 'file'
+	}
+</script>
 
-	<style scoped>
+<style scoped>
 	.nav-menu {
 	  flex: 1;
 	  padding: 16px 12px;
@@ -232,4 +234,4 @@
 	  font-weight: 500;
 	  white-space: nowrap;
 	}
-	</style>
+</style>

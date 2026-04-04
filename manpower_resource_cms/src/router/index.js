@@ -24,7 +24,7 @@ const router = createRouter({
           path: 'dashboard',
           name: 'dashboard',
           component: () => import('@/views/DashboardView.vue'),
-          meta: { title: '工作台', requireAdmin: true },
+          meta: { title: '工作台' },
         },
         // 员工管理
         {
@@ -370,10 +370,10 @@ router.beforeEach((to, from, next) => {
     if (to.path === '/') {
       const roles = userStore.roles || []
       const isAdmin = roles.some(role =>
-        role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'admin' || role === 'super_admin'
+        role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'admin' || role === 'super_admin' || role === 'HR'
       )
-      // 管理员跳转到工作台，普通员工跳转到个人中心
-      next(isAdmin ? '/dashboard' : '/profile')
+      // 管理员和 HR 跳转到工作台，普通员工跳转到个人中心
+      next(isAdmin || roles.includes('HR') ? '/dashboard' : '/profile')
     } else {
       next()
     }
