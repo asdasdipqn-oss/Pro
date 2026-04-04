@@ -79,9 +79,26 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
+            <el-form-item label="培训部门">
+              <el-select v-model="editForm.deptId" placeholder="请选择部门（不选则全员通知）" clearable style="width: 100%">
+                <el-option
+                  v-for="dept in availableDepts"
+                  :key="dept.id"
+                  :label="dept.deptName"
+                  :value="dept.id"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
             <el-form-item label="讲师">
               <el-input v-model="editForm.trainer" placeholder="请输入讲师" />
             </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item></el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="20">
@@ -218,6 +235,7 @@ import {
   recordScore,
 } from '@/api/train'
 import { listEmployee } from '@/api/employee'
+import { getDepartmentTree } from '@/api/department'
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -231,6 +249,7 @@ const currentPlan = ref(null)
 const participants = ref([])
 const availableEmployees = ref([])
 const selectedEmployees = ref([])
+const availableDepts = ref([])
 const scoreForm = reactive({ participantId: null, score: null, evaluation: '' })
 
 const searchForm = reactive({ status: null })
@@ -251,6 +270,7 @@ const editForm = reactive({
   trainLocation: '',
   maxParticipants: 50,
   description: '',
+  deptId: null,
 })
 
 const formRules = {
@@ -416,7 +436,32 @@ const submitScore = async () => {
   }
 }
 
-onMounted(fetchData)
+onMounted(async () => {
+  await Promise.all([fetchData(), fetchAvailableDepts()])
+})
+
+// 获取可用部门（只显示一级和二级部门，过滤掉三级小部门）
+const fetchAvailableDepts = async () => {
+  try {
+    const res = await getDepartmentTree()
+    const depts = flattenDepts(res.data || [], 2) // 最多二级
+    availableDepts.value = depts
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+// 递归扁平化部门树，最多保留指定层级
+const flattenDepts = (tree, maxLevel, level = 1) => {
+  const result = []
+  for (const dept of tree) {
+    result.push({ id: dept.id, deptName: dept.deptName })
+    if (level < maxLevel && dept.children && dept.children.length > 0) {
+      result.push(...flattenDepts(dept.children, maxLevel, level + 1))
+    }
+  }
+  return result
+}
 </script>
 
 <style scoped>

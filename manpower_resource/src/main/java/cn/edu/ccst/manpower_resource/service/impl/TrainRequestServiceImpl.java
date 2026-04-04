@@ -5,11 +5,17 @@ import cn.edu.ccst.manpower_resource.common.ResultCode;
 import cn.edu.ccst.manpower_resource.dto.TrainRequestDTO;
 import cn.edu.ccst.manpower_resource.entity.EmpEmployee;
 import cn.edu.ccst.manpower_resource.entity.OrgDepartment;
+import cn.edu.ccst.manpower_resource.entity.SysRole;
+import cn.edu.ccst.manpower_resource.entity.SysUser;
+import cn.edu.ccst.manpower_resource.entity.TrainParticipant;
 import cn.edu.ccst.manpower_resource.entity.TrainPlan;
 import cn.edu.ccst.manpower_resource.entity.TrainRequest;
 import cn.edu.ccst.manpower_resource.exception.BusinessException;
 import cn.edu.ccst.manpower_resource.mapper.EmpEmployeeMapper;
 import cn.edu.ccst.manpower_resource.mapper.OrgDepartmentMapper;
+import cn.edu.ccst.manpower_resource.mapper.SysRoleMapper;
+import cn.edu.ccst.manpower_resource.mapper.SysUserMapper;
+import cn.edu.ccst.manpower_resource.mapper.TrainParticipantMapper;
 import cn.edu.ccst.manpower_resource.mapper.TrainPlanMapper;
 import cn.edu.ccst.manpower_resource.mapper.TrainRequestMapper;
 import cn.edu.ccst.manpower_resource.service.IApprovalLogService;
@@ -44,6 +50,9 @@ public class TrainRequestServiceImpl extends ServiceImpl<TrainRequestMapper, Tra
     private final OrgDepartmentMapper departmentMapper;
     private final IApprovalLogService approvalLogService;
     private final TrainPlanMapper trainPlanMapper;
+    private final TrainParticipantMapper trainParticipantMapper;
+    private final SysUserMapper sysUserMapper;
+    private final SysRoleMapper sysRoleMapper;
 
     @Override
     @Transactional
@@ -146,6 +155,80 @@ public class TrainRequestServiceImpl extends ServiceImpl<TrainRequestMapper, Tra
         plan.setCreateTime(LocalDateTime.now());
         plan.setUpdateTime(LocalDateTime.now());
         trainPlanMapper.insert(plan);
+
+        // 自动添加参训人员
+        autoAssignParticipantsForRequest(plan, request, createBy);
+    }
+
+    /**
+     * 根据培训需求自动添加参训人员
+     * 如果审批人是经理角色，则添加审批人所在部门的所有员工
+     * 否则，添加申请人所在部门的所有员工
+     */
+    private void autoAssignParticipantsForRequest(TrainPlan plan, TrainRequest request, Long approverUserId) {
+        // 获取申请人的部门
+        EmpEmployee applicant = employeeMapper.selectById(request.getApplicantId());
+        if (applicant == null) {
+            return;
+        }
+        Long deptId = applicant.getDeptId();
+
+        // 判断审批人是否是经理角色
+        List<SysRole> approverRoles = sysRoleMapper.selectRolesByUserId(approverUserId);
+        boolean isManager = approverRoles.stream().anyMatch(role -> "MANAGER".equals(role.getRoleCode()));
+
+        if (isManager) {
+            // 如果审批人是经理，则使用审批人所在部门
+            SysUser approverUser = sysUserMapper.selectById(approverUserId);
+            if (approverUser != null && approverUser.getEmployeeId() != null) {
+                EmpEmployee approver = employeeMapper.selectById(approverUser.getEmployeeId());
+                if (approver != null && approver.getDeptId() != null) {
+                    deptId = approver.getDeptId();
+                }
+            }
+        }
+
+        // 获取该部门及其所有子部门的员工
+        List<Long> deptIds = new java.util.ArrayList<>();
+        deptIds.add(deptId);
+        getChildDeptIds(deptId, deptIds);
+
+        // 查询这些部门下的所有员工
+        List<EmpEmployee> employees = employeeMapper.selectList(
+                new LambdaQueryWrapper<EmpEmployee>()
+                        .in(EmpEmployee::getDeptId, deptIds)
+                        .eq(EmpEmployee::getDeleted, 0));
+
+        // 添加参训人员
+        for (EmpEmployee emp : employees) {
+            // 检查是否已存在
+            Long count = trainParticipantMapper.selectCount(new LambdaQueryWrapper<TrainParticipant>()
+                    .eq(TrainParticipant::getPlanId, plan.getId())
+                    .eq(TrainParticipant::getEmployeeId, emp.getId()));
+            if (count > 0) continue;
+
+            TrainParticipant participant = new TrainParticipant();
+            participant.setPlanId(plan.getId());
+            participant.setEmployeeId(emp.getId());
+            participant.setAttendanceStatus(0); // 未签到
+            participant.setCreateTime(LocalDateTime.now());
+            participant.setUpdateTime(LocalDateTime.now());
+            trainParticipantMapper.insert(participant);
+        }
+    }
+
+    /**
+     * 递归获取子部门ID
+     */
+    private void getChildDeptIds(Long parentId, List<Long> deptIds) {
+        List<OrgDepartment> children = departmentMapper.selectList(
+                new LambdaQueryWrapper<OrgDepartment>()
+                        .eq(OrgDepartment::getParentId, parentId)
+                        .eq(OrgDepartment::getDeleted, 0));
+        for (OrgDepartment dept : children) {
+            deptIds.add(dept.getId());
+            getChildDeptIds(dept.getId(), deptIds);
+        }
     }
 
     @Override

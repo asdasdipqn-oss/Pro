@@ -19,13 +19,12 @@ const router = createRouter({
     {
       path: '/',
       component: () => import('@/layout/MainLayout.vue'),
-      redirect: '/dashboard',
       children: [
         {
           path: 'dashboard',
           name: 'dashboard',
           component: () => import('@/views/DashboardView.vue'),
-          meta: { title: '工作台' },
+          meta: { title: '工作台', requireAdmin: true },
         },
         // 员工管理
         {
@@ -356,7 +355,28 @@ router.beforeEach((to, from, next) => {
   } else if (!userStore.isLoggedIn) {
     next('/login')
   } else {
-    next()
+    // 检查是否需要管理员权限
+    if (to.meta.requireAdmin) {
+      const roles = userStore.roles || []
+      const isAdmin = roles.some(role =>
+        role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'admin' || role === 'super_admin'
+      )
+      if (!isAdmin) {
+        next('/profile') // 非管理员重定向到个人中心
+        return
+      }
+    }
+    // 处理首页重定向
+    if (to.path === '/') {
+      const roles = userStore.roles || []
+      const isAdmin = roles.some(role =>
+        role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'admin' || role === 'super_admin'
+      )
+      // 管理员跳转到工作台，普通员工跳转到个人中心
+      next(isAdmin ? '/dashboard' : '/profile')
+    } else {
+      next()
+    }
   }
 })
 

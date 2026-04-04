@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -109,6 +110,65 @@ public class TrainPlanServiceImpl extends ServiceImpl<TrainPlanMapper, TrainPlan
         plan.setCreateTime(LocalDateTime.now());
         plan.setUpdateTime(LocalDateTime.now());
         baseMapper.insert(plan);
+
+        // 根据部门自动添加参训人员
+        autoAssignParticipants(plan);
+    }
+
+    /**
+     * 根据部门自动添加参训人员
+     */
+    private void autoAssignParticipants(TrainPlan plan) {
+        List<EmpEmployee> employees = new ArrayList<>();
+
+        if (plan.getDeptId() != null) {
+            // 如果指定了部门，获取该部门及其子部门的所有员工
+            employees = getEmployeesByDept(plan.getDeptId());
+        } else {
+            // 如果没有指定部门，获取所有员工
+            employees = employeeMapper.selectList(new LambdaQueryWrapper<EmpEmployee>()
+                    .eq(EmpEmployee::getDeleted, 0));
+        }
+
+        // 添加参训人员
+        for (EmpEmployee emp : employees) {
+            TrainParticipant participant = new TrainParticipant();
+            participant.setPlanId(plan.getId());
+            participant.setEmployeeId(emp.getId());
+            participant.setAttendanceStatus(0); // 未签到
+            participant.setCreateTime(LocalDateTime.now());
+            participant.setUpdateTime(LocalDateTime.now());
+            participantMapper.insert(participant);
+        }
+    }
+
+    /**
+     * 获取指定部门及其所有子部门的员工
+     */
+    private List<EmpEmployee> getEmployeesByDept(Long deptId) {
+        List<Long> deptIds = new ArrayList<>();
+        deptIds.add(deptId);
+        // 递归获取所有子部门ID
+        getChildDeptIds(deptId, deptIds);
+
+        // 查询这些部门下的所有员工
+        return employeeMapper.selectList(new LambdaQueryWrapper<EmpEmployee>()
+                .in(EmpEmployee::getDeptId, deptIds)
+                .eq(EmpEmployee::getDeleted, 0));
+    }
+
+    /**
+     * 递归获取子部门ID
+     */
+    private void getChildDeptIds(Long parentId, List<Long> deptIds) {
+        List<OrgDepartment> children = departmentMapper.selectList(
+                new LambdaQueryWrapper<OrgDepartment>()
+                        .eq(OrgDepartment::getParentId, parentId)
+                        .eq(OrgDepartment::getDeleted, 0));
+        for (OrgDepartment dept : children) {
+            deptIds.add(dept.getId());
+            getChildDeptIds(dept.getId(), deptIds);
+        }
     }
 
     @Override

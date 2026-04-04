@@ -11,6 +11,7 @@
         <el-button @click="handleExport">导出</el-button>
         <el-button @click="showImportDialog = true">导入</el-button>
         <el-button @click="handleDownloadTemplate">下载模板</el-button>
+        <el-button @click="goToUserManage">用户管理</el-button>
       </div>
     </div>
 
@@ -229,6 +230,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { Plus, UploadFilled } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
@@ -244,6 +246,8 @@ import {
 } from '@/api/employee'
 import { getDepartmentTree } from '@/api/department'
 import { listPosition, listPositionByDept } from '@/api/position'
+
+const router = useRouter()
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -351,6 +355,10 @@ const handleReset = () => {
   queryForm.deptId = null
   queryForm.pageNum = 1
   fetchData()
+}
+
+const goToUserManage = () => {
+  router.push('/system/user')
 }
 
 const fetchPositions = async (deptId = null) => {

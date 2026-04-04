@@ -15,24 +15,29 @@ export const useUserStore = defineStore('user', () => {
   // 登录
   async function login(loginForm) {
     const res = await loginApi(loginForm)
+    console.log('[Login] Response:', res.data)
     token.value = res.data.token
     // 兼容两种返回格式：userInfo对象或直接的username
-    userInfo.value = res.data.userInfo || { 
-      userId: res.data.userId, 
-      username: res.data.username 
+    userInfo.value = res.data.userInfo || {
+      userId: res.data.userId,
+      username: res.data.username
     }
     roles.value = res.data.roles || []
     permissions.value = res.data.permissions || []
-    
+
     localStorage.setItem('token', token.value)
     localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
     localStorage.setItem('roles', JSON.stringify(roles.value))
     localStorage.setItem('permissions', JSON.stringify(permissions.value))
-    
+
     // 获取用户菜单权限
     const menuStore = useMenuStore()
-    await menuStore.fetchUserMenus(res.data.userId)
-    
+    try {
+      await menuStore.fetchUserMenus(res.data.userId)
+    } catch (err) {
+      console.error('[Login] 获取菜单失败，但不影响登录:', err)
+    }
+
     return res
   }
 
