@@ -41,7 +41,7 @@
         <el-table-column prop="employeeName" label="关联员工" width="150" />
         <el-table-column prop="roleNames" label="角色" width="150">
           <template #default="{ row }">
-            {{ row.roleNames ? row.roleNames.join(', ') : '-' }}
+            {{ row.roleNames && row.roleNames.length > 0 ? row.roleNames[0] : '-' }}
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="80">
@@ -117,7 +117,6 @@
         <el-form-item label="角色" prop="roleIds">
           <el-select
             v-model="editForm.roleIds"
-            multiple
             placeholder="请选择角色"
             style="width: 100%"
           >
@@ -182,7 +181,7 @@ const editForm = reactive({
   username: '',
   password: '',
   employeeId: null,
-  roleIds: [],
+  roleIds: null,
   status: 1,
 })
 
@@ -190,7 +189,7 @@ const formRules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
   employeeId: [{ required: true, message: '请选择关联员工', trigger: 'change', type: 'number' }],
-  roleIds: [{ required: true, message: '请选择角色', trigger: 'change', type: 'array' }],
+  roleIds: [{ required: true, message: '请选择角色', trigger: 'change', type: 'number' }],
 }
 
 const fetchData = async () => {
@@ -252,7 +251,7 @@ const resetForm = () => {
     username: '',
     password: '',
     employeeId: null,
-    roleIds: [],
+    roleIds: null,
     status: 1,
   })
 }
@@ -270,10 +269,10 @@ const handleEdit = async (row) => {
     employeeId: row.employeeId,
     status: row.status,
   })
-  // 获取用户角色ID列表
+  // 获取用户角色
   try {
     const roles = await getUserRoles(row.id)
-    editForm.roleIds = roles.map(r => r.id) || []
+    editForm.roleIds = roles && roles.length > 0 ? roles[0].id : null
   } catch (error) {
     console.error(error)
   }
