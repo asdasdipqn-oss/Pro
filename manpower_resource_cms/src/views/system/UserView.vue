@@ -114,9 +114,9 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="角色" prop="roleIds">
+        <el-form-item label="角色" prop="roleId">
           <el-select
-            v-model="editForm.roleIds"
+            v-model="editForm.roleId"
             placeholder="请选择角色"
             style="width: 100%"
           >
@@ -181,7 +181,7 @@ const editForm = reactive({
   username: '',
   password: '',
   employeeId: null,
-  roleIds: null,
+  roleId: null,
   status: 1,
 })
 
@@ -189,7 +189,7 @@ const formRules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
   employeeId: [{ required: true, message: '请选择关联员工', trigger: 'change', type: 'number' }],
-  roleIds: [{ required: true, message: '请选择角色', trigger: 'change', type: 'number' }],
+  roleId: [{ required: true, message: '请选择角色', trigger: 'change', type: 'number' }],
 }
 
 const fetchData = async () => {
@@ -251,7 +251,7 @@ const resetForm = () => {
     username: '',
     password: '',
     employeeId: null,
-    roleIds: null,
+    roleId: null,
     status: 1,
   })
 }
@@ -272,7 +272,7 @@ const handleEdit = async (row) => {
   // 获取用户角色
   try {
     const roles = await getUserRoles(row.id)
-    editForm.roleIds = roles && roles.length > 0 ? roles[0].id : null
+    editForm.roleId = roles && roles.length > 0 ? roles[0].id : null
   } catch (error) {
     console.error(error)
   }
