@@ -92,7 +92,14 @@ const handleLogin = async () => {
       password: loginForm.password
     })
     ElMessage.success('登录成功')
-    router.push('/')
+
+    // 直接根据角色跳转，避免路由守卫重复检查
+    const roles = userStore.roles || []
+    const isAdmin = roles.some(role =>
+      role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'admin' || role === 'super_admin'
+    )
+    const target = isAdmin || roles.includes('HR') ? '/dashboard' : '/profile'
+    router.push(target)
   } catch (error) {
     console.error('登录失败:', error)
   } finally {
