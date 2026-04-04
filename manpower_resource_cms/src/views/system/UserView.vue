@@ -109,7 +109,7 @@
             <el-option
               v-for="emp in employeeList"
               :key="emp.id"
-              :label="`${emp.empName} (${emp.empCode})`"
+              :label="`${emp.empName} (${emp.empCode}) (${emp.positionName || '无岗位'})`"
               :value="emp.id"
             />
           </el-select>
