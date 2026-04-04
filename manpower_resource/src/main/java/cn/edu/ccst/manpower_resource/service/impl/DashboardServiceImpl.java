@@ -4,6 +4,7 @@ import cn.edu.ccst.manpower_resource.mapper.*;
 import cn.edu.ccst.manpower_resource.service.IDashboardService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ public class DashboardServiceImpl implements IDashboardService {
     private final AttClockRecordMapper clockRecordMapper;
 
     @Override
+    @Cacheable(value = "dashboardStats", key = "'stats'")
     public Map<String, Object> getStats() {
         Map<String, Object> stats = new HashMap<>();
         
