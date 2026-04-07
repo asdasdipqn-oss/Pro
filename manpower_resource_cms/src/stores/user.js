@@ -1,13 +1,14 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { login as loginApi, getUserInfo as getUserInfoApi, logout as logoutApi } from '@/api/auth'
-import { useMenuStore } from './menu'
+import { login as loginApi, getUserInfo as getUserInfoApi } from '@/api/auth'
 
 export const useUserStore = defineStore('user', () => {
   const token = ref(localStorage.getItem('token') || '')
   const userInfo = ref(JSON.parse(localStorage.getItem('userInfo') || '{}'))
   const roles = ref(JSON.parse(localStorage.getItem('roles') || '[]'))
   const permissions = ref(JSON.parse(localStorage.getItem('permissions') || '[]'))
+  const deptId = ref(JSON.parse(localStorage.getItem('deptId') || 'null'))
+  const departmentName = ref(JSON.parse(localStorage.getItem('departmentName') || ''))
 
   const isLoggedIn = computed(() => !!token.value)
   const username = computed(() => userInfo.value.username || '')
@@ -25,10 +26,18 @@ export const useUserStore = defineStore('user', () => {
     roles.value = res.data.roles || []
     permissions.value = res.data.permissions || []
 
+    // 保存用户的部门信息
+    if (res.data.userInfo && res.data.userInfo.deptId) {
+      deptId.value = res.data.userInfo.deptId
+      departmentName.value = res.data.userInfo.departmentName || ''
+    }
+
     localStorage.setItem('token', token.value)
     localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
     localStorage.setItem('roles', JSON.stringify(roles.value))
     localStorage.setItem('permissions', JSON.stringify(permissions.value))
+    localStorage.setItem('deptId', JSON.stringify(deptId.value))
+    localStorage.setItem('departmentName', JSON.stringify(departmentName.value))
 
     // 获取用户菜单权限
     const menuStore = useMenuStore()
@@ -47,11 +56,19 @@ export const useUserStore = defineStore('user', () => {
     userInfo.value = res.data.userInfo || {}
     roles.value = res.data.roles || []
     permissions.value = res.data.permissions || []
-    
+
+    // 更新部门信息
+    if (res.data.userInfo && res.data.userInfo.deptId) {
+      deptId.value = res.data.userInfo.deptId
+      departmentName.value = res.data.userInfo.departmentName || ''
+    }
+
     localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
     localStorage.setItem('roles', JSON.stringify(roles.value))
     localStorage.setItem('permissions', JSON.stringify(permissions.value))
-    
+    localStorage.setItem('deptId', JSON.stringify(deptId.value))
+    localStorage.setItem('departmentName', JSON.stringify(departmentName.value))
+
     return res
   }
 
@@ -61,12 +78,16 @@ export const useUserStore = defineStore('user', () => {
     userInfo.value = {}
     roles.value = []
     permissions.value = []
-    
+    deptId.value = null
+    departmentName.value = ''
+
     localStorage.removeItem('token')
     localStorage.removeItem('userInfo')
     localStorage.removeItem('roles')
     localStorage.removeItem('permissions')
-    
+    localStorage.removeItem('deptId')
+    localStorage.removeItem('departmentName')
+
     // 清除菜单权限
     const menuStore = useMenuStore()
     menuStore.clearMenus()
@@ -87,6 +108,8 @@ export const useUserStore = defineStore('user', () => {
     userInfo,
     roles,
     permissions,
+    deptId,
+    departmentName,
     isLoggedIn,
     username,
     login,

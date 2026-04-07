@@ -311,8 +311,15 @@ const fetchData = async () => {
   loading.value = true
   try {
     const res = await pageEmployee(queryForm)
-    tableData.value = res.data.records || []
-    total.value = res.data.total || 0
+    let allRecords = res.data.records || []
+
+    // 如果是部门经理，只显示本部门的员工
+    if (useUserStore().roles.includes('HR')) {
+      allRecords = allRecords.filter(emp => emp.deptId === useUserStore().deptId)
+    }
+
+    tableData.value = allRecords
+    total.value = allRecords.length
   } catch (error) {
     // 忽略请求取消错误
     if (error.message !== 'cancel') {
