@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { login as loginApi, getUserInfo as getUserInfoApi } from '@/api/auth'
+import { useMenuStore } from '@/stores/menu'
 
 // 安全的 JSON 解析函数
 function safeJSONParse(str, defaultValue) {
