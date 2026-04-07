@@ -2,16 +2,33 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { login as loginApi, getUserInfo as getUserInfoApi } from '@/api/auth'
 
+// 安全的 JSON 解析函数
+function safeJSONParse(str, defaultValue) {
+  if (!str) return defaultValue
+  try {
+    return JSON.parse(str)
+  } catch (error) {
+    console.error('JSON parse error:', error)
+    return defaultValue
+  }
+}
+
 export const useUserStore = defineStore('user', () => {
   const token = ref(localStorage.getItem('token') || '')
-  const userInfo = ref(JSON.parse(localStorage.getItem('userInfo') || '{}'))
-  const roles = ref(JSON.parse(localStorage.getItem('roles') || '[]'))
-  const permissions = ref(JSON.parse(localStorage.getItem('permissions') || '[]'))
-  const deptId = ref(JSON.parse(localStorage.getItem('deptId') || 'null'))
-  const departmentName = ref(JSON.parse(localStorage.getItem('departmentName') || ''))
+  const userInfo = ref(safeJSONParse(localStorage.getItem('userInfo'), '{}'))
+  const roles = ref(safeJSONParse(localStorage.getItem('roles'), '[]'))
+  const permissions = ref(safeJSONParse(localStorage.getItem('permissions'), '[]'))
+  const deptId = ref(safeJSONParse(localStorage.getItem('deptId'), null))
+  const departmentName = ref(safeJSONParse(localStorage.getItem('departmentName'), ''))
 
   const isLoggedIn = computed(() => !!token.value)
-  const username = computed(() => userInfo.value.username || '')
+  const username = computed(() => {
+    try {
+      return userInfo.value.username || ''
+    } catch (error) {
+      return ''
+    }
+  })
 
   // 登录
   async function login(loginForm) {
@@ -52,22 +69,26 @@ export const useUserStore = defineStore('user', () => {
 
   // 获取用户信息
   async function fetchUserInfo() {
-    const res = await getUserInfoApi()
-    userInfo.value = res.data.userInfo || {}
-    roles.value = res.data.roles || []
-    permissions.value = res.data.permissions || []
+    try {
+      const res = await getUserInfoApi()
+      userInfo.value = res.data.userInfo || {}
+      roles.value = res.data.roles || []
+      permissions.value = res.data.permissions || []
 
-    // 更新部门信息
-    if (res.data.userInfo && res.data.userInfo.deptId) {
-      deptId.value = res.data.userInfo.deptId
-      departmentName.value = res.data.userInfo.departmentName || ''
+      // 更新部门信息
+      if (res.data.userInfo && res.data.userInfo.deptId) {
+        deptId.value = res.data.userInfo.deptId
+        departmentName.value = res.data.userInfo.departmentName || ''
+      }
+
+      localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
+      localStorage.setItem('roles', JSON.stringify(roles.value))
+      localStorage.setItem('permissions', JSON.stringify(permissions.value))
+      localStorage.setItem('deptId', JSON.stringify(deptId.value))
+      localStorage.setItem('departmentName', JSON.stringify(departmentName.value))
+    } catch (error) {
+      console.error('Fetch user info error:', error)
     }
-
-    localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
-    localStorage.setItem('roles', JSON.stringify(roles.value))
-    localStorage.setItem('permissions', JSON.stringify(permissions.value))
-    localStorage.setItem('deptId', JSON.stringify(deptId.value))
-    localStorage.setItem('departmentName', JSON.stringify(departmentName.value))
 
     return res
   }
