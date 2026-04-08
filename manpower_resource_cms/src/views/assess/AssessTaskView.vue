@@ -93,6 +93,7 @@
             v-model="editForm.deadline"
             type="datetime"
             placeholder="选择截止时间"
+            format="YYYY-MM-DD HH:mm:ss"
             value-format="YYYY-MM-DD HH:mm:ss"
             style="width: 100%"
           />
@@ -302,7 +303,7 @@ const editForm = reactive({
   id: null,
   title: '',
   description: '',
-  deadline: '',
+  deadline: null,
   planId: null,
   allowFileTypes: '.doc,.docx,.pdf,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.jpg,.png',
   maxFileSize: 10,
@@ -353,6 +354,7 @@ const scorePayload = computed(() => {
 const formRules = {
   title: [{ required: true, message: '请输入任务标题', trigger: 'blur' }],
   description: [{ required: true, message: '请输入任务描述', trigger: 'blur' }],
+  deadline: [{ required: true, message: '请选择截止时间', trigger: 'change' }],
 }
 
 const statusMap = { 0: '草稿', 1: '已发布', 2: '已截止' }
@@ -398,7 +400,7 @@ const resetForm = () => {
     id: null,
     title: '',
     description: '',
-    deadline: '',
+    deadline: null,
     planId: null,
     allowFileTypes: '.doc,.docx,.pdf,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.jpg,.png',
     maxFileSize: 10,
@@ -427,17 +429,41 @@ const handleSubmit = async () => {
   try {
     await formRef.value.validate()
     submitting.value = true
+    const payload = { ...editForm }
+    console.log('=== Submitting AssessTask ===')
+    console.log('editForm:', editForm)
+    console.log('payload:', payload)
+    console.log('deadline value:', payload.deadline)
+    console.log('deadline type:', typeof payload.deadline)
+    // 移除 null 值
+    if (payload.id === null || payload.id === undefined) {
+      delete payload.id
+    }
+    if (payload.deadline) {
+      // 转换为 ISO 格式以兼容后端
+      const date = new Date(payload.deadline)
+      payload.deadline = date.toISOString()
+      console.log('Converted deadline to ISO format:', payload.deadline)
+    } else {
+      delete payload.deadline
+    }
+    if (!payload.planId) {
+      delete payload.planId
+    }
     if (editForm.id) {
-      await updateAssessTask({ ...editForm })
+      await updateAssessTask(payload)
       ElMessage.success('更新成功')
     } else {
-      await addAssessTask({ ...editForm })
+      await addAssessTask(payload)
       ElMessage.success('创建成功')
     }
     dialogVisible.value = false
     fetchData()
   } catch (error) {
-    console.error(error)
+    console.error('handleSubmit error:', error)
+    console.error('Response data:', error.response?.data)
+    console.error('Response status:', error.response?.status)
+    ElMessage.error(error.response?.data?.message || error.message || '创建失败')
   } finally {
     submitting.value = false
   }

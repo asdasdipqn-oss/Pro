@@ -5,11 +5,13 @@ import cn.edu.ccst.manpower_resource.common.ResultCode;
 import cn.edu.ccst.manpower_resource.dto.SysUserDTO;
 import cn.edu.ccst.manpower_resource.dto.SysUserQuery;
 import cn.edu.ccst.manpower_resource.entity.EmpEmployee;
+import cn.edu.ccst.manpower_resource.entity.OrgDepartment;
 import cn.edu.ccst.manpower_resource.entity.SysRole;
 import cn.edu.ccst.manpower_resource.entity.SysUser;
 import cn.edu.ccst.manpower_resource.entity.SysUserRole;
 import cn.edu.ccst.manpower_resource.exception.BusinessException;
 import cn.edu.ccst.manpower_resource.mapper.EmpEmployeeMapper;
+import cn.edu.ccst.manpower_resource.mapper.OrgDepartmentMapper;
 import cn.edu.ccst.manpower_resource.mapper.SysRoleMapper;
 import cn.edu.ccst.manpower_resource.mapper.SysUserMapper;
 import cn.edu.ccst.manpower_resource.mapper.SysUserRoleMapper;
@@ -37,6 +39,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private final SysRoleMapper roleMapper;
     private final PasswordEncoder passwordEncoder;
     private final EmpEmployeeMapper employeeMapper;
+    private final OrgDepartmentMapper departmentMapper;
 
     @Override
     public List<SysRole> getUserRoles(Long userId) {
@@ -82,6 +85,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             EmpEmployee employee = employeeMapper.selectById(user.getEmployeeId());
             if (employee != null) {
                 vo.setEmployeeName(employee.getEmpName());
+                vo.setDeptId(employee.getDeptId());
+                if (employee.getDeptId() != null) {
+                    OrgDepartment department = departmentMapper.selectById(employee.getDeptId());
+                    if (department != null) {
+                        vo.setDepartmentName(department.getDeptName());
+                    }
+                }
             }
         }
 

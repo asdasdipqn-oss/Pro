@@ -233,6 +233,7 @@ import { ref, reactive, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Plus, UploadFilled } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useUserStore } from '@/stores/user'
 import {
   pageEmployee,
   addEmployee,
@@ -248,6 +249,7 @@ import { getDepartmentTree } from '@/api/department'
 import { listPosition, listPositionByDept } from '@/api/position'
 
 const router = useRouter()
+const userStore = useUserStore()
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -312,14 +314,30 @@ const fetchData = async () => {
   try {
     const res = await pageEmployee(queryForm)
     let allRecords = res.data.records || []
+    total.value = res.data.total || 0
 
-    // 如果是部门经理，只显示本部门的员工
-    if (useUserStore().roles.includes('HR')) {
-      allRecords = allRecords.filter(emp => emp.deptId === useUserStore().deptId)
+    // HR和Admin可以看到所有员工，部门经理只能看到本部门及子部门的员工
+    const isHrOrAdmin = userStore.roles.some(role =>
+      role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'admin' || role === 'super_admin' || role === 'HR'
+    )
+    console.log('[EmployeeList] 用户角色:', userStore.roles)
+    console.log('[EmployeeList] 是否是HR或Admin:', isHrOrAdmin)
+    console.log('[EmployeeList] 用户部门ID:', userStore.deptId)
+    console.log('[EmployeeList] 过滤前员工数:', allRecords.length)
+
+    if (!isHrOrAdmin && userStore.deptId) {
+      // 获取部门树并递归获取所有子部门ID
+      const deptTreeRes = await getDepartmentTree()
+      const deptTree = deptTreeRes.data || []
+      const allowedDeptIds = getDeptIdsWithChildren(userStore.deptId, deptTree)
+      console.log('[EmployeeList] 允许的部门ID:', allowedDeptIds)
+      allRecords = allRecords.filter(emp => allowedDeptIds.includes(emp.deptId))
+      console.log('[EmployeeList] 过滤后员工数:', allRecords.length)
     }
 
+    console.log('[EmployeeList] 第一条员工部门:', allRecords[0]?.departmentName)
+
     tableData.value = allRecords
-    total.value = allRecords.length
   } catch (error) {
     // 忽略请求取消错误
     if (error.message !== 'cancel') {
@@ -349,6 +367,39 @@ const flattenTree = (tree, result = []) => {
     }
   })
   return result
+}
+
+// 获取部门及其所有子部门ID（递归）
+const getDeptIdsWithChildren = (deptId, deptTree) => {
+  const ids = []
+  const findDept = (nodes, targetId) => {
+    for (const node of nodes) {
+      if (node.id === targetId) {
+        ids.push(node.id)
+        // 递归添加子部门
+        if (node.children && node.children.length) {
+          addChildrenIds(node.children)
+        }
+        return true
+      }
+      if (node.children && node.children.length) {
+        if (findDept(node.children, targetId)) return true
+      }
+    }
+    return false
+  }
+
+  const addChildrenIds = (children) => {
+    for (const child of children) {
+      ids.push(child.id)
+      if (child.children && child.children.length) {
+        addChildrenIds(child.children)
+      }
+    }
+  }
+
+  findDept(deptTree, deptId)
+  return ids
 }
 
 const handleSearch = () => {

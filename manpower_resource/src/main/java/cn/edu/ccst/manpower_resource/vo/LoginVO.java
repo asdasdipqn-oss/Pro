@@ -28,4 +28,10 @@ public class LoginVO {
 
     @Schema(description = "权限列表")
     private List<String> permissions;
+
+    @Schema(description = "部门ID")
+    private Long deptId;
+
+    @Schema(description = "部门名称")
+    private String departmentName;
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import java.time.LocalDate;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableField;
 import java.time.LocalDateTime;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -60,6 +61,10 @@ public class EmpEmployee implements Serializable {
 
     @ApiModelProperty(value = "所属部门ID")
     private Long deptId;
+
+    @ApiModelProperty(value = "部门名称（非数据库字段，仅用于返回）")
+    @TableField(exist = false)
+    private String deptName;
 
     @ApiModelProperty(value = "岗位ID")
     private Long positionId;

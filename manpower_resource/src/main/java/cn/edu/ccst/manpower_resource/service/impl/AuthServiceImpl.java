@@ -4,11 +4,13 @@ import cn.edu.ccst.manpower_resource.common.ResultCode;
 import cn.edu.ccst.manpower_resource.dto.LoginRequest;
 import cn.edu.ccst.manpower_resource.dto.RegisterRequest;
 import cn.edu.ccst.manpower_resource.entity.EmpEmployee;
+import cn.edu.ccst.manpower_resource.entity.OrgDepartment;
 import cn.edu.ccst.manpower_resource.entity.OrgPosition;
 import cn.edu.ccst.manpower_resource.entity.SysUser;
 import cn.edu.ccst.manpower_resource.entity.SysUserRole;
 import cn.edu.ccst.manpower_resource.exception.BusinessException;
 import cn.edu.ccst.manpower_resource.mapper.EmpEmployeeMapper;
+import cn.edu.ccst.manpower_resource.mapper.OrgDepartmentMapper;
 import cn.edu.ccst.manpower_resource.mapper.OrgPositionMapper;
 import cn.edu.ccst.manpower_resource.mapper.SysUserMapper;
 import cn.edu.ccst.manpower_resource.mapper.SysUserRoleMapper;
@@ -39,6 +41,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final EmpEmployeeMapper empEmployeeMapper;
     private final OrgPositionMapper orgPositionMapper;
+    private final OrgDepartmentMapper orgDepartmentMapper;
 
     @Override
     public LoginVO login(LoginRequest request, String ip) {
@@ -56,6 +59,20 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtUtil.generateToken(user.getId(), user.getUsername());
 
+        // 获取用户部门信息
+        Long deptId = null;
+        String departmentName = null;
+        if (user.getEmployeeId() != null) {
+            EmpEmployee employee = empEmployeeMapper.selectById(user.getEmployeeId());
+            if (employee != null && employee.getDeptId() != null) {
+                deptId = employee.getDeptId();
+                OrgDepartment department = orgDepartmentMapper.selectById(deptId);
+                if (department != null) {
+                    departmentName = department.getDeptName();
+                }
+            }
+        }
+
         return LoginVO.builder()
                 .token(token)
                 .tokenType("Bearer")
@@ -63,6 +80,8 @@ public class AuthServiceImpl implements AuthService {
                 .username(user.getUsername())
                 .roles(loginUser.getRoles())
                 .permissions(loginUser.getPermissions())
+                .deptId(deptId)
+                .departmentName(departmentName)
                 .build();
     }
 
@@ -110,13 +129,24 @@ public class AuthServiceImpl implements AuthService {
         vo.setEmployeeId(user.getEmployeeId());
         vo.setStatus(user.getStatus());
 
-        // 查询员工岗位信息
+        // 查询员工岗位和部门信息
         if (user.getEmployeeId() != null) {
             EmpEmployee employee = empEmployeeMapper.selectById(user.getEmployeeId());
-            if (employee != null && employee.getPositionId() != null) {
-                OrgPosition position = orgPositionMapper.selectById(employee.getPositionId());
-                if (position != null) {
-                    vo.setPositionName(position.getPositionName());
+            if (employee != null) {
+                vo.setDeptId(employee.getDeptId());
+                if (employee.getDeptId() != null) {
+                    OrgDepartment department = orgDepartmentMapper.selectById(employee.getDeptId());
+                    if (department != null) {
+                        vo.setDepartmentName(department.getDeptName());
+                    }
+                }
+                if (employee.getPositionId() != null) {
+                    OrgPosition position = orgPositionMapper.selectById(employee.getPositionId());
+                    if (position != null) {
+                        vo.setPositionName(position.getPositionName());
+                    } else {
+                        vo.setPositionName("未设置岗位");
+                    }
                 } else {
                     vo.setPositionName("未设置岗位");
                 }

@@ -39,6 +39,11 @@ spring:
       max-file-size: 50MB
       max-request-size: 50MB
 
+# 配置文件上传目录
+file:
+  upload-dir: /tmp/manpower_uploads
+
+
   # Jackson 配置
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss

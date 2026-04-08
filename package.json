@@ -1,0 +1,21 @@
+{
+  "name": "manpower_resource_cms",
+  "version": "1.0.0",
+  "description": "一个基于 Spring Boot 3 + Vue 3 + Element Plus 构建的人力资源管理系统，提供员工管理、考勤管理、薪酬管理、绩效管理、招聘管理等核心功能。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asdasdipqn-oss/Pro.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/asdasdipqn-oss/Pro/issues"
+  },
+  "homepage": "https://github.com/asdasdipqn-oss/Pro#readme"
+}

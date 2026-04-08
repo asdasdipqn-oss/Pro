@@ -67,4 +67,8 @@ public class LoginUser implements UserDetails {
     public Long getUserId() {
         return user.getId();
     }
+
+    public SysUser getUser() {
+        return user;
+    }
 }

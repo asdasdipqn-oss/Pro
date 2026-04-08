@@ -69,16 +69,16 @@
         </el-table-column>
         <el-table-column label="操作" width="240" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)" v-if="row.status !== 2"
+            <el-button type="primary" link @click="handleEdit(row)" v-if="canEditSalary && row.status !== 2"
               >编辑</el-button
             >
-            <el-button type="info" link @click="handleRecalculate(row)" v-if="row.status === 0"
+            <el-button type="info" link @click="handleRecalculate(row)" v-if="canEditSalary && row.status === 0"
               >重算</el-button
             >
-            <el-button type="warning" link @click="handleConfirm(row)" v-if="row.status === 0"
+            <el-button type="warning" link @click="handleConfirm(row)" v-if="canEditSalary && row.status === 0"
               >确认</el-button
             >
-            <el-button type="success" link @click="handlePay(row)" v-if="row.status === 1"
+            <el-button type="success" link @click="handlePay(row)" v-if="canEditSalary && row.status === 1"
               >发放</el-button
             >
             <el-tag v-if="row.status === 2" type="success" size="small">已发放</el-tag>
@@ -252,6 +252,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useUserStore } from '@/stores/user'
 import {
   pageSalaryByMonth,
   getSalarySummary,
@@ -264,6 +265,8 @@ import {
   getSalaryDetail,
   updateSalaryRecord,
 } from '@/api/salary'
+
+const userStore = useUserStore()
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -296,6 +299,14 @@ const year = computed(() =>
 const month = computed(() =>
   monthPicker.value ? new Date(monthPicker.value).getMonth() + 1 : new Date().getMonth() + 1,
 )
+
+// 权限检查：HR和Admin可以编辑/删除薪资，经理和普通员工只能查看
+const canEditSalary = computed(() => {
+  const isAdmin = userStore.roles.some(role =>
+    role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'admin' || role === 'super_admin' || role === 'HR'
+  )
+  return isAdmin
+})
 
 const pagination = reactive({
   pageNum: 1,

@@ -263,8 +263,8 @@ const router = createRouter({
         {
           path: 'assess/result',
           name: 'assessResult',
-          component: () => import('@/views/assess/AssessResultView.vue'),
-          meta: { title: '考核结果' },
+          component: () => import('@/views/assess/AssessSubmissionView.vue'),
+          meta: { title: '考核审批' },
         },
         // 离职管理
         {

@@ -72,13 +72,26 @@ public class AssessTaskController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','HR')")
     public Result<Void> create(@RequestBody AssessTask task, @AuthenticationPrincipal LoginUser loginUser) {
-        task.setCreateBy(loginUser.getUserId());
-        task.setStatus(0);
-        task.setDeleted(0);
-        task.setCreateTime(LocalDateTime.now());
-        task.setUpdateTime(LocalDateTime.now());
-        assessTaskService.save(task);
-        return Result.success();
+        System.out.println("========== Creating AssessTask ==========");
+        System.out.println("Task: " + task);
+        System.out.println("Title: " + task.getTitle());
+        System.out.println("Deadline: " + task.getDeadline());
+        System.out.println("PlanId: " + task.getPlanId());
+        try {
+            task.setCreateBy(loginUser.getUserId());
+            task.setStatus(0);
+            task.setDeleted(0);
+            task.setCreateTime(LocalDateTime.now());
+            task.setUpdateTime(LocalDateTime.now());
+            assessTaskService.save(task);
+            System.out.println("========== AssessTask saved successfully ==========");
+            return Result.success();
+        } catch (Exception e) {
+            System.out.println("========== ERROR SAVING ASSESS TASK ==========");
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            return Result.fail(500, "创建考核任务失败: " + e.getMessage());
+        }
     }
 
     @Operation(summary = "更新考核任务")

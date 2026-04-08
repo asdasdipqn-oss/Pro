@@ -45,9 +45,9 @@ export const useUserStore = defineStore('user', () => {
     permissions.value = res.data.permissions || []
 
     // 保存用户的部门信息
-    if (res.data.userInfo && res.data.userInfo.deptId) {
-      deptId.value = res.data.userInfo.deptId
-      departmentName.value = res.data.userInfo.departmentName || ''
+    if (res.data.deptId) {
+      deptId.value = res.data.deptId
+      departmentName.value = res.data.departmentName || ''
     }
 
     localStorage.setItem('token', token.value)
@@ -72,14 +72,14 @@ export const useUserStore = defineStore('user', () => {
   async function fetchUserInfo() {
     try {
       const res = await getUserInfoApi()
-      userInfo.value = res.data.userInfo || {}
+      userInfo.value = res.data.userInfo || res.data || {}
       roles.value = res.data.roles || []
       permissions.value = res.data.permissions || []
 
       // 更新部门信息
-      if (res.data.userInfo && res.data.userInfo.deptId) {
-        deptId.value = res.data.userInfo.deptId
-        departmentName.value = res.data.userInfo.departmentName || ''
+      if (res.data.deptId) {
+        deptId.value = res.data.deptId
+        departmentName.value = res.data.departmentName || ''
       }
 
       localStorage.setItem('userInfo', JSON.stringify(userInfo.value))

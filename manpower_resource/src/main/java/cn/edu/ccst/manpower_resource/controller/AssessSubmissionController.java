@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -69,7 +70,8 @@ public class AssessSubmissionController {
     private final IEmpEmployeeService empEmployeeService;
     private final AssessIndicatorMapper assessIndicatorMapper;
 
-    private static final String UPLOAD_DIR = "uploads/assess/";
+    @Value("${file.upload-dir}")
+    private String storageDir;
 
     @Data
     @ApiModel(value = "SubmissionScoreDetailDTO", description = "提交评分明细")
@@ -177,7 +179,8 @@ public class AssessSubmissionController {
         String storedName = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
                 + "_" + UUID.randomUUID().toString().substring(0, 8) + ext;
 
-        Path uploadPath = Paths.get(UPLOAD_DIR, String.valueOf(taskId));
+        Path baseDir = Paths.get(storageDir != null ? storageDir : "/tmp/manpower_uploads", "assess");
+        Path uploadPath = baseDir.resolve(String.valueOf(taskId));
         Files.createDirectories(uploadPath);
         Path filePath = uploadPath.resolve(storedName);
         file.transferTo(filePath.toFile());

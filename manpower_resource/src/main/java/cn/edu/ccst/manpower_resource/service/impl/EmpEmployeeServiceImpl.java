@@ -191,7 +191,22 @@ public class EmpEmployeeServiceImpl extends ServiceImpl<EmpEmployeeMapper, EmpEm
 
         if (emp.getDeptId() != null) {
             OrgDepartment dept = departmentMapper.selectById(emp.getDeptId());
-            if (dept != null) vo.setDepartmentName(dept.getDeptName());
+            if (dept != null) {
+                // 如果有父部门，检查父部门是否也有父部门（即三级部门）
+                if (dept.getParentId() != null) {
+                    OrgDepartment parentDept = departmentMapper.selectById(dept.getParentId());
+                    if (parentDept != null && parentDept.getParentId() != null) {
+                        // 三级部门：显示父部门（当前部门）
+                        vo.setDepartmentName(parentDept.getDeptName() + "（" + dept.getDeptName() + "）");
+                    } else {
+                        // 二级部门：只显示部门名称
+                        vo.setDepartmentName(dept.getDeptName());
+                    }
+                } else {
+                    // 一级部门：只显示部门名称
+                    vo.setDepartmentName(dept.getDeptName());
+                }
+            }
         }
         if (emp.getPositionId() != null) {
             OrgPosition pos = positionMapper.selectById(emp.getPositionId());

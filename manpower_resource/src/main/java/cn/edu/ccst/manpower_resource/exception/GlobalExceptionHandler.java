@@ -77,6 +77,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result<Void> handleException(Exception e) {
         log.error("System error: ", e);
-        return Result.fail(ResultCode.SYSTEM_ERROR.getCode(), "System error");
+        // 返回详细的错误信息用于调试
+        return Result.fail(ResultCode.SYSTEM_ERROR.getCode(), "System error: " + e.getMessage());
     }
 }

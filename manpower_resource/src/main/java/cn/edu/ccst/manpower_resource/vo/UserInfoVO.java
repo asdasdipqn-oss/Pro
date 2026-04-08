@@ -37,6 +37,12 @@ public class UserInfoVO {
     @Schema(description = "岗位名称")
     private String positionName;
 
+    @Schema(description = "部门ID")
+    private Long deptId;
+
+    @Schema(description = "部门名称")
+    private String departmentName;
+
     @Schema(description = "最后登录时间")
     private LocalDateTime lastLoginTime;
 
