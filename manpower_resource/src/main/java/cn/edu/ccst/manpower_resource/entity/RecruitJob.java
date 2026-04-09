@@ -73,6 +73,9 @@ public class RecruitJob implements Serializable {
     @ApiModelProperty(value = "福利待遇")
     private String benefits;
 
+    @ApiModelProperty(value = "工作地点")
+    private String location;
+
     @ApiModelProperty(value = "发布人ID")
     private Long publisherId;
 

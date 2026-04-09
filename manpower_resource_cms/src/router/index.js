@@ -17,6 +17,24 @@ const router = createRouter({
       meta: { title: '注册', public: true },
     },
     {
+      path: '/candidate',
+      name: 'candidate',
+      component: () => import('@/views/CandidateView.vue'),
+      meta: { title: '求职者', public: true },
+    },
+    {
+      path: '/candidate/dashboard',
+      name: 'candidateDashboard',
+      component: () => import('@/views/candidate/CandidateDashboardView.vue'),
+      meta: { title: '求职者首页', requireCandidate: true },
+    },
+    {
+      path: '/candidate/profile',
+      name: 'candidateProfile',
+      component: () => import('@/views/candidate/CandidateProfileView.vue'),
+      meta: { title: '求职者个人信息', requireCandidate: true },
+    },
+    {
       path: '/',
       component: () => import('@/layout/MainLayout.vue'),
       children: [
@@ -352,6 +370,14 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.public) {
     next()
+  } else if (to.meta.requireCandidate) {
+    // 求职者页面需要检查是否是求职者用户
+    const userType = localStorage.getItem('userType')
+    if (userType === 'candidate') {
+      next()
+    } else {
+      next('/candidate')
+    }
   } else if (!userStore.isLoggedIn) {
     next('/login')
   } else {

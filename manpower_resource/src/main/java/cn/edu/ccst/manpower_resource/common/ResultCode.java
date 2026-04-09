@@ -25,6 +25,8 @@ public enum ResultCode {
     DATA_NOT_EXIST(4001, "data not exist"),
     DATA_ALREADY_EXIST(4002, "data already exist"),
     DATA_ERROR(4003, "data error"),
+    PHONE_EXIST(4004, "phone already exist"),
+    EMAIL_EXIST(4005, "email already exist"),
     SYSTEM_ERROR(5001, "system error"),
     SYSTEM_BUSY(5002, "system busy");
 

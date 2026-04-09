@@ -1,5 +1,12 @@
 <template>
   <div class="login-container">
+    <!-- 右上角求职者登录按钮 -->
+    <div class="top-right-switch">
+      <el-button type="primary" link @click="router.push('/candidate')">
+        求职者登录
+      </el-button>
+    </div>
+
     <div class="login-card">
       <div class="card-header">
         <div class="login-header">
@@ -9,26 +16,8 @@
               <path d="M16 24h16M24 16v16" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
             </svg>
           </div>
-          <h1>{{ loginMode === 'hr' ? 'HR 管理系统' : '求职者登录' }}</h1>
+          <h1>{{ loginMode === 'hr' ? '人力资源管理' : '求职者登录' }}</h1>
           <p>{{ loginMode === 'hr' ? '登录您的账户以继续' : '欢迎求职者登录' }}</p>
-        </div>
-        <div class="switch-login">
-          <el-button
-            v-if="loginMode === 'hr'"
-            type="primary"
-            link
-            @click="loginMode = 'candidate'"
-          >
-            求职者登录
-          </el-button>
-          <el-button
-            v-else
-            type="primary"
-            link
-            @click="loginMode = 'hr'"
-          >
-            HR登录
-          </el-button>
         </div>
       </div>
 
@@ -66,11 +55,6 @@
           登录
         </el-button>
       </el-form>
-
-      <div class="login-footer" v-if="loginMode === 'hr'">
-        <span>还没有账号？</span>
-        <a href="javascript:;" @click="router.push('/register')">创建账户</a>
-      </div>
     </div>
 
     <div class="login-copyright">
@@ -108,12 +92,6 @@ const handleLogin = async () => {
 
   loading.value = true
   try {
-    if (loginMode.value === 'candidate') {
-      // 求职者登录逻辑（暂时使用相同接口，后续可扩展）
-      ElMessage.info('求职者登录功能开发中')
-      return
-    }
-
     await userStore.login({
       username: loginForm.username,
       password: loginForm.password
@@ -143,10 +121,19 @@ const handleLogin = async () => {
   justify-content: center;
   align-items: center;
   background: #F5F5F7;
+  position: relative;
+}
+
+.top-right-switch {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
 }
 
 .login-card {
   width: 380px;
+  max-width: 90vw;
   padding: 48px 40px;
   background: #FFFFFF;
   border-radius: 20px;
@@ -176,18 +163,6 @@ const handleLogin = async () => {
 .login-header p {
   color: #86868B;
   font-size: 15px;
-}
-
-.switch-login {
-  text-align: right;
-  margin-top: -20px;
-  margin-bottom: 20px;
-}
-
-.switch-login :deep(.el-button) {
-  font-size: 13px;
-  padding: 4px 0;
-  height: auto;
 }
 
 .login-form {
@@ -266,5 +241,10 @@ const handleLogin = async () => {
   margin-top: 40px;
   font-size: 12px;
   color: #86868B;
+}
+
+.top-right-switch :deep(.el-button) {
+  font-size: 13px;
+  padding: 4px 12px;
 }
 </style>

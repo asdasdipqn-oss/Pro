@@ -13,8 +13,10 @@ request.interceptors.request.use(
   (config) => {
     const userStore = useUserStore()
     const token = userStore.token
-    console.log('[Request] URL:', config.url, 'Has token:', !!token)
-    if (token) {
+    // 登录请求不发送旧token，避免求职者token干扰员工登录
+    const isLoginRequest = config.url?.includes('/auth/login')
+    console.log('[Request] URL:', config.url, 'Has token:', !!token, 'Skip token:', isLoginRequest)
+    if (token && !isLoginRequest) {
       config.headers.Authorization = `Bearer ${token}`
     }
     return config

@@ -33,6 +33,9 @@ export const useUserStore = defineStore('user', () => {
 
   // 登录
   async function login(loginForm) {
+    // 登录前清除旧的token，避免求职者token影响员工登录
+    localStorage.removeItem('token')
+
     const res = await loginApi(loginForm)
     console.log('[Login] Response:', res.data)
     token.value = res.data.token

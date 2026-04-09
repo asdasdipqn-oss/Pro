@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.ccst.manpower_resource.mapper.RecruitApplicationMapper">
+
+    <select id="selectByJobSeeker" resultType="cn.edu.ccst.manpower_resource.vo.RecruitApplicationVO">
+        SELECT a.*,
+               j.job_name,
+               j.job_code,
+               a.status,
+               CASE WHEN a.status = 0 THEN '待处理'
+                    WHEN a.status = 1 THEN '已查看'
+                    WHEN a.status = 2 THEN '面试'
+                    WHEN a.status = 3 THEN '已录用'
+                    ELSE '未知'
+               END AS status_text,
+               a.apply_time,
+               a.id,
+               a.job_seeker_id
+        FROM recruit_application a
+        LEFT JOIN recruit_job j ON a.job_id = j.id
+        WHERE a.job_seeker_id = #{jobSeekerId}
+        ORDER BY a.apply_time DESC
+    </select>
+
+    <select id="selectById" resultType="cn.edu.ccst.manpower_resource.vo.RecruitApplicationVO">
+        SELECT a.*, j.job_name, j.job_code
+        FROM recruit_application a
+        LEFT JOIN recruit_job j ON a.job_id = j.id
+        WHERE a.id = #{id}
+    </select>
+
+    <insert id="insertApplication" parameterType="cn.edu.ccst.manpower_resource.dto.JobApplicationRequest">
+        INSERT INTO recruit_application
+            (job_id, job_seeker_id, resume_id, status, cover_letter, self_intro, apply_time, create_time, update_time)
+        VALUES
+            (#{request.jobId}, #{jobSeekerId}, #{request.resumeId}, 0, #{request.coverLetter}, #{request.selfIntro}, NOW(), NOW())
+    </insert>
+
+</mapper>

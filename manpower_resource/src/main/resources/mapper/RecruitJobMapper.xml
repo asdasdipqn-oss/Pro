@@ -1,6 +1,16 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.edu.ccst.manpower_resource.mapper.RecruitJobMapper">
 
-</mapper>
+    <select id="selectList" resultType="cn.edu.ccst.manpower_resource.entity.RecruitJob">
+        SELECT * FROM recruit_job
+        WHERE status = 1
+        AND deleted = 0
+        ORDER BY publish_time DESC
+    </select>
 
+    <select id="selectById" resultType="cn.edu.ccst.manpower_resource.entity.RecruitJob">
+        SELECT * FROM recruit_job WHERE id = #{id} AND deleted = 0
+    </select>
+
+</mapper>

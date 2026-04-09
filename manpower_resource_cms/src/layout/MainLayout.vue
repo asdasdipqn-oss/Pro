@@ -183,67 +183,12 @@ onMounted(() => {
   white-space: nowrap;
 }
 
-.nav-menu {
-  flex: 1;
-  padding: 16px 12px;
-  overflow-y: auto;
-}
-
-.nav-group {
-  margin-bottom: 8px;
-}
-
-.nav-group-title {
-  font-size: 11px;
-  font-weight: 600;
-  color: #86868B;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 16px 12px 8px;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  padding: 10px 12px;
-  border-radius: 8px;
-  color: #1D1D1F;
-  text-decoration: none;
-  margin-bottom: 2px;
-  transition: all 0.15s ease;
-}
-
-.nav-item:hover {
-  background: #F5F5F7;
-}
-
-.nav-item.active {
-  background: #F5F5F7;
-  color: #007AFF;
-}
-
-.nav-icon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.nav-text {
-  margin-left: 12px;
-  font-size: 14px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
 /* 主内容区 */
 .main-container {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  min-width: 0;
 }
 
 .header {
@@ -278,12 +223,6 @@ onMounted(() => {
 
 .toggle-btn:hover {
   background: #F5F5F7;
-}
-
-.page-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #1D1D1F;
 }
 
 .header-right {
@@ -351,5 +290,6 @@ onMounted(() => {
   flex: 1;
   padding: 24px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 </style>
