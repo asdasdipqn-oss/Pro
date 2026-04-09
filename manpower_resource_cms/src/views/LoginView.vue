@@ -1,17 +1,37 @@
 <template>
   <div class="login-container">
     <div class="login-card">
-      <div class="login-header">
-        <div class="logo-icon">
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-            <rect width="48" height="48" rx="12" fill="#1D1D1F"/>
-            <path d="M16 24h16M24 16v16" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
+      <div class="card-header">
+        <div class="login-header">
+          <div class="logo-icon">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <rect width="48" height="48" rx="12" fill="#1D1D1F"/>
+              <path d="M16 24h16M24 16v16" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h1>{{ loginMode === 'hr' ? 'HR 管理系统' : '求职者登录' }}</h1>
+          <p>{{ loginMode === 'hr' ? '登录您的账户以继续' : '欢迎求职者登录' }}</p>
         </div>
-        <h1>HR 管理系统</h1>
-        <p>登录您的账户以继续</p>
+        <div class="switch-login">
+          <el-button
+            v-if="loginMode === 'hr'"
+            type="primary"
+            link
+            @click="loginMode = 'candidate'"
+          >
+            求职者登录
+          </el-button>
+          <el-button
+            v-else
+            type="primary"
+            link
+            @click="loginMode = 'hr'"
+          >
+            HR登录
+          </el-button>
+        </div>
       </div>
-      
+
       <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" class="login-form" hide-required-asterisk>
         <el-form-item prop="username">
           <el-input
@@ -20,7 +40,7 @@
             size="large"
           />
         </el-form-item>
-        
+
         <el-form-item prop="password">
           <el-input
             v-model="loginForm.password"
@@ -31,11 +51,11 @@
             @keyup.enter="handleLogin"
           />
         </el-form-item>
-        
+
         <div class="form-options">
           <el-checkbox v-model="loginForm.remember">记住我</el-checkbox>
         </div>
-        
+
         <el-button
           type="primary"
           size="large"
@@ -46,13 +66,13 @@
           登录
         </el-button>
       </el-form>
-      
-      <div class="login-footer">
+
+      <div class="login-footer" v-if="loginMode === 'hr'">
         <span>还没有账号？</span>
         <a href="javascript:;" @click="router.push('/register')">创建账户</a>
       </div>
     </div>
-    
+
     <div class="login-copyright">
       © 2025 HR Management System. All rights reserved.
     </div>
@@ -69,6 +89,7 @@ const router = useRouter()
 const userStore = useUserStore()
 const loginFormRef = ref()
 const loading = ref(false)
+const loginMode = ref('hr') // 'hr' or 'candidate'
 
 const loginForm = reactive({
   username: '',
@@ -84,9 +105,15 @@ const loginRules = {
 const handleLogin = async () => {
   const valid = await loginFormRef.value.validate().catch(() => false)
   if (!valid) return
-  
+
   loading.value = true
   try {
+    if (loginMode.value === 'candidate') {
+      // 求职者登录逻辑（暂时使用相同接口，后续可扩展）
+      ElMessage.info('求职者登录功能开发中')
+      return
+    }
+
     await userStore.login({
       username: loginForm.username,
       password: loginForm.password
@@ -126,9 +153,12 @@ const handleLogin = async () => {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
 }
 
+.card-header {
+  margin-bottom: 24px;
+}
+
 .login-header {
   text-align: center;
-  margin-bottom: 36px;
 }
 
 .logo-icon {
@@ -146,6 +176,18 @@ const handleLogin = async () => {
 .login-header p {
   color: #86868B;
   font-size: 15px;
+}
+
+.switch-login {
+  text-align: right;
+  margin-top: -20px;
+  margin-bottom: 20px;
+}
+
+.switch-login :deep(.el-button) {
+  font-size: 13px;
+  padding: 4px 0;
+  height: auto;
 }
 
 .login-form {
