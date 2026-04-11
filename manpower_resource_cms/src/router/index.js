@@ -35,6 +35,18 @@ const router = createRouter({
       meta: { title: '求职者个人信息', requireCandidate: true },
     },
     {
+      path: '/candidate/jobs',
+      name: 'candidateJobs',
+      component: () => import('@/views/candidate/CandidateJobsView.vue'),
+      meta: { title: '岗位招聘', requireCandidate: true },
+    },
+    {
+      path: '/candidate/process',
+      name: 'candidateProcess',
+      component: () => import('@/views/candidate/CandidateProcessView.vue'),
+      meta: { title: '招聘流程', requireCandidate: true },
+    },
+    {
       path: '/',
       component: () => import('@/layout/MainLayout.vue'),
       children: [
@@ -382,8 +394,8 @@ router.beforeEach((to, from, next) => {
     next('/login')
   } else {
     // 检查是否需要管理员权限
+    const roles = userStore.roles.value || []
     if (to.meta.requireAdmin) {
-      const roles = userStore.roles || []
       const isAdmin = roles.some(role =>
         role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'admin' || role === 'super_admin'
       )
@@ -394,7 +406,6 @@ router.beforeEach((to, from, next) => {
     }
     // 处理首页重定向
     if (to.path === '/') {
-      const roles = userStore.roles || []
       const isAdmin = roles.some(role =>
         role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'admin' || role === 'super_admin' || role === 'HR'
       )

@@ -199,8 +199,8 @@ const handleLogin = async () => {
     localStorage.setItem('userType', 'candidate')
     localStorage.setItem('username', response.data.data.username)
 
-    // 跳转到个人信息页面
-    router.push('/candidate/profile')
+    // 跳转到求职者首页
+    router.push('/candidate/dashboard')
   } catch (error) {
     console.error('登录失败:', error)
     ElMessage.error(error.response?.data?.message || '登录失败，请重试')
