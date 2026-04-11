@@ -116,8 +116,8 @@
             <el-form-item label="状态" prop="empStatus">
               <el-select v-model="editForm.empStatus" placeholder="请选择状态" style="width: 100%">
                 <el-option label="在职" :value="1" />
-                <el-option label="离职" :value="2" />
-                <el-option label="试用期" :value="3" />
+                <el-option label="试用期" :value="2" />
+                <el-option label="离职" :value="3" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -300,12 +300,12 @@ const formRules = {
 }
 
 const getStatusClass = (status) => {
-  const map = { 1: 'active', 2: 'inactive', 3: 'pending' }
+  const map = { 1: 'active', 2: 'pending', 3: 'inactive' }
   return map[status] || ''
 }
 
 const getStatusText = (status) => {
-  const map = { 1: '在职', 2: '离职', 3: '试用期' }
+  const map = { 1: '在职', 2: '试用期', 3: '离职' }
   return map[status] || '未知'
 }
 
@@ -601,7 +601,7 @@ const handleBatchDelete = async () => {
 // 批量修改状态
 const handleBatchUpdateStatus = async (status) => {
   if (selectedRows.value.length === 0) return
-  const statusText = status === 1 ? '在职' : '离职'
+  const statusText = status === 1 ? '在职' : status === 2 ? '试用期' : '离职'
   await ElMessageBox.confirm(
     `确定要将选中的${selectedRows.value.length}名员工设为${statusText}吗？`,
     '提示',
