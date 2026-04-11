@@ -135,11 +135,13 @@ const formRules = {
 const fetchData = async () => {
   loading.value = true
   try {
+    console.log('[JobListView] 查询参数:', { ...searchForm, pageNum: pagination.pageNum, pageSize: pagination.pageSize })
     const res = await pageJobs({
       ...searchForm,
       pageNum: pagination.pageNum,
       pageSize: pagination.pageSize
     })
+    console.log('[JobListView] 查询结果:', res.data)
     tableData.value = res.data?.records || []
     pagination.total = res.data?.total || 0
   } catch (error) {
@@ -185,7 +187,9 @@ const handleSubmit = async () => {
 const handleClose = async (row) => {
   try {
     await ElMessageBox.confirm('确定要关闭该招聘岗位吗？', '提示', { type: 'warning' })
+    console.log('[JobListView] 关闭岗位:', row)
     await closeJob(row.id)
+    console.log('[JobListView] 关闭成功，刷新列表')
     ElMessage.success('已关闭')
     fetchData()
   } catch (error) {

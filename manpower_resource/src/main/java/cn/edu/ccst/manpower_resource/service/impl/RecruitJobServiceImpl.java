@@ -39,7 +39,9 @@ public class RecruitJobServiceImpl extends ServiceImpl<RecruitJobMapper, Recruit
         }
         wrapper.eq(RecruitJob::getDeleted, 0)
                 .orderByDesc(RecruitJob::getCreateTime);
+        System.out.println("[RecruitJob] 查询条件 status: " + status);
         Page<RecruitJob> result = baseMapper.selectPage(page, wrapper);
+        System.out.println("[RecruitJob] 查询结果数量: " + result.getRecords().size());
         return PageResult.of(result.getCurrent(), result.getSize(), result.getTotal(), result.getRecords());
     }
 
