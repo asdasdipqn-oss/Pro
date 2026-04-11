@@ -1,139 +1,326 @@
 <template>
-  <div class="candidate-dashboard">
-    <div class="header">
-      <h1>欢迎，{{ displayName }}！</h1>
-      <p>开始您的求职之旅</p>
-    </div>
-
-    <div class="cards-container">
-      <div class="nav-card" @click="goToProfile">
-        <div class="card-icon">
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-            <circle cx="24" cy="24" r="22" fill="#007AFF"/>
-            <path d="M24 18a6 6 0 0 0 0 0-6 6 6 0 1 0 3-3 3-3v6" stroke="#fff" stroke-width="2"/>
+  <div class="candidate-layout">
+    <!-- 侧边栏 -->
+    <aside :class="['sidebar', { collapsed: isCollapse }]">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="#1D1D1F"/>
+            <path d="M10 16h12M16 10v12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </div>
-        <h2>个人信息</h2>
-        <p>完善您的个人信息</p>
+        <span v-show="!isCollapse" class="logo-text">求职者中心</span>
       </div>
 
-      <div class="nav-card" @click="goToJobs">
-        <div class="card-icon">
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-            <circle cx="24" cy="24" r="22" fill="#34C759"/>
-            <path d="M16 16h16M24 16v8" stroke="#fff" stroke-width="2"/>
-          </svg>
-        </div>
-        <h2>岗位招聘</h2>
-        <p>查看并申请心仪的岗位</p>
-      </div>
+      <!-- 动态菜单 -->
+      <div class="nav-group-title" v-show="!isCollapse">功能导航</div>
+      <router-link
+        to="/candidate/dashboard"
+        class="nav-item"
+        :class="{ active: isActive('/candidate/dashboard') }"
+      >
+        <IconComponent :icon="getIcon('首页')" class="nav-icon" />
+        <span v-show="!isCollapse" class="nav-text">首页</span>
+      </router-link>
+      <router-link
+        to="/candidate/jobs"
+        class="nav-item"
+        :class="{ active: isActive('/candidate/jobs') }"
+      >
+        <IconComponent :icon="getIcon('岗位招聘')" class="nav-icon" />
+        <span v-show="!isCollapse" class="nav-text">岗位招聘</span>
+      </router-link>
+      <router-link
+        to="/candidate/process"
+        class="nav-item"
+        :class="{ active: isActive('/candidate/process') }"
+      >
+        <IconComponent :icon="getIcon('招聘流程')" class="nav-icon" />
+        <span v-show="!isCollapse" class="nav-text">招聘流程</span>
+      </router-link>
+      <router-link
+        to="/candidate/profile"
+        class="nav-item"
+        :class="{ active: isActive('/candidate/profile') }"
+      >
+        <IconComponent :icon="getIcon('个人信息')" class="nav-icon" />
+        <span v-show="!isCollapse" class="nav-text">个人信息</span>
+      </router-link>
 
-      <div class="nav-card" @click="goToProcess">
-        <div class="card-icon">
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-            <circle cx="24" cy="24" r="22" fill="#FF9500"/>
-            <path d="M12 24l3-3 4-4h3v2H12m3-3-4v2H20v6h6v-6h-6" stroke="#fff" stroke-width="2"/>
-          </svg>
-        </div>
-        <h2>招聘流程</h2>
-        <p>查看您的应聘进度和面试安排</p>
+      <!-- 退出登录 -->
+      <div class="nav-group">
+        <div class="nav-group-title" v-show="!isCollapse">账户</div>
+        <button class="nav-item logout-btn" @click="handleLogout">
+          <IconComponent :icon="getIcon('退出登录')" class="nav-icon" />
+          <span v-show="!isCollapse" class="nav-text">退出登录</span>
+        </button>
       </div>
-    </div>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-container">
+      <header class="header">
+        <div class="header-left">
+          <button class="toggle-btn" @click="isCollapse = !isCollapse">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12h18M3 6h18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="header-right">
+          <div class="user-info">
+            <div class="user-avatar">{{ displayInitial }}</div>
+            <span class="username">{{ displayName }}</span>
+          </div>
+        </div>
+      </header>
+      <div class="content">
+        <router-view />
+      </div>
+    </main>
   </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { useUserStore } from '@/stores/user'
+import IconComponent from '@/components/IconComponent.vue'
 
+const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
+
+const isCollapse = ref(false)
 
 const displayName = computed(() => {
   return localStorage.getItem('username') || '求职者'
 })
 
-const goToProfile = () => {
-  router.push('/candidate/profile')
+const displayInitial = computed(() => {
+  const name = displayName.value
+  return name.charAt(0).toUpperCase()
+})
+
+const isActive = (path) => {
+  if (!path) return false
+  return route.path.startsWith(path)
 }
 
-const goToJobs = () => {
-  router.push('/candidate/jobs')
+// 菜单名称到图标的映射
+const iconMap = {
+  '首页': 'home',
+  '岗位招聘': 'plus',
+  '招聘流程': 'list',
+  '个人信息': 'user',
+  '退出登录': 'logout'
 }
 
-const goToProcess = () => {
-  router.push('/candidate/process')
+const getIcon = (menuName) => {
+  // 精确匹配
+  if (iconMap[menuName]) {
+    return iconMap[menuName]
+  }
+
+  // 关键词匹配
+  for (const [key, icon] of Object.entries(iconMap)) {
+    if (menuName.includes(key)) {
+      return icon
+    }
+  }
+
+  // 默认图标
+  return 'file'
+}
+
+const handleLogout = async () => {
+  try {
+    await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    userStore.logout()
+    ElMessage.success('已退出登录')
+    router.push('/candidate')
+  } catch {
+    // 用户取消
+  }
 }
 </script>
 
 <style scoped>
-.candidate-dashboard {
-  min-height: 100vh;
+.candidate-layout {
+  display: flex;
+  height: 100vh;
   background: #F5F5F7;
-  padding: 40px 20px;
+}
+
+/* 侧边栏 */
+.sidebar {
+  width: 240px;
+  background: #FFFFFF;
+  border-right: 1px solid #E5E5EA;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+  width: 72px;
+}
+
+.sidebar-header {
+  height: 64px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #E5E5EA;
+}
+
+.logo {
+  flex-shrink: 0;
+}
+
+.logo-text {
+  margin-left: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1D1D1F;
+  white-space: nowrap;
+}
+
+.nav-group-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #86868B;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 16px 20px 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: #1D1D1F;
+  text-decoration: none;
+  margin-bottom: 2px;
+  transition: background 0.15s ease;
+}
+
+.nav-item:hover {
+  background: #F5F5F7;
+}
+
+.nav-item.active {
+  background: #F5F5F7;
+  color: #007AFF;
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.nav-text {
+  margin-left: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* 主内容区 */
+.main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .header {
-  text-align: center;
-  margin-bottom: 60px;
-}
-
-.header h1 {
-  font-size: 36px;
-  font-weight: 600;
-  color: #1D1D1F;
-  margin-bottom: 12px;
-}
-
-.header p {
-  font-size: 16px;
-  color: #86868B;
-}
-
-.cards-container {
-  max-width: 900px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 24px;
-  margin-bottom: 60px;
-}
-
-.nav-card {
+  height: 64px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background: #FFFFFF;
-  border-radius: 20px;
-  padding: 40px;
-  text-align: center;
+  border-bottom: 1px solid #E5E5EA;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.toggle-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-}
-
-.nav-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
-}
-
-.card-icon {
-  width: 72px;
-  height: 72px;
-  margin: 0 auto 20px;
-  border-radius: 16px;
-}
-
-.card-icon svg {
-  width: 100%;
-  height: 100%;
-}
-
-.nav-card h2 {
-  font-size: 20px;
-  font-weight: 600;
   color: #1D1D1F;
-  margin-bottom: 8px;
+  transition: background 0.15s;
 }
 
-.nav-card p {
+.toggle-btn:hover {
+  background: #F5F5F7;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.user-info:hover {
+  background: #F5F5F7;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1D1D1F;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 14px;
-  color: #86868B;
+  font-weight: 600;
+}
+
+.username {
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1D1D1F;
+}
+
+.content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 </style>
