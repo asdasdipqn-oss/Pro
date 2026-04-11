@@ -56,7 +56,8 @@ public class EmpEmployeeServiceImpl extends ServiceImpl<EmpEmployeeMapper, EmpEm
         wrapper.like(StringUtils.hasText(query.getEmpCode()), EmpEmployee::getEmpCode, query.getEmpCode())
                 .like(StringUtils.hasText(query.getEmpName()), EmpEmployee::getEmpName, query.getEmpName())
                 .eq(query.getDeptId() != null, EmpEmployee::getDeptId, query.getDeptId())
-                .eq(query.getPositionId() != null, EmpEmployee::getPositionId, query.getPositionId());
+                .eq(query.getPositionId() != null, EmpEmployee::getPositionId, query.getPositionId())
+                .eq(query.getEmpStatus() != null, EmpEmployee::getEmpStatus, query.getEmpStatus());
 
         Page<EmpEmployee> result = baseMapper.selectPage(page, wrapper);
         List<EmpEmployeeVO> voList = result.getRecords().stream().map(this::toVO).collect(Collectors.toList());

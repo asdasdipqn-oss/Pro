@@ -37,6 +37,14 @@
             />
           </el-select>
         </div>
+        <div class="search-item">
+          <label>状态</label>
+          <el-select v-model="queryForm.empStatus" placeholder="选择状态" clearable>
+            <el-option label="在职" :value="1" />
+            <el-option label="试用期" :value="2" />
+            <el-option label="离职" :value="3" />
+          </el-select>
+        </div>
         <div class="search-actions">
           <el-button type="primary" @click="handleSearch">查询</el-button>
           <el-button @click="handleReset">重置</el-button>
@@ -270,6 +278,7 @@ const queryForm = reactive({
   empCode: '',
   empName: '',
   deptId: null,
+  empStatus: null,
   pageNum: 1,
   pageSize: 10,
 })
@@ -411,6 +420,7 @@ const handleReset = () => {
   queryForm.empCode = ''
   queryForm.empName = ''
   queryForm.deptId = null
+  queryForm.empStatus = null
   queryForm.pageNum = 1
   fetchData()
 }
