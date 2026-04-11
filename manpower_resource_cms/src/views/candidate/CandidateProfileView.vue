@@ -1,10 +1,5 @@
 <template>
   <div class="profile-container">
-    <div class="profile-header">
-      <h1>个人信息</h1>
-      <p>完善您的个人信息，让HR更了解您</p>
-    </div>
-
     <el-form ref="formRef" :model="form" :rules="rules" class="profile-form" label-width="120px">
       <el-form-item label="真实姓名" prop="realName">
         <el-input v-model="form.realName" placeholder="请输入真实姓名" size="large" />
@@ -31,11 +26,11 @@
 
       <el-form-item label="学历" prop="education">
         <el-select v-model="form.education" placeholder="请选择学历" size="large">
-          <el-option :label="1" value="1">高中</el-option>
-          <el-option :label="2" value="2">大专</el-option>
-          <el-option :label="3" value="3">本科</el-option>
-          <el-option :label="4" value="4">硕士</el-option>
-          <el-option :label="5" value="5">博士</el-option>
+          <el-option label="高中" :value="1" />
+          <el-option label="大专" :value="2" />
+          <el-option label="本科" :value="3" />
+          <el-option label="硕士" :value="4" />
+          <el-option label="博士" :value="5" />
         </el-select>
       </el-form-item>
 
@@ -65,7 +60,7 @@
 
       <el-form-item label="期望薪资（元/月）" prop="expectedSalary">
         <el-input v-model="form.expectedSalary" placeholder="请输入期望薪资" size="large">
-          <template #append>元</template>
+          <template #append>元/月</template>
         </el-input>
       </el-form-item>
 
@@ -81,11 +76,24 @@
         <el-button type="primary" size="large" class="submit-btn" :loading="loading" @click="handleSave">
           保存信息
         </el-button>
-        <el-button size="large" @click="handleCancel">
-          取消
-        </el-button>
       </el-form-item>
     </el-form>
+
+    <!-- 历史记录 -->
+    <div class="history-section">
+      <h3 class="history-title">保存记录</h3>
+      <div class="history-list">
+        <div v-for="history in historyList" :key="history.id" class="history-item">
+          <div class="history-header">
+            <span class="save-time">{{ formatTime(history.submitTime) }}</span>
+          </div>
+          <el-table :data="history.data" border stripe size="small" class="history-table">
+            <el-table-column prop="field" label="字段" width="100" />
+            <el-table-column prop="value" label="值" width="200" />
+          </el-table>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -99,6 +107,7 @@ const router = useRouter()
 const formRef = ref()
 const loading = ref(false)
 const username = ref('')
+const historyList = ref([])
 
 const form = reactive({
   realName: '',
@@ -131,11 +140,27 @@ const rules = {
     { required: true, message: '请选择性别', trigger: 'change' }
   ],
   idCard: [
-    { pattern: /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[1-2]\d|3[0-1])\d{3}[0-9Xx]$/, message: '请输入正确的身份证号', trigger: 'blur' }
+    { pattern: /^[1-9]\d{5}(18|19|20)\d{2}(\d|X|x)\d{2}[0-9X]\d{2})\d{3}[0-9]\d{3}[0-9X]\d{2})$/, message: '请输入正确的身份证号', trigger: 'blur' }
   ],
   education: [
     { required: true, message: '请选择学历', trigger: 'change' }
   ]
+}
+
+const displayFields = {
+  realName: '真实姓名',
+  phone: '手机号码',
+  email: '邮箱',
+  gender: '性别',
+  idCard: '身份证号',
+  education: '学历',
+  graduateSchool: '毕业院校',
+  major: '专业',
+  graduateDate: '毕业日期',
+  workExperience: '工作年限',
+  expectedSalary: '期望薪资',
+  expectedPosition: '期望岗位',
+  resumeUrl: '简历地址'
 }
 
 const handleSave = async () => {
@@ -144,8 +169,9 @@ const handleSave = async () => {
 
   loading.value = true
   try {
-    await axios.put('/api/candidate/profile', form)
+    await axios.put('/candidate/profile', form)
     ElMessage.success('保存成功')
+    loadHistory()
   } catch (error) {
     console.error('保存失败:', error)
     ElMessage.error(error.response?.data?.message || '保存失败，请重试')
@@ -154,22 +180,32 @@ const handleSave = async () => {
   }
 }
 
-const handleCancel = () => {
-  router.push('/candidate/dashboard')
+const loadHistory = async () => {
+  try {
+    const response = await axios.get('/candidate/profile/history')
+    historyList.value = response.data || []
+  } catch (error) {
+    console.error('加载历史记录失败:', error)
+  }
+}
+
+const formatTime = (timeStr) => {
+  if (!timeStr) return ''
+  const date = new Date(timeStr)
+  return date.toLocaleString('zh-CN')
 }
 
 onMounted(() => {
   username.value = localStorage.getItem('username') || ''
   loadProfile()
+  loadHistory()
 })
 
 const loadProfile = async () => {
   try {
-    const response = await axios.get('/api/candidate/profile')
-    const data = response.data.data
-    if (data) {
-      Object.assign(form, data)
-    }
+    const response = await axios.get('/candidate/profile')
+    const data = response.data || {}
+    Object.assign(form, data)
   } catch (error) {
     console.error('加载个人信息失败:', error)
   }
@@ -238,31 +274,51 @@ const loadProfile = async () => {
   font-size: 15px;
 }
 
-.profile-form :deep(.el-select .el-input__wrapper) {
-  padding: 8px 16px;
-  height: 44px;
-  background: #F5F5F7;
-  border: 1px solid transparent;
-}
-
-.profile-form :deep(.el-input-number) {
-  width: 100%;
-}
-
-.profile-form :deep(.el-input-number .el-input__inner) {
-  padding: 8px 16px;
-  height: 44px;
-  background: #F5F5F7;
-  border: 1px solid transparent;
-}
-
 .submit-btn {
   width: 60%;
   margin-right: 12px;
 }
 
-.profile-form :deep(.el-form-item__content) {
-  flex-direction: row;
+.history-section {
+  max-width: 800px;
+  margin: 40px auto 0;
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.history-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1D1D1F;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #E5E5EA;
+}
+
+.history-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.history-item {
+  margin-bottom: 24px;
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
   gap: 12px;
+}
+
+.save-time {
+  font-size: 12px;
+  color: #86868B;
+  font-weight: 500;
+}
+
+.history-table {
+  margin-top: 12px;
 }
 </style>

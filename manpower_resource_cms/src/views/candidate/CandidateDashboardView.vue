@@ -14,38 +14,38 @@
 
       <!-- 动态菜单 -->
       <div class="nav-group-title" v-show="!isCollapse">功能导航</div>
-      <router-link
-        to="/candidate/dashboard"
+      <div
         class="nav-item"
-        :class="{ active: isActive('/candidate/dashboard') }"
+        :class="{ active: currentMenu === 'dashboard' }"
+        @click="currentMenu = 'dashboard'"
       >
         <IconComponent :icon="getIcon('首页')" class="nav-icon" />
         <span v-show="!isCollapse" class="nav-text">首页</span>
-      </router-link>
-      <router-link
-        to="/candidate/jobs"
+      </div>
+      <div
         class="nav-item"
-        :class="{ active: isActive('/candidate/jobs') }"
+        :class="{ active: currentMenu === 'jobs' }"
+        @click="currentMenu = 'jobs'"
       >
         <IconComponent :icon="getIcon('岗位招聘')" class="nav-icon" />
         <span v-show="!isCollapse" class="nav-text">岗位招聘</span>
-      </router-link>
-      <router-link
-        to="/candidate/process"
+      </div>
+      <div
         class="nav-item"
-        :class="{ active: isActive('/candidate/process') }"
+        :class="{ active: currentMenu === 'process' }"
+        @click="currentMenu = 'process'"
       >
         <IconComponent :icon="getIcon('招聘流程')" class="nav-icon" />
         <span v-show="!isCollapse" class="nav-text">招聘流程</span>
-      </router-link>
-      <router-link
-        to="/candidate/profile"
+      </div>
+      <div
         class="nav-item"
-        :class="{ active: isActive('/candidate/profile') }"
+        :class="{ active: currentMenu === 'profile' }"
+        @click="currentMenu = 'profile'"
       >
         <IconComponent :icon="getIcon('个人信息')" class="nav-icon" />
         <span v-show="!isCollapse" class="nav-text">个人信息</span>
-      </router-link>
+      </div>
 
       <!-- 退出登录 -->
       <div class="nav-group">
@@ -75,7 +75,22 @@
         </div>
       </header>
       <div class="content">
-        <router-view />
+        <!-- 首页 -->
+        <div v-show="currentMenu === 'dashboard'" class="page-content">
+          <div class="welcome-banner">
+            <h1>欢迎，{{ displayName }}！</h1>
+            <p>开始您的求职之旅</p>
+          </div>
+        </div>
+
+        <!-- 岗位招聘 -->
+        <CandidateJobs v-show="currentMenu === 'jobs'" />
+
+        <!-- 招聘流程 -->
+        <CandidateProcess v-show="currentMenu === 'process'" />
+
+        <!-- 个人信息 -->
+        <CandidateProfile v-show="currentMenu === 'profile'" />
       </div>
     </main>
   </div>
@@ -83,16 +98,19 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 import IconComponent from '@/components/IconComponent.vue'
+import CandidateJobs from './candidate/CandidateJobsView.vue'
+import CandidateProcess from './candidate/CandidateProcessView.vue'
+import CandidateProfile from './candidate/CandidateProfileView.vue'
 
-const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 
 const isCollapse = ref(false)
+const currentMenu = ref('dashboard')
 
 const displayName = computed(() => {
   return localStorage.getItem('username') || '求职者'
@@ -102,11 +120,6 @@ const displayInitial = computed(() => {
   const name = displayName.value
   return name.charAt(0).toUpperCase()
 })
-
-const isActive = (path) => {
-  if (!path) return false
-  return route.path.startsWith(path)
-}
 
 // 菜单名称到图标的映射
 const iconMap = {
@@ -118,19 +131,9 @@ const iconMap = {
 }
 
 const getIcon = (menuName) => {
-  // 精确匹配
   if (iconMap[menuName]) {
     return iconMap[menuName]
   }
-
-  // 关键词匹配
-  for (const [key, icon] of Object.entries(iconMap)) {
-    if (menuName.includes(key)) {
-      return icon
-    }
-  }
-
-  // 默认图标
   return 'file'
 }
 
@@ -207,7 +210,9 @@ const handleLogout = async () => {
   color: #1D1D1F;
   text-decoration: none;
   margin-bottom: 2px;
+  cursor: pointer;
   transition: background 0.15s ease;
+  background: transparent;
 }
 
 .nav-item:hover {
@@ -322,5 +327,30 @@ const handleLogout = async () => {
   padding: 24px;
   overflow-y: auto;
   overflow-x: hidden;
+  background: #F5F5F7;
+}
+
+.page-content {
+  min-height: calc(100vh - 112px);
+}
+
+.welcome-banner {
+  text-align: center;
+  background: #FFFFFF;
+  padding: 60px 40px;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-banner h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1D1D1F;
+  margin-bottom: 12px;
+}
+
+.welcome-banner p {
+  font-size: 16px;
+  color: #86868B;
 }
 </style>

@@ -1,59 +1,36 @@
 <template>
-  <div class="candidate-jobs">
-    <div class="header">
-      <h1>岗位招聘</h1>
-      <p>查看并申请心仪的岗位</p>
-    </div>
+  <div class="job-list" v-loading="loading">
+    <el-empty v-if="!jobList.length && !loading" description="暂无招聘信息" />
 
-    <div class="search-bar">
-      <el-input
-        v-model="searchKeyword"
-        placeholder="搜索岗位名称"
-        clearable
-        style="width: 300px"
-        @clear="fetchJobs"
-        @keyup.enter="fetchJobs"
-      >
-        <template #prefix>
-          <el-icon><Search /></el-icon>
-        </template>
-      </el-input>
-      <el-button type="primary" @click="fetchJobs">搜索</el-button>
-    </div>
+    <div v-for="job in jobList" :key="job.id" class="job-card">
+      <div class="job-header">
+        <h3 class="job-title">{{ job.jobName }}</h3>
+        <el-tag type="success" size="small">招聘中</el-tag>
+      </div>
 
-    <div class="job-list" v-loading="loading">
-      <el-empty v-if="!jobList.length && !loading" description="暂无招聘信息" />
-
-      <div v-for="job in jobList" :key="job.id" class="job-card">
-        <div class="job-header">
-          <h3 class="job-title">{{ job.jobName }}</h3>
-          <el-tag type="success" size="small">招聘中</el-tag>
+      <div class="job-info">
+        <div class="info-item">
+          <el-icon><OfficeBuilding /></el-icon>
+          <span>{{ job.deptName || '公司' }}</span>
         </div>
-
-        <div class="job-info">
-          <div class="info-item">
-            <el-icon><OfficeBuilding /></el-icon>
-            <span>{{ job.deptName || '公司' }}</span>
-          </div>
-          <div class="info-item">
-            <el-icon><User /></el-icon>
-            <span>招聘 {{ job.headcount }} 人</span>
-          </div>
-          <div class="info-item">
-            <el-icon><Money /></el-icon>
-            <span>{{ job.salaryMin && job.salaryMax ? `${job.salaryMin}-${job.salaryMax}元/月` : '薪资面议' }}</span>
-          </div>
+        <div class="info-item">
+          <el-icon><User /></el-icon>
+          <span>招聘 {{ job.headcount }} 人</span>
         </div>
-
-        <div class="job-description">
-          <p><strong>岗位职责：</strong>{{ job.jobDescription || '无' }}</p>
-          <p><strong>任职要求：</strong>{{ job.requirements || '无' }}</p>
+        <div class="info-item">
+          <el-icon><Money /></el-icon>
+          <span>{{ job.salaryMin && job.salaryMax ? `${job.salaryMin}-${job.salaryMax}元/月` : '薪资面议' }}</span>
         </div>
+      </div>
 
-        <div class="job-footer">
-          <span class="publish-time">发布于 {{ formatDate(job.createTime) }}</span>
-          <el-button type="primary" @click="handleApply(job)">投递简历</el-button>
-        </div>
+      <div class="job-description">
+        <p><strong>岗位职责：</strong>{{ job.jobDescription || '无' }}</p>
+        <p><strong>任职要求：</strong>{{ job.requirements || '无' }}</p>
+      </div>
+
+      <div class="job-footer">
+        <span class="publish-time">发布于 {{ formatDate(job.createTime) }}</span>
+        <el-button type="primary" @click="handleApply(job)">投递简历</el-button>
       </div>
     </div>
 
@@ -140,15 +117,6 @@ const fetchJobs = async () => {
     jobList.value = res.data || []
     // 按发布时间倒序排列
     jobList.value.sort((a, b) => new Date(b.createTime) - new Date(a.createTime))
-
-    // 搜索过滤
-    if (searchKeyword.value) {
-      const keyword = searchKeyword.value.toLowerCase()
-      jobList.value = jobList.value.filter(job =>
-        job.jobName.toLowerCase().includes(keyword) ||
-        job.deptName?.toLowerCase().includes(keyword)
-      )
-    }
   } catch (error) {
     console.error('获取岗位列表失败:', error)
     ElMessage.error('获取岗位列表失败')
@@ -158,7 +126,6 @@ const fetchJobs = async () => {
 }
 
 const handleApply = async (job) => {
-  // 先加载候选人个人信息
   try {
     const res = await request.get('/candidate/profile')
     const profile = res.data || {}
@@ -172,7 +139,6 @@ const handleApply = async (job) => {
     applyForm.selfIntro = ''
     applyDialogVisible.value = true
   } catch (error) {
-    // 如果没有个人信息，显示空的表单
     applyForm.jobId = job.id
     applyForm.jobName = job.jobName
     applyForm.name = ''
@@ -208,7 +174,6 @@ const formatDate = (dateStr) => {
   const now = new Date()
   const diff = now - date
   const days = Math.floor(diff / (1000 * 60 * 60))
-
   if (days === 0) return '今天'
   if (days === 1) return '昨天'
   if (days < 7) return `${days}天前`
@@ -219,40 +184,10 @@ onMounted(fetchJobs)
 </script>
 
 <style scoped>
-.candidate-jobs {
-  padding-top: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.header {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.header h1 {
-  font-size: 28px;
-  font-weight: 600;
-  color: #1D1D1F;
-  margin-bottom: 8px;
-}
-
-.header p {
-  font-size: 16px;
-  color: #86868B;
-}
-
-.search-bar {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 32px;
-}
-
 .job-list {
   max-width: 900px;
   margin: 0 auto;
+  padding: 24px;
 }
 
 .job-card {
@@ -266,7 +201,6 @@ onMounted(fetchJobs)
 
 .job-card:hover {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
 }
 
 .job-header {
@@ -292,7 +226,7 @@ onMounted(fetchJobs)
 .info-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 14px;
   color: #86868B;
 }
@@ -312,7 +246,7 @@ onMounted(fetchJobs)
   font-size: 14px;
   color: #1D1D1F;
   line-height: 1.6;
-  margin: 8px 0;
+  margin-bottom: 12px;
 }
 
 .job-description strong {
