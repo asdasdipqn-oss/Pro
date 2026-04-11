@@ -8,7 +8,6 @@ import cn.edu.ccst.manpower_resource.service.IRecruitCandidateService;
 import cn.edu.ccst.manpower_resource.vo.RecruitJobVO;
 import cn.edu.ccst.manpower_resource.vo.RecruitApplicationVO;
 import cn.edu.ccst.manpower_resource.security.LoginUser;
-import cn.edu.ccst.manpower_resource.security.CandidateAuthenticationToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -52,24 +51,8 @@ public class RecruitController {
     @PostMapping("/applications")
     public Result<Void> applyJob(
             @Valid @RequestBody JobApplicationRequest request,
-            @org.springframework.security.core.annotation.AuthenticationPrincipal Object authentication) {
-        System.out.println("[RecruitController] applyJob called, authentication type: " +
-            (authentication != null ? authentication.getClass().getName() : "null"));
-
-        Long jobSeekerId = null;
-
-        if (authentication instanceof CandidateAuthenticationToken) {
-            jobSeekerId = ((CandidateAuthenticationToken) authentication).getUserId();
-            System.out.println("[RecruitController] Candidate auth detected, userId: " + jobSeekerId);
-        } else if (authentication instanceof LoginUser) {
-            jobSeekerId = ((LoginUser) authentication).getUserId();
-            System.out.println("[RecruitController] Employee auth detected, userId: " + jobSeekerId);
-        } else {
-            System.out.println("[RecruitController] Unknown auth type: " +
-                (authentication != null ? authentication.getClass().getName() : "null"));
-            throw new RuntimeException("Unable to get user ID from authentication");
-        }
-
+            @AuthenticationPrincipal LoginUser loginUser) {
+        Long jobSeekerId = loginUser.getUserId();
         recruitService.applyJob(request, jobSeekerId);
         return Result.success();
     }
@@ -77,34 +60,17 @@ public class RecruitController {
     @Operation(summary = "获取我的投递记录")
     @GetMapping("/applications/my")
     public Result<java.util.List<RecruitApplicationVO>> getMyApplications(
-            @org.springframework.security.core.annotation.AuthenticationPrincipal Object authentication) {
-        System.out.println("[RecruitController] getMyApplications called, authentication type: " +
-            (authentication != null ? authentication.getClass().getName() : "null"));
-
-        Long jobSeekerId = null;
-
-        if (authentication instanceof CandidateAuthenticationToken) {
-            jobSeekerId = ((CandidateAuthenticationToken) authentication).getUserId();
-            System.out.println("[RecruitController] Candidate auth detected, userId: " + jobSeekerId);
-        } else if (authentication instanceof LoginUser) {
-            jobSeekerId = ((LoginUser) authentication).getUserId();
-            System.out.println("[RecruitController] Employee auth detected, userId: " + jobSeekerId);
-        } else {
-            System.out.println("[RecruitController] Unknown auth type: " +
-                (authentication != null ? authentication.getClass().getName() : "null"));
-            throw new RuntimeException("Unable to get user ID from authentication");
-        }
-
+            @AuthenticationPrincipal LoginUser loginUser) {
+        Long jobSeekerId = loginUser.getUserId();
         java.util.List<RecruitApplicationVO> list = recruitService.getMyApplications(jobSeekerId);
-        System.out.println("[RecruitController] Returning list size: " + (list != null ? list.size() : 0));
         return Result.success(list);
     }
 
     @Operation(summary = "获取投递申请详情")
     @GetMapping("/applications/{id}")
-    public Result<RecruitApplicationVO> getApplicationDetail(
+    public Result<cn.edu.ccst.manpower_resource.entity.RecruitApplication> getApplicationDetail(
             @Parameter(description = "申请ID") @PathVariable("id") Long id) {
-        RecruitApplicationVO application = recruitService.getApplicationDetail(id);
+        cn.edu.ccst.manpower_resource.entity.RecruitApplication application = recruitService.getApplicationDetail(id);
         return Result.success(application);
     }
 }

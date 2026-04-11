@@ -69,9 +69,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Result<Void> handleAccessDeniedException(AccessDeniedException e) {
-        log.error("Access denied: {} - Cause: {}", e.getMessage(), e.getCause());
-        // 打印堆栈跟踪以帮助调试
-        e.printStackTrace();
+        log.error("Access denied: {}", e.getMessage());
         return Result.fail(ResultCode.NO_PERMISSION);
     }
 

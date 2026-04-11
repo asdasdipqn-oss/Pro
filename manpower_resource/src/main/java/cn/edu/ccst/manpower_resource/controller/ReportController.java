@@ -40,20 +40,20 @@ public class ReportController {
     @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public Result<Map<String, Object>> employeeOverview() {
         Map<String, Object> data = new HashMap<>();
-        
-        // 在职员工数
+
+        // 在职员工（status = 1）
         long activeCount = employeeMapper.selectCount(new LambdaQueryWrapper<EmpEmployee>()
                 .eq(EmpEmployee::getDeleted, 0)
-                .ne(EmpEmployee::getEmpStatus, 3));
+                .eq(EmpEmployee::getEmpStatus, 1));
         data.put("activeCount", activeCount);
-        
-        // 试用期员工
+
+        // 试用期员工（status = 2）
         long probationCount = employeeMapper.selectCount(new LambdaQueryWrapper<EmpEmployee>()
                 .eq(EmpEmployee::getDeleted, 0)
                 .eq(EmpEmployee::getEmpStatus, 2));
         data.put("probationCount", probationCount);
-        
-        // 离职员工
+
+        // 离职员工（status = 3）
         long leftCount = employeeMapper.selectCount(new LambdaQueryWrapper<EmpEmployee>()
                 .eq(EmpEmployee::getDeleted, 0)
                 .eq(EmpEmployee::getEmpStatus, 3));
