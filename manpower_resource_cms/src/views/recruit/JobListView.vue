@@ -191,8 +191,6 @@ const handleClose = async (row) => {
     await closeJob(row.id)
     console.log('[JobListView] 关闭成功，刷新列表')
     ElMessage.success('已关闭')
-    // 清空状态筛选，确保能看到关闭后的记录
-    searchForm.status = null
     fetchData()
   } catch (error) {
     if (error !== 'cancel') console.error(error)
