@@ -1,350 +1,455 @@
 <template>
-  <div class="candidate-layout">
-    <!-- 侧边栏 -->
-    <aside :class="['sidebar', { collapsed: isCollapse }]">
-      <div class="sidebar-header">
-        <div class="logo">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <rect width="32" height="32" rx="8" fill="#1D1D1F"/>
-            <path d="M10 16h12M16 10v12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-          </svg>
+  <div class="candidate-dashboard">
+    <div class="dashboard-container">
+      <!-- 左侧个人信息面板 - 始终显示 -->
+      <div class="left-panel">
+        <div class="profile-summary">
+          <div class="profile-avatar">
+            {{ displayInitial }}
+          </div>
+          <h3 class="profile-name">{{ profile.value.realName || '请完善信息' }}</h3>
+          <p class="profile-status">{{ hasCompleteProfile ? '已完善信息' : '未完善信息' }}</p>
         </div>
-        <span v-show="!isCollapse" class="logo-text">求职者中心</span>
-      </div>
-
-      <!-- 动态菜单 -->
-      <div class="nav-group-title" v-show="!isCollapse">功能导航</div>
-      <div
-        class="nav-item"
-        :class="{ active: currentMenu === 'dashboard' }"
-        @click="currentMenu = 'dashboard'"
-      >
-        <IconComponent :icon="getIcon('首页')" class="nav-icon" />
-        <span v-show="!isCollapse" class="nav-text">首页</span>
-      </div>
-      <div
-        class="nav-item"
-        :class="{ active: currentMenu === 'jobs' }"
-        @click="currentMenu = 'jobs'"
-      >
-        <IconComponent :icon="getIcon('岗位招聘')" class="nav-icon" />
-        <span v-show="!isCollapse" class="nav-text">岗位招聘</span>
-      </div>
-      <div
-        class="nav-item"
-        :class="{ active: currentMenu === 'process' }"
-        @click="currentMenu = 'process'"
-      >
-        <IconComponent :icon="getIcon('招聘流程')" class="nav-icon" />
-        <span v-show="!isCollapse" class="nav-text">招聘流程</span>
-      </div>
-      <div
-        class="nav-item"
-        :class="{ active: currentMenu === 'profile' }"
-        @click="currentMenu = 'profile'"
-      >
-        <IconComponent :icon="getIcon('个人信息')" class="nav-icon" />
-        <span v-show="!isCollapse" class="nav-text">个人信息</span>
-      </div>
-
-      <!-- 退出登录 -->
-      <div class="nav-group">
-        <div class="nav-group-title" v-show="!isCollapse">账户</div>
-        <button class="nav-item logout-btn" @click="handleLogout">
-          <IconComponent :icon="getIcon('退出登录')" class="nav-icon" />
-          <span v-show="!isCollapse" class="nav-text">退出登录</span>
-        </button>
-      </div>
-    </aside>
-
-    <!-- 主内容区 -->
-    <main class="main-container">
-      <header class="header">
-        <div class="header-left">
-          <button class="toggle-btn" @click="isCollapse = !isCollapse">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 12h18M3 6h18"/>
-            </svg>
-          </button>
-        </div>
-        <div class="header-right">
-          <div class="user-info">
-            <div class="user-avatar">{{ displayInitial }}</div>
-            <span class="username">{{ displayName }}</span>
+        <div class="profile-info-list">
+          <div class="info-row">
+            <span class="label">手机号码</span>
+            <span class="value">{{ profile.value.phone }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">邮箱</span>
+            <span class="value">{{ profile.value.email || '-' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">学历</span>
+            <span class="value">{{ getEducationLabel(profile.value.education) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">期望岗位</span>
+            <span class="value">{{ profile.value.expectedPosition || '-' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">最后更新</span>
+            <span class="value">{{ profile.value.lastUpdateTime || '暂无更新' }}</span>
           </div>
         </div>
-      </header>
-      <div class="content">
-        <!-- 首页 -->
-        <div v-show="currentMenu === 'dashboard'" class="page-content">
-          <div class="welcome-banner">
-            <h1>欢迎，{{ displayName }}！</h1>
-            <p>开始您的求职之旅</p>
+      </div>
+
+      <!-- 右侧主内容 -->
+      <div class="right-content">
+        <!-- 顶部操作区 -->
+        <div class="action-bar">
+          <el-button type="primary" size="large" @click="goToProfile">
+            <span v-if="!hasCompleteProfile">填写个人信息</span>
+            <span v-else>编辑个人信息</span>
+          </el-button>
+        </div>
+
+        <!-- 未完善信息提示 -->
+        <div class="welcome-banner" v-if="!hasCompleteProfile">
+          <h1>欢迎，{{ username }}！</h1>
+          <p>请完善您的个人信息以开始求职之旅</p>
+        </div>
+
+        <!-- 投递记录 -->
+        <div class="history-section" v-if="hasCompleteProfile">
+          <h2 class="section-title">我的投递记录</h2>
+          <el-table :data="applicationList" stripe v-loading="applicationLoading" class="application-table">
+            <el-table-column prop="jobName" label="岗位名称" width="200" />
+            <el-table-column prop="applyTime" label="投递时间" width="180">
+              <template #default="{ row }">
+                {{ formatTime(row.applyTime) }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="hrReviewTime" label="筛选时间" width="180">
+              <template #default="{ row }">
+                {{ row.hrReviewTime ? formatTime(row.hrReviewTime) : '-' }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="status" label="状态" width="120">
+              <template #default="{ row }">
+                <el-tag :type="getStatusType(row.status)">
+                  {{ getStatusText(row.status) }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="hrComment" label="备注" min-width="150" show-overflow-tooltip />
+          </el-table>
+          <div v-if="applicationList.length === 0 && !applicationLoading" class="empty-tip">
+            暂无投递记录，去岗位招聘页面投递简历吧
           </div>
         </div>
 
-        <!-- 岗位招聘 -->
-        <CandidateJobs v-show="currentMenu === 'jobs'" />
-
-        <!-- 招聘流程 -->
-        <CandidateProcess v-show="currentMenu === 'process'" />
-
-        <!-- 个人信息 -->
-        <CandidateProfile v-show="currentMenu === 'profile'" />
+        <!-- 个人信息提交历史 -->
+        <div class="history-section">
+          <h2 class="section-title">个人信息修改记录</h2>
+          <el-table :data="historyList" stripe v-loading="loading" class="history-table">
+            <el-table-column prop="submitTime" label="提交时间" width="180">
+              <template #default="{ row }">
+                {{ formatSubmitTime(row.submitTime) }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="realName" label="姓名" width="100" />
+            <el-table-column prop="phone" label="手机号" width="130" />
+            <el-table-column prop="email" label="邮箱" width="180" />
+            <el-table-column prop="education" label="学历" width="100">
+              <template #default="{ row }">
+                {{ getEducationLabel(row.education) }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="expectedPosition" label="期望岗位" width="150" />
+            <el-table-column prop="expectedSalary" label="期望薪资" width="120">
+              <template #default="{ row }">
+                {{ row.expectedSalary ? row.expectedSalary + '元/月' : '-' }}
+              </template>
+            </el-table-column>
+          </el-table>
+          <div v-if="historyList.length === 0" class="empty-tip">
+            暂无历史记录，请先填写个人信息
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { useUserStore } from '@/stores/user'
-import IconComponent from '@/components/IconComponent.vue'
-import CandidateJobs from './candidate/CandidateJobsView.vue'
-import CandidateProcess from './candidate/CandidateProcessView.vue'
-import CandidateProfile from './candidate/CandidateProfileView.vue'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { getMyApplications } from '@/api/recruit'
+import request from '@/utils/request'
 
 const router = useRouter()
-const userStore = useUserStore()
+const route = useRoute()
+const username = ref('')
+const hasCompleteProfile = ref(false)
+const loading = ref(false)
+const applicationLoading = ref(false)
 
-const isCollapse = ref(false)
-const currentMenu = ref('dashboard')
-
-const displayName = computed(() => {
-  return localStorage.getItem('username') || '求职者'
+const profile = ref({
+  realName: '',
+  phone: '',
+  email: '',
+  education: '',
+  graduateSchool: '',
+  major: '',
+  expectedPosition: '',
+  expectedSalary: '',
+  lastUpdateTime: ''
 })
+
+const historyList = ref([])
+const applicationList = ref([])
+
+const getEducationLabel = (edu) => {
+  const map = { 1: '高中', 2: '大专', 3: '本科', 4: '硕士', 5: '博士' }
+  return map[edu] || '-'
+}
 
 const displayInitial = computed(() => {
-  const name = displayName.value
-  return name.charAt(0).toUpperCase()
+  const name = profile.value.realName
+  return name ? name.charAt(0).toUpperCase() : ''
 })
 
-// 菜单名称到图标的映射
-const iconMap = {
-  '首页': 'home',
-  '岗位招聘': 'plus',
-  '招聘流程': 'list',
-  '个人信息': 'user',
-  '退出登录': 'logout'
-}
-
-const getIcon = (menuName) => {
-  if (iconMap[menuName]) {
-    return iconMap[menuName]
+const getStatusType = (status) => {
+  const typeMap = {
+    0: 'info',      // 待处理
+    1: 'warning',   // 已查看
+    2: 'primary',   // 面试
+    3: 'success'    // 已录用
   }
-  return 'file'
+  return typeMap[status] || 'info'
 }
 
-const handleLogout = async () => {
+const getStatusText = (status) => {
+  const textMap = {
+    0: '待处理',
+    1: '已查看',
+    2: '面试中',
+    3: '已录用'
+  }
+  return textMap[status] || '未知'
+}
+
+const formatTime = (timeStr) => {
+  if (!timeStr) return '-'
+  const time = new Date(timeStr)
+  const now = new Date()
+  const diff = now - time
+  const diffMinutes = Math.floor(diff / 60000)
+
+  if (diffMinutes < 1) {
+    return '刚刚'
+  } else if (diffMinutes < 60) {
+    return diffMinutes + '分钟前'
+  } else if (diffMinutes < 1440) {
+    const hours = Math.floor(diffMinutes / 60)
+    return hours + '小时前'
+  } else if (diffMinutes < 43200) {
+    const days = Math.floor(diffMinutes / 1440)
+    return days + '天前'
+  } else {
+    return timeStr.substring(0, 16)
+  }
+}
+
+watch(() => route.path, (newPath) => {
+  if (newPath === '/candidate/dashboard') {
+    loadProfile()
+    loadHistory()
+    loadApplications()
+  }
+}, { immediate: false })
+
+onMounted(() => {
+  username.value = localStorage.getItem('username') || ''
+
+  const token = localStorage.getItem('token')
+  if (!token) {
+    return
+  }
+
+  loadProfile()
+  loadHistory()
+  loadApplications()
+})
+
+const loadProfile = async () => {
   try {
-    await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
-    userStore.logout()
-    ElMessage.success('已退出登录')
-    router.push('/candidate')
-  } catch {
-    // 用户取消
+    const response = await request.get('/candidate/profile')
+
+    if (response && response.code === 200) {
+      const data = response.data
+
+      if (data) {
+        profile.value = data
+        hasCompleteProfile.value = !!data.realName
+
+        if (data.updateTime) {
+          try {
+            const updateTime = new Date(data.updateTime)
+            const now = new Date()
+            const diff = now - updateTime
+            if (diff < 60000) {
+              profile.value.lastUpdateTime = '刚刚'
+            } else if (diff < 3600000) {
+              profile.value.lastUpdateTime = Math.floor(diff / 60000) + '分钟前'
+            } else if (diff < 86400000) {
+              const hours = Math.floor(diff / 3600000)
+              profile.value.lastUpdateTime = hours + '小时前'
+            } else {
+              profile.value.lastUpdateTime = data.updateTime
+            }
+          } catch (e) {
+            console.error('[CandidateDashboard] 日期解析错误:', e)
+            profile.value.lastUpdateTime = data.updateTime || '暂无更新'
+          }
+        } else {
+          profile.value.lastUpdateTime = '暂无更新'
+        }
+      } else {
+        hasCompleteProfile.value = false
+      }
+    } else {
+      hasCompleteProfile.value = false
+    }
+  } catch (error) {
+    console.error('[CandidateDashboard] 加载个人信息失败:', error)
+    console.error('[CandidateDashboard] 错误详情:', error.response)
+    hasCompleteProfile.value = false
+  }
+}
+
+const loadHistory = async () => {
+  loading.value = true
+  try {
+    const response = await axios.get('/api/candidate/profile/history')
+
+    if (response && response.code === 200) {
+      const data = response.data
+      historyList.value = data || []
+    } else {
+      historyList.value = []
+    }
+  } catch (error) {
+    console.error('[CandidateDashboard] 加载历史记录失败:', error)
+    historyList.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+const loadApplications = async () => {
+  applicationLoading.value = true
+  try {
+    const response = await getMyApplications()
+
+    if (response && response.code === 200) {
+      const data = response.data
+      applicationList.value = data || []
+    } else {
+      applicationList.value = []
+    }
+  } catch (error) {
+    console.error('[CandidateDashboard] 加载投递记录失败:', error)
+    applicationList.value = []
+  } finally {
+    applicationLoading.value = false
+  }
+}
+
+const goToProfile = () => {
+  router.push('/candidate/profile')
+}
+
+const formatSubmitTime = (timeStr) => {
+  if (!timeStr) return '-'
+  const time = new Date(timeStr)
+  const now = new Date()
+  const diff = now - time
+  const diffMinutes = Math.floor(diff / 60000)
+
+  if (diffMinutes < 1) {
+    return '刚刚'
+  } else if (diffMinutes < 60) {
+    return diffMinutes + '分钟前'
+  } else if (diffMinutes < 1440) {
+    const hours = Math.floor(diffMinutes / 60)
+    return hours + '小时前'
+  } else if (diffMinutes < 43200) {
+    const days = Math.floor(diffMinutes / 1440)
+    return days + '天前'
+  } else {
+    return timeStr.substring(0, 16)
   }
 }
 </script>
 
 <style scoped>
-.candidate-layout {
-  display: flex;
-  height: 100vh;
-  background: #F5F5F7;
+.candidate-dashboard {
+  padding-top: 24px;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
-/* 侧边栏 */
-.sidebar {
-  width: 240px;
+.dashboard-container {
+  display: flex;
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.left-panel {
+  width: 320px;
+  flex-shrink: 0;
+}
+
+.profile-summary {
   background: #FFFFFF;
-  border-right: 1px solid #E5E5EA;
-  display: flex;
-  flex-direction: column;
-  transition: width 0.3s ease;
+  padding: 32px 24px;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.sidebar.collapsed {
-  width: 72px;
-}
-
-.sidebar-header {
-  height: 64px;
-  padding: 0 20px;
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #FFFFFF;
+  font-size: 32px;
+  font-weight: 600;
   display: flex;
   align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.profile-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1D1D1F;
+  margin: 0 0 8px;
+}
+
+.profile-status {
+  font-size: 14px;
+  color: #007AFF;
+  margin: 0 0 24px;
+}
+
+.profile-info-list {
+  background: #F5F5F7;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
   border-bottom: 1px solid #E5E5EA;
 }
 
-.logo {
-  flex-shrink: 0;
+.info-row:last-child {
+  border-bottom: none;
 }
 
-.logo-text {
-  margin-left: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #1D1D1F;
-  white-space: nowrap;
-}
-
-.nav-group-title {
-  font-size: 11px;
-  font-weight: 600;
+.info-row .label {
+  font-size: 14px;
   color: #86868B;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 16px 20px 8px;
 }
 
-.nav-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  color: #1D1D1F;
-  text-decoration: none;
-  margin-bottom: 2px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-  background: transparent;
-}
-
-.nav-item:hover {
-  background: #F5F5F7;
-}
-
-.nav-item.active {
-  background: #F5F5F7;
-  color: #007AFF;
-}
-
-.nav-icon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-}
-
-.nav-text {
-  margin-left: 12px;
+.info-row .value {
   font-size: 14px;
   font-weight: 500;
-  white-space: nowrap;
+  color: #1D1D1F;
 }
 
-.logout-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-/* 主内容区 */
-.main-container {
+.right-content {
   flex: 1;
-  display: flex;
-  flex-direction: column;
   min-width: 0;
 }
 
-.header {
-  height: 64px;
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.action-bar {
   background: #FFFFFF;
-  border-bottom: 1px solid #E5E5EA;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-}
-
-.toggle-btn {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  border-radius: 8px;
-  cursor: pointer;
-  color: #1D1D1F;
-  transition: background 0.15s;
-}
-
-.toggle-btn:hover {
-  background: #F5F5F7;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  padding: 6px 12px;
+  padding: 20px 24px;
   border-radius: 20px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.user-info:hover {
-  background: #F5F5F7;
-}
-
-.user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #1D1D1F;
-  color: #FFFFFF;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 600;
 }
 
-.username {
-  margin-left: 8px;
-  font-size: 14px;
+.action-bar .el-button {
+  background: #007AFF;
+  border-color: #007AFF;
+  color: #FFFFFF;
   font-weight: 500;
-  color: #1D1D1F;
+  padding: 12px 32px;
+  border-radius: 10px;
 }
 
-.content {
-  flex: 1;
-  padding: 24px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background: #F5F5F7;
-}
-
-.page-content {
-  min-height: calc(100vh - 112px);
+.action-bar .el-button:hover {
+  background: #0066D6;
+  border-color: #0066D6;
 }
 
 .welcome-banner {
-  text-align: center;
   background: #FFFFFF;
-  padding: 60px 40px;
+  padding: 40px 60px;
   border-radius: 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
 }
 
 .welcome-banner h1 {
   font-size: 28px;
-  font-weight: 600;
   color: #1D1D1F;
   margin-bottom: 12px;
 }
@@ -352,5 +457,63 @@ const handleLogout = async () => {
 .welcome-banner p {
   font-size: 16px;
   color: #86868B;
+}
+
+.history-section {
+  background: #FFFFFF;
+  padding: 24px;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1D1D1F;
+  margin-bottom: 20px;
+}
+
+.history-table {
+  margin-top: 10px;
+}
+
+.application-table {
+  margin-top: 10px;
+}
+
+.history-table :deep(.el-table__header-wrapper),
+.application-table :deep(.el-table__header-wrapper) {
+  background: #F5F5F7;
+}
+
+.history-table :deep(.el-table__header th),
+.application-table :deep(.el-table__header th) {
+  background: #FFFFFF;
+  color: #86868B;
+  font-weight: 600;
+  border-bottom: 2px solid #E5E5EA;
+}
+
+.history-table :deep(.el-table__body td),
+.application-table :deep(.el-table__body td) {
+  padding: 16px 12px;
+}
+
+.history-table :deep(.el-table__row--striped),
+.application-table :deep(.el-table__row--striped) {
+  background: #FFFFFF;
+}
+
+.history-table :deep(.el-table__row--striped:nth-child(even)),
+.application-table :deep(.el-table__row--striped:nth-child(even)) {
+  background: #F9FAFB;
+}
+
+.empty-tip {
+  text-align: center;
+  padding: 40px 20px;
+  color: #86868B;
+  font-size: 14px;
 }
 </style>

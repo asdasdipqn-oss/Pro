@@ -121,9 +121,11 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import axios from 'axios'
+import { useUserStore } from '@/stores/user'
+import request from '@/utils/request'
 
 const router = useRouter()
+const userStore = useUserStore()
 const formRef = ref()
 const loginFormRef = ref()
 const loading = ref(false)
@@ -174,7 +176,7 @@ const handleRegister = async () => {
 
   loading.value = true
   try {
-    await axios.post('/api/candidate/register', form)
+    await request.post('/candidate/register', form)
     ElMessage.success('注册成功，请登录')
     loginMode.value = 'login'
   } catch (error) {
@@ -191,18 +193,27 @@ const handleLogin = async () => {
 
   loading.value = true
   try {
-    const response = await axios.post('/api/candidate/login', loginForm)
+    const response = await request.post('/candidate/login', loginForm)
     ElMessage.success('登录成功')
 
-    // 保存token到本地存储
-    localStorage.setItem('token', response.data.data.token)
-    localStorage.setItem('userType', 'candidate')
-    localStorage.setItem('username', response.data.data.username)
+    const token = response.data.data.token
+    const username = response.data.data.username
 
-    // 跳转到求职者首页
-    router.push('/candidate/dashboard')
+
+    // 保存token到userStore和本地存储
+    userStore.token = token
+    localStorage.setItem('token', token)
+    localStorage.setItem('userType', 'candidate')
+    localStorage.setItem('username', username)
+
+
+    // 验证 token 是否正确存储
+
+    // 跳转到求职者个人信息页面
+    await router.push('/candidate/profile')
   } catch (error) {
-    console.error('登录失败:', error)
+    console.error('[CandidateView] Login failed:', error)
+    console.error('[CandidateView] Error response:', error.response)
     ElMessage.error(error.response?.data?.message || '登录失败，请重试')
   } finally {
     loading.value = false
