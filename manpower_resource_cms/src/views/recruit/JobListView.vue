@@ -11,7 +11,6 @@
       <el-form :inline="true" class="search-form">
         <el-form-item label="状态">
           <el-select v-model="searchForm.status" placeholder="全部状态" clearable @change="fetchData" @clear="handleStatusClear">
-            <el-option label="全部" :value="null" />
             <el-option label="招聘中" :value="1" />
             <el-option label="已关闭" :value="2" />
           </el-select>
