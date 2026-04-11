@@ -33,8 +33,11 @@ public class RecruitJobServiceImpl extends ServiceImpl<RecruitJobMapper, Recruit
     public PageResult<RecruitJob> pageJobs(PageQuery query, Integer status) {
         Page<RecruitJob> page = new Page<>(query.getPageNum(), query.getPageSize());
         LambdaQueryWrapper<RecruitJob> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(status != null, RecruitJob::getStatus, status)
-                .eq(RecruitJob::getDeleted, 0)
+        // 只在 status 不为 null 时添加状态过滤条件
+        if (status != null) {
+            wrapper.eq(RecruitJob::getStatus, status);
+        }
+        wrapper.eq(RecruitJob::getDeleted, 0)
                 .orderByDesc(RecruitJob::getCreateTime);
         Page<RecruitJob> result = baseMapper.selectPage(page, wrapper);
         return PageResult.of(result.getCurrent(), result.getSize(), result.getTotal(), result.getRecords());
