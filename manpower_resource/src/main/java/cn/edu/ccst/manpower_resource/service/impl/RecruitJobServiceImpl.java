@@ -78,8 +78,10 @@ public class RecruitJobServiceImpl extends ServiceImpl<RecruitJobMapper, Recruit
         if (job == null) {
             throw new BusinessException(ResultCode.DATA_NOT_EXIST);
         }
+        System.out.println("[RecruitJob] 关闭岗位: id=" + id + ", status从" + job.getStatus() + "改为2");
         job.setStatus(2); // 关闭
         job.setUpdateTime(LocalDateTime.now());
         baseMapper.updateById(job);
+        System.out.println("[RecruitJob] 关闭岗位成功");
     }
 }
