@@ -10,7 +10,7 @@
       
       <el-form :inline="true" class="search-form">
         <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="全部" clearable @change="fetchData">
+          <el-select v-model="searchForm.status" placeholder="全部状态" clearable @change="fetchData" @clear="handleStatusClear">
             <el-option label="招聘中" :value="1" />
             <el-option label="已关闭" :value="2" />
           </el-select>
@@ -135,11 +135,13 @@ const formRules = {
 const fetchData = async () => {
   loading.value = true
   try {
+    console.log('[JobListView] 查询参数:', { ...searchForm, pageNum: pagination.pageNum, pageSize: pagination.pageSize })
     const res = await pageJobs({
       ...searchForm,
       pageNum: pagination.pageNum,
       pageSize: pagination.pageSize
     })
+    console.log('[JobListView] 查询结果:', res.data)
     tableData.value = res.data?.records || []
     pagination.total = res.data?.total || 0
   } catch (error) {
@@ -185,7 +187,9 @@ const handleSubmit = async () => {
 const handleClose = async (row) => {
   try {
     await ElMessageBox.confirm('确定要关闭该招聘岗位吗？', '提示', { type: 'warning' })
+    console.log('[JobListView] 关闭岗位:', row)
     await closeJob(row.id)
+    console.log('[JobListView] 关闭成功，刷新列表')
     ElMessage.success('已关闭')
     // 清空状态筛选，确保能看到关闭后的记录
     searchForm.status = null
@@ -193,6 +197,12 @@ const handleClose = async (row) => {
   } catch (error) {
     if (error !== 'cancel') console.error(error)
   }
+}
+
+const handleStatusClear = () => {
+  console.log('[JobListView] 清空状态选择')
+  searchForm.status = null
+  fetchData()
 }
 
 onMounted(fetchData)
