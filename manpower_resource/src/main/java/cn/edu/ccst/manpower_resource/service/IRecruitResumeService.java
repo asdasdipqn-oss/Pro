@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public interface IRecruitResumeService extends IService<RecruitResume> {
 
-    void submitResume(RecruitResumeDTO dto, Long jobSeekerId);
+    void submitResume(RecruitResumeDTO dto);
 
     PageResult<RecruitResumeVO> pageList(PageQuery query, Long jobId, Integer status);
 

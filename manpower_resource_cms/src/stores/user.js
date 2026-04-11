@@ -47,11 +47,6 @@ export const useUserStore = defineStore('user', () => {
     roles.value = res.data.roles || []
     permissions.value = res.data.permissions || []
 
-    console.log('[Login] Roles from response:', roles.value)
-    console.log('[Login] Roles (raw):', JSON.stringify(res.data.roles))
-    console.log('[Login] Roles (type):', typeof res.data.roles)
-    console.log('[Login] Roles (length):', (res.data.roles || []).length)
-
     // 保存用户的部门信息
     if (res.data.deptId) {
       deptId.value = res.data.deptId
@@ -117,9 +112,6 @@ export const useUserStore = defineStore('user', () => {
     localStorage.removeItem('permissions')
     localStorage.removeItem('deptId')
     localStorage.removeItem('departmentName')
-    // 清除求职者相关的数据
-    localStorage.removeItem('userType')
-    localStorage.removeItem('username')
 
     // 清除菜单权限
     const menuStore = useMenuStore()
@@ -128,8 +120,7 @@ export const useUserStore = defineStore('user', () => {
 
   // 检查是否有角色
   function hasRole(role) {
-    if (!role) return false
-    return roles.value.some(r => r && r.toUpperCase() === role.toUpperCase())
+    return roles.value.includes(role)
   }
 
   // 检查是否有权限

@@ -31,6 +31,7 @@ public class RecruitJobController {
 
     @Operation(summary = "分页查询招聘岗位")
     @GetMapping("/page")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('HR')")
     public Result<PageResult<RecruitJob>> page(PageQuery query,
             @Parameter(description = "状态") @RequestParam(required = false) Integer status) {
         return Result.success(recruitJobService.pageJobs(query, status));
@@ -44,6 +45,7 @@ public class RecruitJobController {
 
     @Operation(summary = "发布招聘岗位")
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('HR')")
     public Result<Void> publish(@Valid @RequestBody RecruitJob job) {
         recruitJobService.publishJob(job);
         return Result.success();
@@ -51,6 +53,7 @@ public class RecruitJobController {
 
     @Operation(summary = "修改招聘岗位")
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('HR')")
     public Result<Void> update(@Valid @RequestBody RecruitJob job) {
         recruitJobService.updateJob(job);
         return Result.success();
@@ -58,6 +61,7 @@ public class RecruitJobController {
 
     @Operation(summary = "关闭招聘岗位")
     @PutMapping("/{id}/close")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('HR')")
     public Result<Void> close(@Parameter(description = "岗位ID") @PathVariable Long id) {
         recruitJobService.closeJob(id);
         return Result.success();

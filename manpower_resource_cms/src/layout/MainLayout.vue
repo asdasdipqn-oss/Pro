@@ -9,7 +9,7 @@
             <path d="M10 16h12M16 10v12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </div>
-        <span v-show="!isCollapse" class="logo-text">{{ logoText }}</span>
+        <span v-show="!isCollapse" class="logo-text">企业人力资源管理系统</span>
       </div>
 
       <!-- 动态菜单 -->
@@ -87,18 +87,8 @@ const menuStore = useMenuStore()
 const isCollapse = ref(false)
 const unreadCount = ref(0)
 
-// 根据用户类型显示不同的logo文字
-const logoText = computed(() => {
-  const userType = localStorage.getItem('userType')
-  return userType === 'candidate' ? '求职者中心' : '企业人力资源管理系统'
-})
-
 // 获取显示的用户名
 const displayName = computed(() => {
-  const userType = localStorage.getItem('userType')
-  if (userType === 'candidate') {
-    return localStorage.getItem('username') || '求职者'
-  }
   const info = userStore.userInfo
   return info.employeeName || info.username || info.realName || '用户'
 })
@@ -113,11 +103,6 @@ const isActive = (path) => route.path.startsWith(path)
 const hasRole = (role) => userStore.hasRole(role)
 
 const fetchUnreadCount = async () => {
-  const userType = localStorage.getItem('userType')
-  if (userType === 'candidate') {
-    // 求职者不获取通知数量
-    return
-  }
   try {
     const res = await request.get('/notification/unread-count')
     unreadCount.value = res.data?.totalCount || 0
@@ -130,14 +115,9 @@ const fetchUnreadCount = async () => {
 }
 
 const handleCommand = async (command) => {
-  const userType = localStorage.getItem('userType')
   switch (command) {
     case 'profile':
-      if (userType === 'candidate') {
-        router.push('/candidate/profile')
-      } else {
-        router.push('/profile')
-      }
+      router.push('/profile')
       break
     case 'notification':
       router.push('/notification')
@@ -150,11 +130,7 @@ const handleCommand = async (command) => {
       })
       userStore.logout()
       ElMessage.success('已退出登录')
-      if (userType === 'candidate') {
-        router.push('/candidate')
-      } else {
-        router.push('/login')
-      }
+      router.push('/login')
       break
   }
 }
@@ -315,6 +291,5 @@ onMounted(() => {
   padding: 24px;
   overflow-y: auto;
   overflow-x: hidden;
-  min-height: calc(100vh - 64px);
 }
 </style>

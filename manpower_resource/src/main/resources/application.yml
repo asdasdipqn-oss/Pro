@@ -11,7 +11,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://43.139.247.55:3306/manpower_resource?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&connectTimeout=10000&socketTimeout=30000
+    url: jdbc:mysql://43.139.247.55:3306/manpower_resource?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&connectTimeout=10000&socketTimeout=30000
     username: manpower_resource
     password: ckayDzbNmGRHdn6j
     druid:
@@ -29,24 +29,9 @@ spring:
       max-pool-prepared-statement-per-connection-size: 20
       filters: stat,wall
       connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
-    connect-timeout-millis: 10000
-    socket-timeout-millis: 30000
-
-  # MyBatis Plus 配置
-  mybatis-plus:
-    mapper-locations: classpath*:/mapper/**/*.xml
-    type-aliases-package: cn.edu.ccst.manpower_resource.entity
-    global-config:
-      db-config:
-        id-type: auto
-        logic-delete-field: deleted
-        logic-delete-value: 1
-        logic-not-delete-value: 0
-        table-underline: true
-      map-underscore-to-camel-case: true
-      log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
-    configuration:
-      map-underscore-to-camel-case: true
+      # 连接超时配置（毫秒）
+      connect-timeout-millis: 10000
+      socket-timeout-millis: 30000
 
   # 文件上传配置
   servlet:
@@ -54,49 +39,68 @@ spring:
       max-file-size: 50MB
       max-request-size: 50MB
 
+# 配置文件上传目录
+file:
+  upload-dir: /tmp/manpower_uploads
+
+
   # Jackson 配置
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
-    default-property-inclusion: non_null
     serialization:
       write-dates-as-timestamps: false
+    default-property-inclusion: non_null
 
-  # 日志配置
-logging:
-  level:
-    cn.edu.ccst.manpower_resource: debug
-    com.baomidou.mybatisplus: debug
-
-# Knife4j 配置
-knif4j:
-  enable: true
-  setting:
-    language: zh_cn
-    swagger-model-name: 实体类列表
-  springdoc:
-    swagger-ui:
-      path: /swagger-ui.html
-      tags-sorter: alpha
-    operations-sorter: alpha
-  api-docs:
-    path: /v3/api-docs
-    group-configs:
-      - group: "default"
-        paths-to-match: "/**"
-
-kknife4j:
-  api:
-    key: sk-3fdcc0061ba14b6d957fd7c100
-    base-url: https://api.deepseek.com/v1
+# MyBatis Plus 配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: cn.edu.ccst.manpower_resource.entity
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      table-underline: true
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 
 # JWT 配置
 jwt:
   secret: HrManagementSystemSecretKey2024VeryLongAndSecureKeyForJWT
   expiration: 86400000 # 24小时（毫秒）
   header: Authorization
-  prefix: bearer
+  prefix: Bearer
 
-# 文件上传目录
-file:
-  upload-dir: /tmp/manpower_uploads
+# Knife4j 配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: "default"
+      paths-to-match: "/**"
+      packages-to-scan: cn.edu.ccst.manpower_resource.controller
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+    swagger-model-name: 实体类列表
+
+# DeepSeek AI 配置
+deepseek:
+  api:
+    key: sk-3fdcc0061ba14b6d9567fd7d57791c74
+    base-url: https://api.deepseek.com/v1
+
+# 日志配置
+logging:
+  level:
+    cn.edu.ccst.manpower_resource: debug
+    com.baomidou.mybatisplus: debug

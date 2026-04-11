@@ -57,6 +57,7 @@ public class EmpEmployeeServiceImpl extends ServiceImpl<EmpEmployeeMapper, EmpEm
                 .like(StringUtils.hasText(query.getEmpName()), EmpEmployee::getEmpName, query.getEmpName())
                 .eq(query.getDeptId() != null, EmpEmployee::getDeptId, query.getDeptId())
                 .eq(query.getPositionId() != null, EmpEmployee::getPositionId, query.getPositionId())
+                .ne(EmpEmployee::getEmpStatus, 3); // 默认过滤离职员工
                 .eq(query.getEmpStatus() != null, EmpEmployee::getEmpStatus, query.getEmpStatus())
                 .eq(query.getEmpType() != null, EmpEmployee::getEmpType, query.getEmpType())
                 .orderByDesc(EmpEmployee::getCreateTime);
@@ -439,5 +440,14 @@ public class EmpEmployeeServiceImpl extends ServiceImpl<EmpEmployeeMapper, EmpEm
         if (cell == null) return "";
         cell.setCellType(CellType.STRING);
         return cell.getStringCellValue().trim();
+    }
+
+    @Override
+    public List<EmpEmployee> list() {
+        LambdaQueryWrapper<EmpEmployee> wrapper = new LambdaQueryWrapper<>();
+        wrapper.ne(EmpEmployee::getEmpStatus, 3); // 默认过滤离职员工
+        wrapper.eq(EmpEmployee::getDeleted, 0);
+        wrapper.orderByDesc(EmpEmployee::getCreateTime);
+        return baseMapper.selectList(wrapper);
     }
 }

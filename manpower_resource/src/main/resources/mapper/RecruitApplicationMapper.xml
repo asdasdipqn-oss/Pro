@@ -3,34 +3,26 @@
 <mapper namespace="cn.edu.ccst.manpower_resource.mapper.RecruitApplicationMapper">
 
     <select id="selectByJobSeeker" resultType="cn.edu.ccst.manpower_resource.vo.RecruitApplicationVO">
-        SELECT
-            a.id,
-            a.job_id,
-            a.job_seeker_id,
-            a.resume_id,
-            a.status,
-            a.cover_letter,
-            a.self_intro,
-            a.apply_time,
-            a.create_time,
-            a.update_time,
-            j.job_name,
-            j.job_code,
-            CASE WHEN a.status = 0 THEN '待处理'
-                 WHEN a.status = 1 THEN '已查看'
-                 WHEN a.status = 2 THEN '面试中'
-                 WHEN a.status = 3 THEN '面试中'
-                 WHEN a.status = 4 THEN '已录用'
-                 WHEN a.status = 5 THEN '未通过'
-                 ELSE '未知'
-            END AS status_text
+        SELECT a.*,
+               j.job_name,
+               j.job_code,
+               a.status,
+               CASE WHEN a.status = 0 THEN '待处理'
+                    WHEN a.status = 1 THEN '已查看'
+                    WHEN a.status = 2 THEN '面试'
+                    WHEN a.status = 3 THEN '已录用'
+                    ELSE '未知'
+               END AS status_text,
+               a.apply_time,
+               a.id,
+               a.job_seeker_id
         FROM recruit_application a
         LEFT JOIN recruit_job j ON a.job_id = j.id
         WHERE a.job_seeker_id = #{jobSeekerId}
         ORDER BY a.apply_time DESC
     </select>
 
-    <select id="selectVOById" resultType="cn.edu.ccst.manpower_resource.vo.RecruitApplicationVO">
+    <select id="selectById" resultType="cn.edu.ccst.manpower_resource.vo.RecruitApplicationVO">
         SELECT a.*, j.job_name, j.job_code
         FROM recruit_application a
         LEFT JOIN recruit_job j ON a.job_id = j.id

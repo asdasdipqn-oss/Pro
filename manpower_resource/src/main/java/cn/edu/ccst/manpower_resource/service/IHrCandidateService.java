@@ -27,9 +27,4 @@ public interface IHrCandidateService extends IService<cn.edu.ccst.manpower_resou
      * 更新求职者个人信息
      */
     void updateProfile(String username, cn.edu.ccst.manpower_resource.dto.CandidateProfileDTO request);
-
-    /**
-     * 获取求职者个人信息修改历史
-     */
-    java.util.List<cn.edu.ccst.manpower_resource.entity.CandidateProfileHistory> getProfileHistory(String username);
 }

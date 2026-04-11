@@ -3,7 +3,6 @@ package cn.edu.ccst.manpower_resource.controller;
 import cn.edu.ccst.manpower_resource.common.Result;
 import cn.edu.ccst.manpower_resource.dto.LoginRequest;
 import cn.edu.ccst.manpower_resource.dto.RegisterRequest;
-import cn.edu.ccst.manpower_resource.security.LoginUser;
 import cn.edu.ccst.manpower_resource.service.AuthService;
 import cn.edu.ccst.manpower_resource.vo.LoginVO;
 import cn.edu.ccst.manpower_resource.vo.UserInfoVO;
@@ -49,37 +48,6 @@ public class AuthController {
     public Result<Void> logout() {
         authService.logout();
         return Result.success();
-    }
-
-    @Operation(summary = "调试：检查用户角色和权限")
-    @GetMapping("/debug/roles")
-    public Result<java.util.Map<String, Object>> debugRoles(
-        @org.springframework.security.core.annotation.AuthenticationPrincipal LoginUser loginUser) {
-        java.util.Map<String, Object> debugInfo = new java.util.HashMap<>();
-        try {
-            debugInfo.put("username", loginUser.getUsername());
-            debugInfo.put("roles", loginUser.getRoles());
-            debugInfo.put("permissions", loginUser.getPermissions());
-            debugInfo.put("authorities", loginUser.getAuthorities());
-            debugInfo.put("userId", loginUser.getUserId());
-
-            // 检查是否有 ADMIN 或 HR 角色
-            java.util.List<String> roles = loginUser.getRoles();
-            boolean hasAdmin = roles.stream().anyMatch(r -> r != null && r.toUpperCase().equals("ADMIN"));
-            boolean hasHR = roles.stream().anyMatch(r -> r != null && r.toUpperCase().equals("HR"));
-            debugInfo.put("hasADMIN", hasAdmin);
-            debugInfo.put("hasHR", hasHR);
-        } catch (Exception e) {
-            debugInfo.put("error", e.getMessage());
-            debugInfo.put("stackTrace", e.toString());
-        }
-        return Result.success(debugInfo);
-    }
-
-    @Operation(summary = "调试：测试招聘管理接口权限")
-    @GetMapping("/debug/recruit-permission")
-    public Result<String> testRecruitPermission() {
-        return Result.success("你有权限访问招聘管理接口");
     }
 
     private String getClientIp(HttpServletRequest request) {
