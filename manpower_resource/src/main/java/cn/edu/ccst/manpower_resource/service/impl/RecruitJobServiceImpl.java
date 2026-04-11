@@ -33,10 +33,15 @@ public class RecruitJobServiceImpl extends ServiceImpl<RecruitJobMapper, Recruit
     public PageResult<RecruitJob> pageJobs(PageQuery query, Integer status) {
         Page<RecruitJob> page = new Page<>(query.getPageNum(), query.getPageSize());
         LambdaQueryWrapper<RecruitJob> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(status != null, RecruitJob::getStatus, status)
-                .eq(RecruitJob::getDeleted, 0)
+        // 只在 status 不为 null 时添加状态过滤条件
+        if (status != null) {
+            wrapper.eq(RecruitJob::getStatus, status);
+        }
+        wrapper.eq(RecruitJob::getDeleted, 0)
                 .orderByDesc(RecruitJob::getCreateTime);
+        System.out.println("[RecruitJob] 查询条件 status: " + status);
         Page<RecruitJob> result = baseMapper.selectPage(page, wrapper);
+        System.out.println("[RecruitJob] 查询结果数量: " + result.getRecords().size());
         return PageResult.of(result.getCurrent(), result.getSize(), result.getTotal(), result.getRecords());
     }
 
@@ -73,8 +78,10 @@ public class RecruitJobServiceImpl extends ServiceImpl<RecruitJobMapper, Recruit
         if (job == null) {
             throw new BusinessException(ResultCode.DATA_NOT_EXIST);
         }
+        System.out.println("[RecruitJob] 关闭岗位: id=" + id + ", status从" + job.getStatus() + "改为2");
         job.setStatus(2); // 关闭
         job.setUpdateTime(LocalDateTime.now());
         baseMapper.updateById(job);
+        System.out.println("[RecruitJob] 关闭岗位成功");
     }
 }
