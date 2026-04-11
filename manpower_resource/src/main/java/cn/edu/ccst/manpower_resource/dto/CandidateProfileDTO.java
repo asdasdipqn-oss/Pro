@@ -29,7 +29,6 @@ public class CandidateProfileDTO {
     private Integer gender;
 
     @ApiModelProperty(value = "身份证号")
-    @Pattern(regexp = "^[1-9]\\d{5}(18|19|20)\\d{2}(0[1-9]|1[0-2])(0[1-9]|[1-2]\\d|3[0-1])\\d{3}[0-9Xx]$", message = "请输入正确的身份证号")
     private String idCard;
 
     @ApiModelProperty(value = "学历：1-高中 2-大专 3-本科 4-硕士 5-博士")

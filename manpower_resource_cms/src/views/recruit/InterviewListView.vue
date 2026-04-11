@@ -109,7 +109,7 @@
         </el-form-item>
         <el-form-item label="面试时间" prop="interviewTime">
           <el-date-picker v-model="addForm.interviewTime" type="datetime"
-            placeholder="选择面试时间" value-format="YYYY-MM-DD HH:mm:ss" style="width: 100%" />
+            placeholder="选择面试时间" value-format="YYYY-MM-DDTHH:mm:ss" style="width: 100%" />
         </el-form-item>
         <el-form-item label="面试地点">
           <el-input v-model="addForm.interviewAddress" placeholder="面试地点/会议链接" />

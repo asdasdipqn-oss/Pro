@@ -5,6 +5,11 @@ export function listPublishedJobs() {
   return request.get('/recruit/job/published')
 }
 
+// 获取我的投递记录
+export function getMyApplications() {
+  return request.get('/recruit/applications/my')
+}
+
 // 分页查询招聘岗位
 export function pageJobs(params) {
   return request.get('/recruit/job/page', { params })
@@ -106,4 +111,14 @@ export function cancelInterview(id) {
 // 删除面试记录
 export function deleteInterview(id) {
   return request.delete(`/recruit/interview/${id}`)
+}
+
+// 求职者 - 获取我的面试记录
+export function getMyInterviews() {
+  return request.get('/recruit/interview/my')
+}
+
+// 求职者 - 获取投递记录的面试详情
+export function getInterviewsByApplication(applicationId) {
+  return request.get(`/recruit/interview/application/${applicationId}`)
 }

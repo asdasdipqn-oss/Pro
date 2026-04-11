@@ -36,5 +36,5 @@ public interface IRecruitCandidateService {
     /**
      * 获取投递申请详情
      */
-    RecruitApplication getApplicationDetail(Long applicationId);
+    RecruitApplicationVO getApplicationDetail(Long applicationId);
 }

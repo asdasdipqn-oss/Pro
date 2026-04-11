@@ -112,11 +112,22 @@ public class RecruitCandidateServiceImpl implements IRecruitCandidateService {
 
     @Override
     public List<RecruitApplicationVO> getMyApplications(Long jobSeekerId) {
-        return applicationMapper.selectByJobSeeker(jobSeekerId);
+        System.out.println("[RecruitCandidateServiceImpl] getMyApplications called, jobSeekerId: " + jobSeekerId);
+        List<RecruitApplicationVO> list = applicationMapper.selectByJobSeeker(jobSeekerId);
+        System.out.println("[RecruitCandidateServiceImpl] Returned list size: " + (list != null ? list.size() : 0));
+        if (list != null && !list.isEmpty()) {
+            for (RecruitApplicationVO vo : list) {
+                System.out.println("[RecruitCandidateServiceImpl] Application ID: " + vo.getId() +
+                    ", JobName: " + vo.getJobName() +
+                    ", Status: " + vo.getStatus() +
+                    ", ApplyTime: " + vo.getApplyTime());
+            }
+        }
+        return list;
     }
 
     @Override
-    public RecruitApplication getApplicationDetail(Long applicationId) {
-        return applicationMapper.selectById(applicationId);
+    public RecruitApplicationVO getApplicationDetail(Long applicationId) {
+        return applicationMapper.selectVOById(applicationId);
     }
 }

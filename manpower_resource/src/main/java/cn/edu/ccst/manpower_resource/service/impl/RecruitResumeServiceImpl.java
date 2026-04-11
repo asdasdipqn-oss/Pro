@@ -6,9 +6,11 @@ import cn.edu.ccst.manpower_resource.dto.PageQuery;
 import cn.edu.ccst.manpower_resource.dto.RecruitResumeDTO;
 import cn.edu.ccst.manpower_resource.entity.RecruitJob;
 import cn.edu.ccst.manpower_resource.entity.RecruitResume;
+import cn.edu.ccst.manpower_resource.entity.RecruitApplication;
 import cn.edu.ccst.manpower_resource.exception.BusinessException;
 import cn.edu.ccst.manpower_resource.mapper.RecruitJobMapper;
 import cn.edu.ccst.manpower_resource.mapper.RecruitResumeMapper;
+import cn.edu.ccst.manpower_resource.mapper.RecruitApplicationMapper;
 import cn.edu.ccst.manpower_resource.service.IRecruitResumeService;
 import cn.edu.ccst.manpower_resource.vo.RecruitResumeVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -32,15 +34,47 @@ import java.util.stream.Collectors;
 public class RecruitResumeServiceImpl extends ServiceImpl<RecruitResumeMapper, RecruitResume> implements IRecruitResumeService {
 
     private final RecruitJobMapper jobMapper;
+    private final RecruitApplicationMapper applicationMapper;
 
     @Override
-    public void submitResume(RecruitResumeDTO dto) {
+    public void submitResume(RecruitResumeDTO dto, Long jobSeekerId) {
+        System.out.println("[RecruitResumeServiceImpl] submitResume called, dto: " + dto);
+        System.out.println("[RecruitResumeServiceImpl] jobSeekerId: " + jobSeekerId);
+
         RecruitResume resume = new RecruitResume();
         BeanUtils.copyProperties(dto, resume);
         resume.setStatus(1); // 待筛选
         resume.setCreateTime(LocalDateTime.now());
         resume.setUpdateTime(LocalDateTime.now());
+
+        System.out.println("[RecruitResumeServiceImpl] Creating resume in recruit_resume table");
+
+        // 先插入简历
         baseMapper.insert(resume);
+
+        System.out.println("[RecruitResumeServiceImpl] Resume inserted with ID: " + resume.getId());
+
+        // 同时创建投递申请记录
+        RecruitApplication application = new RecruitApplication();
+        application.setJobId(dto.getJobId());
+        application.setJobSeekerId(jobSeekerId);
+        application.setResumeId(resume.getId());
+        application.setStatus(0); // 待处理
+        application.setSelfIntro(dto.getSelfIntro());
+        application.setCoverLetter(null);
+        application.setApplyTime(LocalDateTime.now());
+        application.setCreateTime(LocalDateTime.now());
+        application.setUpdateTime(LocalDateTime.now());
+
+        System.out.println("[RecruitResumeServiceImpl] Creating application in recruit_application table");
+        System.out.println("[RecruitResumeServiceImpl] Application data - jobId: " + application.getJobId() +
+                    ", jobSeekerId: " + application.getJobSeekerId() +
+                    ", resumeId: " + application.getResumeId() +
+                    ", status: " + application.getStatus());
+
+        applicationMapper.insert(application);
+
+        System.out.println("[RecruitResumeServiceImpl] Application inserted successfully");
     }
 
     @Override
@@ -73,11 +107,33 @@ public class RecruitResumeServiceImpl extends ServiceImpl<RecruitResumeMapper, R
         resume.setStatus(status);
         resume.setUpdateTime(LocalDateTime.now());
         baseMapper.updateById(resume);
+
+        // 同步更新 recruit_application 表的状态
+        syncApplicationStatus(resume.getId(), status);
     }
 
     @Override
     public void updateStatus(Long id, Integer status) {
         screenResume(id, status);
+    }
+
+    /**
+     * 同步更新 recruit_application 表的状态
+     * 根据简历ID查找对应的投递记录并更新状态
+     */
+    private void syncApplicationStatus(Long resumeId, Integer newStatus) {
+        // 根据简历ID查找对应的投递记录
+        LambdaQueryWrapper<RecruitApplication> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(RecruitApplication::getResumeId, resumeId);
+        List<RecruitApplication> applications = applicationMapper.selectList(wrapper);
+
+        if (applications != null && !applications.isEmpty()) {
+            for (RecruitApplication app : applications) {
+                app.setStatus(newStatus);
+                app.setUpdateTime(LocalDateTime.now());
+                applicationMapper.updateById(app);
+            }
+        }
     }
 
     @Override

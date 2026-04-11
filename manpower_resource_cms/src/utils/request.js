@@ -3,6 +3,9 @@ import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 import router from '@/router'
 
+// 在模块初始化时创建 userStore 实例
+let userStore = null
+
 const request = axios.create({
   baseURL: 'http://localhost:8080/api',
   timeout: 60000
@@ -11,14 +14,20 @@ const request = axios.create({
 // 请求拦截器
 request.interceptors.request.use(
   (config) => {
-    const userStore = useUserStore()
-    const token = userStore.token
+    // 延迟获取 userStore，确保 Pinia 已初始化
+    if (!userStore) {
+      userStore = useUserStore()
+    }
+    const token = userStore.token || localStorage.getItem('token')
     // 登录请求不发送旧token，避免求职者token干扰员工登录
-    const isLoginRequest = config.url?.includes('/auth/login')
-    console.log('[Request] URL:', config.url, 'Has token:', !!token, 'Skip token:', isLoginRequest)
+    const isLoginRequest = config.url?.includes('/auth/login') || config.url?.includes('/candidate/login')
+    console.log('[Request] URL:', config.url)
+    console.log('[Request] token:', token ? token.substring(0, 20) + '...' : 'null')
+    console.log('[Request] isLoginRequest:', isLoginRequest)
     if (token && !isLoginRequest) {
       config.headers.Authorization = `Bearer ${token}`
     }
+    console.log('[Request] Final Authorization:', config.headers.Authorization?.substring(0, 30) + '...')
     return config
   },
   (error) => {

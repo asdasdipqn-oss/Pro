@@ -9,6 +9,10 @@
     <circle v-if="icon === 'user'" cx="12" cy="8" r="4" />
     <path v-if="icon === 'user'" d="M12 14c-6 0-8 3-8 3v6h16v-6s-2-3-8-3z" />
 
+    <!-- 首页/房子图标 -->
+    <path v-if="icon === 'home'" d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    <polyline v-if="icon === 'home'" points="9 22 9 12 15 12 15 22" stroke="white" stroke-width="2" fill="none" />
+
     <!-- 钟表图标 -->
     <circle v-if="icon === 'clock'" cx="12" cy="12" r="10" />
     <line v-if="icon === 'clock'" x1="12" y1="6" x2="12" y2="12" stroke="white" stroke-width="2" />
