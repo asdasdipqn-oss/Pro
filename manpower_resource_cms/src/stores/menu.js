@@ -1,10 +1,12 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
+import { useUserStore } from './user'
 import request from '@/utils/request'
 
 export const useMenuStore = defineStore('menu', () => {
   const menuTree = ref(JSON.parse(localStorage.getItem('menuTree') || '[]'))
   const menuPaths = ref(JSON.parse(localStorage.getItem('menuPaths') || '[]'))
+  const isInitialized = ref(false)
 
   // 从后端获取用户菜单
   async function fetchUserMenus(userId) {
@@ -16,6 +18,7 @@ export const useMenuStore = defineStore('menu', () => {
       menuTree.value = menus
       // 提取所有菜单路径用于权限判断
       menuPaths.value = extractPaths(menus)
+      isInitialized.value = true
 
       localStorage.setItem('menuTree', JSON.stringify(menus))
       localStorage.setItem('menuPaths', JSON.stringify(menuPaths.value))
@@ -24,6 +27,15 @@ export const useMenuStore = defineStore('menu', () => {
     } catch (error) {
       console.error('[Menu] 获取用户菜单失败', error)
       return []
+    }
+  }
+
+  // 初始化菜单（页面刷新时调用）
+  async function initMenus() {
+    if (isInitialized.value) return
+    const userStore = useUserStore()
+    if (userStore.token && userStore.userInfo.userId) {
+      await fetchUserMenus(userStore.userInfo.userId)
     }
   }
 
@@ -78,6 +90,7 @@ export const useMenuStore = defineStore('menu', () => {
   function clearMenus() {
     menuTree.value = []
     menuPaths.value = []
+    isInitialized.value = false
     localStorage.removeItem('menuTree')
     localStorage.removeItem('menuPaths')
   }
@@ -85,7 +98,9 @@ export const useMenuStore = defineStore('menu', () => {
   return {
     menuTree,
     menuPaths,
+    isInitialized,
     fetchUserMenus,
+    initMenus,
     extractPaths,
     isAdminUser,
     hasPathPermission,

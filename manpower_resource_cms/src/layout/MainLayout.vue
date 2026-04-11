@@ -137,6 +137,8 @@ const handleCommand = async (command) => {
 
 onMounted(() => {
   fetchUnreadCount()
+  // 初始化菜单（页面刷新时从后端重新获取最新菜单权限）
+  menuStore.initMenus()
   // 每分钟刷新一次未读数
   setInterval(fetchUnreadCount, 60000)
 })
