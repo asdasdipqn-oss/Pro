@@ -187,6 +187,8 @@ const handleClose = async (row) => {
     await ElMessageBox.confirm('确定要关闭该招聘岗位吗？', '提示', { type: 'warning' })
     await closeJob(row.id)
     ElMessage.success('已关闭')
+    // 清空状态筛选，确保能看到关闭后的记录
+    searchForm.status = null
     fetchData()
   } catch (error) {
     if (error !== 'cancel') console.error(error)
