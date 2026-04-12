@@ -121,11 +121,9 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { useUserStore } from '@/stores/user'
 import request from '@/utils/request'
 
 const router = useRouter()
-const userStore = useUserStore()
 const formRef = ref()
 const loginFormRef = ref()
 const loading = ref(false)
@@ -196,24 +194,15 @@ const handleLogin = async () => {
     const response = await request.post('/candidate/login', loginForm)
     ElMessage.success('登录成功')
 
-    const token = response.data.data.token
-    const username = response.data.data.username
-
-
-    // 保存token到userStore和本地存储
-    userStore.token = token
-    localStorage.setItem('token', token)
+    // 保存token到本地存储
+    localStorage.setItem('token', response.data.token)
     localStorage.setItem('userType', 'candidate')
-    localStorage.setItem('username', username)
+    localStorage.setItem('username', response.data.username)
 
-
-    // 验证 token 是否正确存储
-
-    // 跳转到求职者个人信息页面
-    await router.push('/candidate/profile')
+    // 跳转到个人信息页面
+    router.push.*/candidate/dashboard')
   } catch (error) {
-    console.error('[CandidateView] Login failed:', error)
-    console.error('[CandidateView] Error response:', error.response)
+    console.error('登录失败:', error)
     ElMessage.error(error.response?.data?.message || '登录失败，请重试')
   } finally {
     loading.value = false

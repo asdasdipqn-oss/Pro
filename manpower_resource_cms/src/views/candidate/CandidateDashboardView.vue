@@ -1,519 +1,534 @@
 <template>
-  <div class="candidate-dashboard">
-    <div class="dashboard-container">
-      <!-- 左侧个人信息面板 - 始终显示 -->
-      <div class="left-panel">
-        <div class="profile-summary">
-          <div class="profile-avatar">
-            {{ displayInitial }}
-          </div>
-          <h3 class="profile-name">{{ profile.value.realName || '请完善信息' }}</h3>
-          <p class="profile-status">{{ hasCompleteProfile ? '已完善信息' : '未完善信息' }}</p>
+  <div class="candidate-layout">
+    <!-- 左侧菜单栏 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="#1D1D1F"/>
+            <path d="M10 16h12M16 10v12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          </svg>
         </div>
-        <div class="profile-info-list">
-          <div class="info-row">
-            <span class="label">手机号码</span>
-            <span class="value">{{ profile.value.phone }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">邮箱</span>
-            <span class="value">{{ profile.value.email || '-' }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">学历</span>
-            <span class="value">{{ getEducationLabel(profile.value.education) }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">期望岗位</span>
-            <span class="value">{{ profile.value.expectedPosition || '-' }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">最后更新</span>
-            <span class="value">{{ profile.value.lastUpdateTime || '暂无更新' }}</span>
+        <span class="logo-text">求职者中心</span>
+      </div>
+
+      <div class="nav-item" :class="{ active: currentMenu === 'jobs' }" @click="currentMenu = 'jobs'">
+        <div class="nav-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" fill="#34C759"/>
+            <path d="M8 12h8M16 12v8" stroke="#fff" stroke-width="2"/>
+          </svg>
+        </div>
+        <span class="nav-text">招聘岗位</span>
+      </div>
+
+      <div class="nav-item" :class="{ active: currentMenu === 'process' }" @click="currentMenu = 'process'">
+        <div class="nav-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" fill="#FF9500"/>
+            <path d="M12 12l-3 4-4h3v2H12m3-3 4v2" stroke="#fff" stroke-width="2"/>
+          </svg>
+        </div>
+        <span class="nav-text">招聘流程</span>
+      </div>
+
+      <div class="nav-item" :class="{ active: currentMenu === 'profile' }" @click="currentMenu = 'profile'">
+        <div class="nav-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" fill="#007AFF"/>
+            <path d="M12 6v6" stroke="#fff" stroke-width="2"/>
+          </svg>
+        </div>
+        <span class="nav-text">个人信息</span>
+      </div>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <!-- 岗位招聘 -->
+      <div v-show="currentMenu === 'jobs'" class="content-panel">
+        <h2 class="panel-title">招聘岗位</h2>
+        <div v-if="jobList.length === 0 && !loading" class="empty-tip">暂无招聘岗位信息</div>
+        <div v-else v-loading="loading" class="job-list">
+          <div v-for="job in jobList" :key="job.id" class="job-card">
+            <div class="job-header">
+              <h3>{{ job.jobName }}</h3>
+              <el-tag type="success" size="small">招聘中</el-tag>
+            </div>
+            <div class="job-info">
+              <div class="info-item">
+                <span class="label">部门：</span>
+                <span class="value">{{ job.deptName || '-' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">招聘人数：</span>
+                <span class="value">{{ job.headcount }} 人</span>
+              </div>
+              <div class="info-item">
+                <span class="label">薪资范围：</span>
+                <span class="value">
+                  {{ job.salaryMin && job.salaryMax ? `${job.salaryMin}-${job.salaryMax}元/月` : '薪资面议' }}
+                </span>
+              </div>
+            </div>
+            <div class="job-description">
+              <div class="desc-item">
+                <strong>岗位职责：</strong>
+                <p>{{ job.jobDescription || '-' }}</p>
+              </div>
+              <div class="desc-item">
+                <strong>任职要求：</strong>
+                <p>{{ job.requirements || '-' }}</p>
+              </div>
+            </div>
+            <div class="job-footer">
+              <span class="publish-time">发布于 {{ formatDate(job.createTime) }}</span>
+              <el-button type="primary" size="small" @click="handleApply(job)">投递简历</el-button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- 右侧主内容 -->
-      <div class="right-content">
-        <!-- 顶部操作区 -->
-        <div class="action-bar">
-          <el-button type="primary" size="large" @click="goToProfile">
-            <span v-if="!hasCompleteProfile">填写个人信息</span>
-            <span v-else>编辑个人信息</span>
-          </el-button>
-        </div>
-
-        <!-- 未完善信息提示 -->
-        <div class="welcome-banner" v-if="!hasCompleteProfile">
-          <h1>欢迎，{{ username }}！</h1>
-          <p>请完善您的个人信息以开始求职之旅</p>
-        </div>
-
-        <!-- 投递记录 -->
-        <div class="history-section" v-if="hasCompleteProfile">
-          <h2 class="section-title">我的投递记录</h2>
-          <el-table :data="applicationList" stripe v-loading="applicationLoading" class="application-table">
-            <el-table-column prop="jobName" label="岗位名称" width="200" />
-            <el-table-column prop="applyTime" label="投递时间" width="180">
-              <template #default="{ row }">
-                {{ formatTime(row.applyTime) }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="hrReviewTime" label="筛选时间" width="180">
-              <template #default="{ row }">
-                {{ row.hrReviewTime ? formatTime(row.hrReviewTime) : '-' }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="status" label="状态" width="120">
-              <template #default="{ row }">
-                <el-tag :type="getStatusType(row.status)">
-                  {{ getStatusText(row.status) }}
-                </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column prop="hrComment" label="备注" min-width="150" show-overflow-tooltip />
-          </el-table>
-          <div v-if="applicationList.length === 0 && !applicationLoading" class="empty-tip">
-            暂无投递记录，去岗位招聘页面投递简历吧
-          </div>
-        </div>
-
-        <!-- 个人信息提交历史 -->
-        <div class="history-section">
-          <h2 class="section-title">个人信息修改记录</h2>
-          <el-table :data="historyList" stripe v-loading="loading" class="history-table">
-            <el-table-column prop="submitTime" label="提交时间" width="180">
-              <template #default="{ row }">
-                {{ formatSubmitTime(row.submitTime) }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="realName" label="姓名" width="100" />
-            <el-table-column prop="phone" label="手机号" width="130" />
-            <el-table-column prop="email" label="邮箱" width="180" />
-            <el-table-column prop="education" label="学历" width="100">
-              <template #default="{ row }">
-                {{ getEducationLabel(row.education) }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="expectedPosition" label="期望岗位" width="150" />
-            <el-table-column prop="expectedSalary" label="期望薪资" width="120">
-              <template #default="{ row }">
-                {{ row.expectedSalary ? row.expectedSalary + '元/月' : '-' }}
-              </template>
-            </el-table-column>
-          </el-table>
-          <div v-if="historyList.length === 0" class="empty-tip">
-            暂无历史记录，请先填写个人信息
+      <!-- 招聘流程 -->
+      <div v-show="currentMenu === 'process'" class="content-panel">
+        <h2 class="panel-title">我的应聘流程</h2>
+        <div v-if="applicationList.length === 0 && !loading" class="empty-tip">暂无应聘记录</div>
+        <div v-else v-loading="loading" class="process-list">
+          <div v-for="app in applicationList" :key="app.id" class="process-item">
+            <div class="process-header">
+              <span class="job-name">{{ app.jobName }}</span>
+              <el-tag :type="getStatusType(app.status)" size="small">
+                {{ getStatusText(app.status) }}
+              </el-tag>
+            </div>
+            <div class="process-timeline">
+              <div class="timeline-item completed">
+                <div class="timeline-icon">✓</div>
+                <div class="timeline-content">
+                  <div class="timeline-title">简历投递</div>
+                  <div class="timeline-time">{{ formatTime(app.applyTime) }}</div>
+                </div>
+              </div>
+              <div class="timeline-item" :class="{ completed: app.status >= 1, current: app.status === 1 }">
+                <div class="timeline-icon">✓</div>
+                <div class="timeline-content">
+                  <div class="timeline-title">简历筛选</div>
+                  <div class="timeline-time" v-if="app.hrReviewTime">{{ formatTime(app.hrReviewTime) }}</div>
+                </div>
+              </div>
+              <div class="timeline-item" :class="{ completed: app.status >= 2, current: app.status === 2 }">
+                <div class="timeline-icon" :class="{ current: app.status === 2 }">
+                  <svg v-if="app.status === 2" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="6" fill="#FF9500"/>
+                    <path d="M8 4m0 0 0 4-4" stroke="#fff" stroke-width="2"/>
+                  </svg>
+                  <div v-else class="timeline-icon">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <circle cx="8" cy="8" r="6" fill="#E5E5EA"/>
+                      <path d="M8 4m0 0 0 4-4" stroke="#fff" stroke-width="2"/>
+                    </svg>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-title">面试安排</div>
+                    <div class="timeline-time" v-if="app.interviewTime">{{ formatTime(app.interviewTime) }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- 个人信息 -->
+      <div v-show="currentMenu === 'profile'" class="content-panel">
+        <h2 class="panel-title">个人信息</h2>
+        <div v-if="!hasCompleteProfile" class="empty-tip">
+          <p>请先完善个人信息后再查看</p>
+          <el-button type="primary" @click="currentMenu = 'profile'">去填写个人信息</el-button>
+        </div>
+        <div v-else>
+          <div class="profile-summary">
+            <div class="summary-item">
+              <span class="summary-label">真实姓名：</span>
+              <span class="summary-value">{{ profile.realName || '-' }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">手机号码：</span>
+              <span class="summary-value">{{ profile.phone || '-' }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">邮箱：</span>
+              <span class="summary-value">{{ profile.email || '-' }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">学历：</span>
+              <span class="summary-value">{{ getEducationLabel(profile.education) }}</span>
+            </div>
+          </div>
+          <el-button type="primary" @click="goToProfileForm">编辑信息</el-button>
+        </div>
+      </div>
+    </main>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { listPublishedJobs } from '@/api/recruit'
 import { getMyApplications } from '@/api/recruit'
-import request from '@/utils/request'
 
 const router = useRouter()
-const route = useRoute()
-const username = ref('')
-const hasCompleteProfile = ref(false)
-const loading = ref(false)
-const applicationLoading = ref(false)
-
-const profile = ref({
-  realName: '',
-  phone: '',
-  email: '',
-  education: '',
-  graduateSchool: '',
-  major: '',
-  expectedPosition: '',
-  expectedSalary: '',
-  lastUpdateTime: ''
-})
-
-const historyList = ref([])
+const currentMenu = ref('jobs')
+const jobList = ref([])
 const applicationList = ref([])
+const loading = ref(false)
+const profile = ref({})
+
+const getStatusType = (status) => {
+  const statusMap = { 0: 'info', 1: 'success', 2: 'warning', 3: 'success' }
+  return statusMap[status] || 'info'
+}
+
+const getStatusText = (status) => {
+  const statusMap = {
+    0: '已投递',
+    1: '已筛选',
+    2: '面试中',
+    3: '已通过'
+  }
+  return statusMap[status] || '待处理'
+}
 
 const getEducationLabel = (edu) => {
   const map = { 1: '高中', 2: '大专', 3: '本科', 4: '硕士', 5: '博士' }
   return map[edu] || '-'
 }
 
-const displayInitial = computed(() => {
-  const name = profile.value.realName
-  return name ? name.charAt(0).toUpperCase() : ''
+const hasCompleteProfile = computed(() => {
+  return !!(profile.realName && profile.phone && profile.email)
 })
 
-const getStatusType = (status) => {
-  const typeMap = {
-    0: 'info',      // 待处理
-    1: 'warning',   // 已查看
-    2: 'primary',   // 面试
-    3: 'success'    // 已录用
-  }
-  return typeMap[status] || 'info'
-}
-
-const getStatusText = (status) => {
-  const textMap = {
-    0: '待处理',
-    1: '已查看',
-    2: '面试中',
-    3: '已录用'
-  }
-  return textMap[status] || '未知'
-}
-
-const formatTime = (timeStr) => {
-  if (!timeStr) return '-'
-  const time = new Date(timeStr)
+const formatDate = (dateStr) => {
+  if (!dateStr) return '-'
+  const date = new Date(dateStr)
   const now = new Date()
-  const diff = now - time
-  const diffMinutes = Math.floor(diff / 60000)
-
-  if (diffMinutes < 1) {
-    return '刚刚'
-  } else if (diffMinutes < 60) {
-    return diffMinutes + '分钟前'
-  } else if (diffMinutes < 1440) {
-    const hours = Math.floor(diffMinutes / 60)
-    return hours + '小时前'
-  } else if (diffMinutes < 43200) {
-    const days = Math.floor(diffMinutes / 1440)
-    return days + '天前'
+  const diff = now - date
+  if (diff < 86400000) {
+    return '今天'
+  } else if (diff < 172800000) {
+    const days = Math.floor(diff / 86400000)
+    return `${days}天前`
   } else {
-    return timeStr.substring(0, 16)
+    return date.toLocaleDateString('zh-CN')
   }
 }
 
-watch(() => route.path, (newPath) => {
-  if (newPath === '/candidate/dashboard') {
-    loadProfile()
-    loadHistory()
-    loadApplications()
-  }
-}, { immediate: false })
-
-onMounted(() => {
-  username.value = localStorage.getItem('username') || ''
-
-  const token = localStorage.getItem('token')
-  if (!token) {
-    return
-  }
-
-  loadProfile()
-  loadHistory()
-  loadApplications()
-})
-
-const loadProfile = async () => {
-  try {
-    const response = await request.get('/candidate/profile')
-
-    if (response && response.code === 200) {
-      const data = response.data
-
-      if (data) {
-        profile.value = data
-        hasCompleteProfile.value = !!data.realName
-
-        if (data.updateTime) {
-          try {
-            const updateTime = new Date(data.updateTime)
-            const now = new Date()
-            const diff = now - updateTime
-            if (diff < 60000) {
-              profile.value.lastUpdateTime = '刚刚'
-            } else if (diff < 3600000) {
-              profile.value.lastUpdateTime = Math.floor(diff / 60000) + '分钟前'
-            } else if (diff < 86400000) {
-              const hours = Math.floor(diff / 3600000)
-              profile.value.lastUpdateTime = hours + '小时前'
-            } else {
-              profile.value.lastUpdateTime = data.updateTime
-            }
-          } catch (e) {
-            console.error('[CandidateDashboard] 日期解析错误:', e)
-            profile.value.lastUpdateTime = data.updateTime || '暂无更新'
-          }
-        } else {
-          profile.value.lastUpdateTime = '暂无更新'
-        }
-      } else {
-        hasCompleteProfile.value = false
-      }
-    } else {
-      hasCompleteProfile.value = false
-    }
-  } catch (error) {
-    console.error('[CandidateDashboard] 加载个人信息失败:', error)
-    console.error('[CandidateDashboard] 错误详情:', error.response)
-    hasCompleteProfile.value = false
-  }
+const handleApply = (job) => {
+  // 跳转到个人信息页面填写信息后再投递
+  currentMenu.value = 'profile'
 }
 
-const loadHistory = async () => {
+const goToProfileForm = () => {
+  router.push('/candidate/profile')
+}
+
+const loadJobs = async () => {
   loading.value = true
   try {
-    const response = await axios.get('/api/candidate/profile/history')
-
-    if (response && response.code === 200) {
-      const data = response.data
-      historyList.value = data || []
-    } else {
-      historyList.value = []
-    }
+    const res = await listPublishedJobs()
+    jobList.value = res.data || []
   } catch (error) {
-    console.error('[CandidateDashboard] 加载历史记录失败:', error)
-    historyList.value = []
+    console.error('加载招聘岗位失败:', error)
   } finally {
     loading.value = false
   }
 }
 
 const loadApplications = async () => {
-  applicationLoading.value = true
+  loading.value = true
   try {
-    const response = await getMyApplications()
-
-    if (response && response.code === 200) {
-      const data = response.data
-      applicationList.value = data || []
-    } else {
-      applicationList.value = []
-    }
+    const res = await getMyApplications()
+    applicationList.value = res.data || []
   } catch (error) {
-    console.error('[CandidateDashboard] 加载投递记录失败:', error)
-    applicationList.value = []
+    console.error('加载应聘记录失败:', error)
   } finally {
-    applicationLoading.value = false
+    loading.value = false
   }
 }
 
-const goToProfile = () => {
-  router.push('/candidate/profile')
-}
-
-const formatSubmitTime = (timeStr) => {
-  if (!timeStr) return '-'
-  const time = new Date(timeStr)
-  const now = new Date()
-  const diff = now - time
-  const diffMinutes = Math.floor(diff / 60000)
-
-  if (diffMinutes < 1) {
-    return '刚刚'
-  } else if (diffMinutes < 60) {
-    return diffMinutes + '分钟前'
-  } else if (diffMinutes < 1440) {
-    const hours = Math.floor(diffMinutes / 60)
-    return hours + '小时前'
-  } else if (diffMinutes < 43200) {
-    const days = Math.floor(diffMinutes / 1440)
-    return days + '天前'
-  } else {
-    return timeStr.substring(0, 16)
-  }
-}
+onMounted(() => {
+  loadJobs()
+  loadApplications()
+})
 </script>
 
 <style scoped>
-.candidate-dashboard {
-  padding-top: 24px;
-  padding-left: 24px;
-  padding-right: 24px;
-}
-
-.dashboard-container {
+.candidate-layout {
   display: flex;
-  gap: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.left-panel {
-  width: 320px;
-  flex-shrink: 0;
-}
-
-.profile-summary {
-  background: #FFFFFF;
-  padding: 32px 24px;
-  border-radius: 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.profile-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #FFFFFF;
-  font-size: 32px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 16px;
-}
-
-.profile-name {
-  font-size: 20px;
-  font-weight: 600;
-  color: #1D1D1F;
-  margin: 0 0 8px;
-}
-
-.profile-status {
-  font-size: 14px;
-  color: #007AFF;
-  margin: 0 0 24px;
-}
-
-.profile-info-list {
+  height: 100vh;
   background: #F5F5F7;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
 }
 
-.info-row {
+.sidebar {
+  width: 240px;
+  background: #FFFFFF;
+  border-right: 1px solid #E5E5EA;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  height: 64px;
+  padding: 0 20px;
+  display: flex;
   align-items: center;
-  padding: 12px 0;
   border-bottom: 1px solid #E5E5EA;
 }
 
-.info-row:last-child {
-  border-bottom: none;
+.logo {
+  flex-shrink: 0;
 }
 
-.info-row .label {
-  font-size: 14px;
-  color: #86868B;
-}
-
-.info-row .value {
-  font-size: 14px;
-  font-weight: 500;
-  color: #1D1D1F;
-}
-
-.right-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.action-bar {
-  background: #FFFFFF;
-  padding: 20px 24px;
-  border-radius: 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-  margin-bottom: 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.action-bar .el-button {
-  background: #007AFF;
-  border-color: #007AFF;
-  color: #FFFFFF;
-  font-weight: 500;
-  padding: 12px 32px;
-  border-radius: 10px;
-}
-
-.action-bar .el-button:hover {
-  background: #0066D6;
-  border-color: #0066D6;
-}
-
-.welcome-banner {
-  background: #FFFFFF;
-  padding: 40px 60px;
-  border-radius: 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-  margin-bottom: 24px;
-}
-
-.welcome-banner h1 {
-  font-size: 28px;
-  color: #1D1D1F;
-  margin-bottom: 12px;
-}
-
-.welcome-banner p {
+.logo-text {
+  margin-left: 12px;
   font-size: 16px;
-  color: #86868B;
-}
-
-.history-section {
-  background: #FFFFFF;
-  padding: 24px;
-  border-radius: 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-  margin-bottom: 24px;
-}
-
-.section-title {
-  font-size: 20px;
   font-weight: 600;
   color: #1D1D1F;
-  margin-bottom: 20px;
 }
 
-.history-table {
-  margin-top: 10px;
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  color: #1D1D1F;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 4px;
 }
 
-.application-table {
-  margin-top: 10px;
-}
-
-.history-table :deep(.el-table__header-wrapper),
-.application-table :deep(.el-table__header-wrapper) {
+.nav-item:hover {
   background: #F5F5F7;
 }
 
-.history-table :deep(.el-table__header th),
-.application-table :deep(.el-table__header th) {
-  background: #FFFFFF;
-  color: #86868B;
+.nav-item.active {
+  background: #F5F5F7;
+  color: #007AFF;
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.nav-text {
+  margin-left: 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.content-panel {
+  padding: 32px;
+}
+
+.panel-title {
+  font-size: 24px;
   font-weight: 600;
-  border-bottom: 2px solid #E5E5EA;
-}
-
-.history-table :deep(.el-table__body td),
-.application-table :deep(.el-table__body td) {
-  padding: 16px 12px;
-}
-
-.history-table :deep(.el-table__row--striped),
-.application-table :deep(.el-table__row--striped) {
-  background: #FFFFFF;
-}
-
-.history-table :deep(.el-table__row--striped:nth-child(even)),
-.application-table :deep(.el-table__row--striped:nth-child(even)) {
-  background: #F9FAFB;
+  color: #1D1D1F;
+  margin-bottom: 24px;
 }
 
 .empty-tip {
   text-align: center;
-  padding: 40px 20px;
+  padding: 60px 20px;
   color: #86868B;
   font-size: 14px;
+}
+
+.job-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.job-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.job-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1D1D1F;
+  margin: 0;
+}
+
+.job-info {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-item .label {
+  font-size: 14px;
+  color: #86868B;
+}
+
+.info-item .value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1D1D1F;
+}
+
+.job-description {
+  background: #F5F5F7;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.job-description p {
+  margin: 0;
+  font-size: 14px;
+  color: #1D1D1F;
+  line-height: 1.6;
+}
+
+.job-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid #E5E5EA;
+}
+
+.publish-time {
+  font-size: 12px;
+  color: #86868B;
+}
+
+.process-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.process-item {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.process-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.job-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1D1D1F;
+}
+
+.process-timeline {
+  display: flex;
+  padding-left: 16px;
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 32px;
+  margin-bottom: 16px;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  background: #E5E5EA;
+  border-radius: 50%;
+}
+
+.timeline-icon {
+  position: absolute;
+  left: -6px;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #007AFF;
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+.timeline-content {
+  margin-left: 12px;
+}
+
+.timeline-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1D1D1F;
+  margin-bottom: 4px;
+}
+
+.timeline-time {
+  font-size: 12px;
+  color: #86868B;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #E5E5EA;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-label {
+  font-size: 14px;
+  color: #86868B;
+}
+
+.summary-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1D1D1F;
 }
 </style>

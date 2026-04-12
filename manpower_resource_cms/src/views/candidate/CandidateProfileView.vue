@@ -1,11 +1,6 @@
 <template>
   <div class="profile-container">
-    <div class="profile-header">
-      <h1>个人信息</h1>
-      <p>完善您的个人信息，让HR更了解您</p>
-    </div>
-
-    <!-- 已记录数据展示区 -->
+    <!-- 已保存数据展示区 -->
     <div v-if="savedData" class="saved-data-section">
       <h3 class="saved-data-title">
         <span class="check-icon">✓</span>
@@ -32,39 +27,11 @@
           <span class="label">期望岗位：</span>
           <span class="value">{{ savedData.expectedPosition || '-' }}</span>
         </div>
-      </div>
-      <div class="save-time">
-        <span class="label">保存时间：</span>
-        <span class="value">{{ formatTime(savedData.saveTime) }}</span>
-      </div>
-    </div>
-
-    <!-- 历史记录区域 -->
-    <div v-if="historyList.length > 0" class="history-section">
-      <h3 class="history-title">
-        <span class="history-icon">📋</span>
-        修改记录（最近10次）
-      </h3>
-      <div class="history-list">
-        <div v-for="(record, index) in historyList.slice(0, 10)" :key="index" class="history-item">
-          <div class="history-info">
-            <div class="history-header">
-              <span class="history-action">历史记录</span>
-              <span class="history-time">{{ formatTime(record.submitTime) }}</span>
-            </div>
-            <div class="history-content">
-              <div class="history-detail" v-for="(label, key) in displayFields" :key="key">
-                <span class="detail-label">{{ label }}：</span>
-                <span class="detail-value">{{ record[key] || '-' }}</span>
-              </div>
-            </div>
-          </div>
+        <div class="save-time">
+          <span class="label">保存时间：</span>
+          <span class="value">{{ formatTime(savedData.saveTime) }}</span>
         </div>
       </div>
-    </div>
-    <div v-else class="empty-history">
-      <div class="empty-icon">📝</div>
-      <p>暂无修改记录</p>
     </div>
 
     <el-form ref="formRef" :model="form" :rules="rules" class="profile-form" label-width="120px">
@@ -163,7 +130,6 @@ const formRef = ref()
 const loading = ref(false)
 const username = ref('')
 const savedData = ref(null)
-const historyList = ref([])
 
 // 监听路由变化，当从其他页面返回时重新加载
 watch(() => route.path, (newPath) => {
@@ -259,59 +225,27 @@ const handleSave = async () => {
 }
 
 const handleCancel = () => {
-  router.push('/candidate/profile')
+  router.push('/candidate/dashboard')
 }
 
 onMounted(() => {
   username.value = localStorage.getItem('username') || ''
   loadProfile()
-  loadHistory()
 })
 
 const loadProfile = async () => {
   try {
     const response = await request.get('/candidate/profile')
 
-    const data = response.data.data
-    if (data) {
-
+    if (response.data) {
       // 保存已记录的数据
-      savedData.value = { ...data }
-
-      // 只保留存在的字段，避免覆盖为null
-      if (data.realName !== undefined && data.realName !== null) form.realName = data.realName
-      if (data.phone !== undefined && data.phone !== null) form.phone = data.phone
-      if (data.email !== undefined && data.email !== null) form.email = data.email
-      if (data.gender !== undefined && data.gender !== null) form.gender = data.gender
-      if (data.idCard !== undefined && data.idCard !== null) form.idCard = data.idCard
-      if (data.education !== undefined && data.education !== null) form.education = data.education
-      if (data.graduateSchool !== undefined && data.graduateSchool !== null) form.graduateSchool = data.graduateSchool
-      if (data.major !== undefined && data.major !== null) form.major = data.major
-      if (data.graduateDate !== undefined && data.graduateDate !== null) form.graduateDate = data.graduateDate
-      if (data.workExperience !== undefined && data.workExperience !== null) form.workExperience = data.workExperience
-      if (data.expectedSalary !== undefined && data.expectedSalary !== null) form.expectedSalary = data.expectedSalary
-      if (data.expectedPosition !== undefined && data.expectedPosition !== null) form.expectedPosition = data.expectedPosition
-      if (data.resumeUrl !== undefined && data.resumeUrl !== null) form.resumeUrl = data.resumeUrl
-
-    } else {
+      savedData.value = response.data
     }
   } catch (error) {
     console.error('[CandidateProfile] 加载个人信息失败:', error)
-    console.error('[CandidateProfile] 错误详情:', error.response?.data)
-  }
-}
-
-const loadHistory = async () => {
-  try {
-    const response = await request.get('/candidate/profile/history')
-
-    if (response.code === 200 && response.data) {
-      historyList.value = response.data || []
+    if (error.response?.data?.message) {
+      ElMessage.error(error.response.data.message)
     }
-  } catch (error) {
-    console.error('[CandidateProfile] 加载历史记录失败:', error)
-    // 如果是404或没有数据，保持为空数组
-    historyList.value = []
   }
 }
 </script>
@@ -322,23 +256,6 @@ const loadHistory = async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.profile-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.profile-header h1 {
-  font-size: 28px;
-  font-weight: 600;
-  color: #1D1D1F;
-  margin-bottom: 12px;
-}
-
-.profile-header p {
-  font-size: 16px;
-  color: #86868B;
 }
 
 .saved-data-section {
@@ -353,7 +270,7 @@ const loadHistory = async () => {
 .saved-data-title {
   font-size: 16px;
   font-weight: 600;
-  color: #007AFF;
+  color: #1D1D1F;
   margin-bottom: 16px;
   display: flex;
   align-items: center;
@@ -377,20 +294,20 @@ const loadHistory = async () => {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
+  margin-bottom: 12px;
 }
 
 .saved-data-item {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
   background: #FFFFFF;
-  padding: 10px 12px;
   border-radius: 8px;
 }
 
 .saved-data-item .label {
   font-size: 14px;
   color: #86868B;
-  min-width: 80px;
 }
 
 .saved-data-item .value {
@@ -400,26 +317,27 @@ const loadHistory = async () => {
 }
 
 .save-time {
-  margin-top: 16px;
+  grid-column: 1 / -1;
+  text-align: right;
   padding-top: 16px;
   border-top: 1px solid #E5E5EA;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
+  padding-right: 16px;
 }
 
 .save-time .label {
+  font-size: 12px;
   color: #86868B;
 }
 
 .save-time .value {
-  color: #1D1D1F;
+  font-size: 12px;
   font-weight: 500;
+  color: #1D1D1F;
 }
 
 .profile-form {
   max-width: 600px;
-  margin: 0 auto;
+  margin: 24px auto 0;
   background: #FFFFFF;
   padding: 40px;
   border-radius: 20px;
@@ -481,97 +399,5 @@ const loadHistory = async () => {
 .profile-form :deep(.el-form-item__content) {
   flex-direction: row;
   gap: 12px;
-}
-
-.history-section {
-  width: 600px;
-  margin: 0 auto 24px;
-  background: #F5F5F7;
-  padding: 20px;
-  border-radius: 12px;
-}
-
-.history-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1D1D1F;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.history-icon {
-  font-size: 18px;
-}
-
-.history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.history-item {
-  background: #FFFFFF;
-  border-radius: 8px;
-  padding: 16px;
-}
-
-.history-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.history-action {
-  font-size: 14px;
-  font-weight: 600;
-  color: #007AFF;
-}
-
-.history-time {
-  font-size: 12px;
-  color: #86868B;
-}
-
-.history-content {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
-
-.history-detail {
-  font-size: 14px;
-}
-
-.detail-label {
-  color: #86868B;
-  margin-right: 4px;
-}
-
-.detail-value {
-  color: #1D1D1F;
-  font-weight: 500;
-}
-
-.empty-history {
-  width: 600px;
-  margin: 0 auto 24px;
-  text-align: center;
-  padding: 40px 20px;
-  background: #F5F5F7;
-  border-radius: 12px;
-}
-
-.empty-history .empty-icon {
-  font-size: 48px;
-  margin-bottom: 12px;
-}
-
-.empty-history p {
-  font-size: 14px;
-  color: #86868B;
-  margin: 0;
 }
 </style>
