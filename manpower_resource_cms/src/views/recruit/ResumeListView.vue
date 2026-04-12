@@ -29,6 +29,7 @@
       </el-form>
       
       <el-table :data="tableData" v-loading="loading" stripe>
+        <el-table-column prop="id" label="简历ID" width="80" />
         <el-table-column prop="name" label="姓名" width="100" />
         <el-table-column prop="phone" label="手机号" width="130" />
         <el-table-column prop="email" label="邮箱" width="180" />

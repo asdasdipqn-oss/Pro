@@ -62,7 +62,7 @@ export const useMenuStore = defineStore('menu', () => {
     // 检查角色列表中是否包含 ADMIN 或 SUPER_ADMIN 角色
     const roles = userInfo.roles || []
     return roles.some(role =>
-      role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'admin' || role === 'super_admin'
+      role === 'ADMIN' || role === 'SUPER_ADMIN' || role.toUpperCase() === 'ADMIN' || role.toUpperCase() === 'SUPER_ADMIN'
     )
   }
 

@@ -21,6 +21,7 @@ export const useUserStore = defineStore('user', () => {
   const permissions = ref(safeJSONParse(localStorage.getItem('permissions'), '[]'))
   const deptId = ref(safeJSONParse(localStorage.getItem('deptId'), null))
   const departmentName = ref(safeJSONParse(localStorage.getItem('departmentName'), ''))
+  const userType = ref(localStorage.getItem('userType') || '')
 
   const isLoggedIn = computed(() => !!token.value)
   const username = computed(() => {
@@ -46,6 +47,7 @@ export const useUserStore = defineStore('user', () => {
     }
     roles.value = res.data.roles || []
     permissions.value = res.data.permissions || []
+    userType.value = res.data.userType || 'EMPLOYEE'
 
     // 保存用户的部门信息
     if (res.data.deptId) {
@@ -57,6 +59,7 @@ export const useUserStore = defineStore('user', () => {
     localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
     localStorage.setItem('roles', JSON.stringify(roles.value))
     localStorage.setItem('permissions', JSON.stringify(permissions.value))
+    localStorage.setItem('userType', userType.value)
     localStorage.setItem('deptId', JSON.stringify(deptId.value))
     localStorage.setItem('departmentName', JSON.stringify(departmentName.value))
 
@@ -105,11 +108,13 @@ export const useUserStore = defineStore('user', () => {
     permissions.value = []
     deptId.value = null
     departmentName.value = ''
+    userType.value = ''
 
     localStorage.removeItem('token')
     localStorage.removeItem('userInfo')
     localStorage.removeItem('roles')
     localStorage.removeItem('permissions')
+    localStorage.removeItem('userType')
     localStorage.removeItem('deptId')
     localStorage.removeItem('departmentName')
 
@@ -135,6 +140,7 @@ export const useUserStore = defineStore('user', () => {
     permissions,
     deptId,
     departmentName,
+    userType,
     isLoggedIn,
     username,
     login,

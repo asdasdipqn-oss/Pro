@@ -7,9 +7,11 @@ import cn.edu.ccst.manpower_resource.service.IHrCandidateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import cn.edu.ccst.manpower_resource.security.LoginUser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -57,19 +59,17 @@ public class HrCandidateController {
     @Operation(summary = "获取求职者个人信息")
     @GetMapping("/profile")
     public Result<cn.edu.ccst.manpower_resource.vo.CandidateProfileVO> getProfile(
-            @Parameter(description = "用户名（从token获取）")
-            @org.springframework.security.core.annotation.AuthenticationPrincipal String username) {
-        cn.edu.ccst.manpower_resource.vo.CandidateProfileVO profile = candidateService.getProfile(username);
+            @AuthenticationPrincipal LoginUser loginUser) {
+        cn.edu.ccst.manpower_resource.vo.CandidateProfileVO profile = candidateService.getProfile(loginUser.getUsername());
         return Result.success(profile);
     }
 
     @Operation(summary = "更新求职者个人信息")
     @PutMapping("/profile")
     public Result<Void> updateProfile(
-            @Parameter(description = "用户名（从token获取）")
-            @org.springframework.security.core.annotation.AuthenticationPrincipal String username,
+            @AuthenticationPrincipal LoginUser loginUser,
             @Valid @RequestBody CandidateProfileDTO request) {
-        candidateService.updateProfile(username, request);
+        candidateService.updateProfile(loginUser.getUsername(), request);
         return Result.success();
     }
 

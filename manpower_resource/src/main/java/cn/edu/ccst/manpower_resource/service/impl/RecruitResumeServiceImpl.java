@@ -4,9 +4,11 @@ import cn.edu.ccst.manpower_resource.common.PageResult;
 import cn.edu.ccst.manpower_resource.common.ResultCode;
 import cn.edu.ccst.manpower_resource.dto.PageQuery;
 import cn.edu.ccst.manpower_resource.dto.RecruitResumeDTO;
+import cn.edu.ccst.manpower_resource.entity.RecruitApplication;
 import cn.edu.ccst.manpower_resource.entity.RecruitJob;
 import cn.edu.ccst.manpower_resource.entity.RecruitResume;
 import cn.edu.ccst.manpower_resource.exception.BusinessException;
+import cn.edu.ccst.manpower_resource.mapper.RecruitApplicationMapper;
 import cn.edu.ccst.manpower_resource.mapper.RecruitJobMapper;
 import cn.edu.ccst.manpower_resource.mapper.RecruitResumeMapper;
 import cn.edu.ccst.manpower_resource.service.IRecruitResumeService;
@@ -17,6 +19,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -32,6 +35,7 @@ import java.util.stream.Collectors;
 public class RecruitResumeServiceImpl extends ServiceImpl<RecruitResumeMapper, RecruitResume> implements IRecruitResumeService {
 
     private final RecruitJobMapper jobMapper;
+    private final RecruitApplicationMapper applicationMapper;
 
     @Override
     public void submitResume(RecruitResumeDTO dto) {
@@ -65,6 +69,7 @@ public class RecruitResumeServiceImpl extends ServiceImpl<RecruitResumeMapper, R
     }
 
     @Override
+    @Transactional
     public void screenResume(Long id, Integer status) {
         RecruitResume resume = baseMapper.selectById(id);
         if (resume == null) {
@@ -73,6 +78,32 @@ public class RecruitResumeServiceImpl extends ServiceImpl<RecruitResumeMapper, R
         resume.setStatus(status);
         resume.setUpdateTime(LocalDateTime.now());
         baseMapper.updateById(resume);
+
+        // 同步更新 recruit_application 状态
+        // resume status: 1-待筛选 2-筛选通过 3-面试中 4-已录用 5-未通过 6-已放弃
+        // application status: 0-待处理 1-筛选中 2-面试中 3-已录用 5-未通过 6-已放弃
+        Integer appStatus = switch (status) {
+            case 1 -> 0;  // 待筛选 → 待处理
+            case 2 -> 1;  // 筛选通过 → 筛选中
+            case 3 -> 2;  // 面试中 → 面试中
+            case 4 -> 3;  // 已录用 → 已录用
+            case 5 -> 5;  // 未通过 → 未通过
+            case 6 -> 6;  // 已放弃 → 已放弃
+            default -> null;
+        };
+        if (appStatus != null) {
+            RecruitApplication application = applicationMapper.selectOne(
+                    new LambdaQueryWrapper<RecruitApplication>()
+                            .eq(RecruitApplication::getResumeId, id));
+            if (application != null) {
+                application.setStatus(appStatus);
+                if (status >= 2) {
+                    application.setHrReviewTime(LocalDateTime.now());
+                }
+                application.setUpdateTime(LocalDateTime.now());
+                applicationMapper.updateById(application);
+            }
+        }
     }
 
     @Override

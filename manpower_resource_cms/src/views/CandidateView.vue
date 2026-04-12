@@ -1,5 +1,10 @@
 <template>
-  <div class="candidate-register-container">
+  <!-- 有子路由匹配时（/candidate/jobs, /candidate/process 等）：显示 CandidateLayout -->
+  <CandidateLayout v-if="showLayout">
+    <router-view />
+  </CandidateLayout>
+  <!-- 精确匹配 /candidate 时：显示登录/注册页 -->
+  <div v-else class="candidate-register-container">
     <div class="top-right-switch">
       <el-button type="primary" link @click="router.push('/login')">
         员工登录
@@ -118,12 +123,19 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, reactive, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import request from '@/utils/request'
+import { useCandidateStore } from '@/stores/candidate'
+import { candidateRegister } from '@/api/candidate'
+import CandidateLayout from '@/layout/CandidateLayout.vue'
 
 const router = useRouter()
+const route = useRoute()
+const candidateStore = useCandidateStore()
+
+const showLayout = computed(() => route.path !== '/candidate')
+
 const formRef = ref()
 const loginFormRef = ref()
 const loading = ref(false)
@@ -174,7 +186,7 @@ const handleRegister = async () => {
 
   loading.value = true
   try {
-    await request.post('/candidate/register', form)
+    await candidateRegister(form)
     ElMessage.success('注册成功，请登录')
     loginMode.value = 'login'
   } catch (error) {
@@ -191,16 +203,9 @@ const handleLogin = async () => {
 
   loading.value = true
   try {
-    const response = await request.post('/candidate/login', loginForm)
+    await candidateStore.login(loginForm)
     ElMessage.success('登录成功')
-
-    // 保存token到本地存储
-    localStorage.setItem('token', response.data.token)
-    localStorage.setItem('userType', 'candidate')
-    localStorage.setItem('username', response.data.username)
-
-    // 跳转到个人信息页面
-    router.push.*/candidate/dashboard')
+    router.push('/candidate/jobs')
   } catch (error) {
     console.error('登录失败:', error)
     ElMessage.error(error.response?.data?.message || '登录失败，请重试')

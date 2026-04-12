@@ -122,10 +122,12 @@
 import { ref, reactive, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import request from '@/utils/request'
+import { getCandidateProfile, updateCandidateProfile } from '@/api/candidate'
+import { useCandidateStore } from '@/stores/candidate'
 
 const router = useRouter()
 const route = useRoute()
+const candidateStore = useCandidateStore()
 const formRef = ref()
 const loading = ref(false)
 const username = ref('')
@@ -156,7 +158,8 @@ const form = reactive({
 
 const rules = {
   realName: [
-    { required: true, message: '请输入真实姓名', trigger: 'blur' }
+    { required: true, message: '请输入真实姓名', trigger: 'blur' },
+    { max: 50, message: '姓名不能超过50个字符', trigger: 'blur' }
   ],
   phone: [
     { required: true, message: '请输入手机号码', trigger: 'blur' },
@@ -168,8 +171,23 @@ const rules = {
   gender: [
     { required: true, message: '请选择性别', trigger: 'change' }
   ],
+  idCard: [
+    { pattern: /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[1-2]\d|3[0-1])\d{3}[0-9Xx]$/, message: '请输入正确的身份证号', trigger: 'blur' }
+  ],
   education: [
     { required: true, message: '请选择学历', trigger: 'change' }
+  ],
+  graduateSchool: [
+    { max: 100, message: '毕业院校不能超过100个字符', trigger: 'blur' }
+  ],
+  major: [
+    { max: 100, message: '专业不能超过100个字符', trigger: 'blur' }
+  ],
+  expectedPosition: [
+    { max: 100, message: '期望岗位不能超过100个字符', trigger: 'blur' }
+  ],
+  resumeUrl: [
+    { max: 500, message: '简历地址不能超过500个字符', trigger: 'blur' }
   ]
 }
 
@@ -201,7 +219,8 @@ const formatTime = (timeStr) => {
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    second: '2-digit'
   })
 }
 
@@ -211,39 +230,77 @@ const handleSave = async () => {
 
   loading.value = true
   try {
-    await request.put('/candidate/profile', form)
+    // 准备提交数据，将空字符串转换为 null
+    const submitData = {
+      realName: form.realName || null,
+      phone: form.phone || null,
+      email: form.email || null,
+      gender: form.gender,
+      idCard: form.idCard || null,
+      education: form.education,
+      graduateSchool: form.graduateSchool || null,
+      major: form.major || null,
+      graduateDate: form.graduateDate || null,
+      workExperience: form.workExperience,
+      expectedSalary: form.expectedSalary ? Number(form.expectedSalary) : null,
+      expectedPosition: form.expectedPosition || null,
+      resumeUrl: form.resumeUrl || null
+    }
+
+    console.log('[CandidateProfile] 提交数据:', submitData)
+
+    await updateCandidateProfile(submitData)
     ElMessage.success('保存成功')
 
     // 保存成功后重新加载数据
     await loadProfile()
   } catch (error) {
     console.error('保存失败:', error)
-    ElMessage.error(error.response?.data?.message || '保存失败，请重试')
+    console.error('错误响应:', error.response?.data)
+    const errorMsg = error.response?.data?.message || error.response?.data?.data?.message || '保存失败，请重试'
+    ElMessage.error(errorMsg)
   } finally {
     loading.value = false
   }
 }
 
 const handleCancel = () => {
-  router.push('/candidate/dashboard')
+  router.push('/candidate/jobs')
 }
 
 onMounted(() => {
-  username.value = localStorage.getItem('username') || ''
+  username.value = candidateStore.username
   loadProfile()
 })
 
 const loadProfile = async () => {
   try {
-    const response = await request.get('/candidate/profile')
+    const response = await getCandidateProfile()
 
     if (response.data) {
       // 保存已记录的数据
       savedData.value = response.data
+      // 同时填充到表单中
+      form.realName = response.data.realName || ''
+      form.phone = response.data.phone || ''
+      form.email = response.data.email || ''
+      form.gender = response.data.gender ?? 1
+      form.idCard = response.data.idCard || ''
+      form.education = response.data.education ?? 3
+      form.graduateSchool = response.data.graduateSchool || ''
+      form.major = response.data.major || ''
+      form.graduateDate = response.data.graduateDate || ''
+      form.workExperience = response.data.workExperience ?? 0
+      form.expectedSalary = response.data.expectedSalary ? String(response.data.expectedSalary) : ''
+      form.expectedPosition = response.data.expectedPosition || ''
+      form.resumeUrl = response.data.resumeUrl || ''
     }
   } catch (error) {
     console.error('[CandidateProfile] 加载个人信息失败:', error)
-    if (error.response?.data?.message) {
+    if (error.response?.status === 404) {
+      // 没有数据时，不显示错误，让用户填写
+      savedData.value = null
+    } else if (error.response?.data?.message) {
       ElMessage.error(error.response.data.message)
     }
   }

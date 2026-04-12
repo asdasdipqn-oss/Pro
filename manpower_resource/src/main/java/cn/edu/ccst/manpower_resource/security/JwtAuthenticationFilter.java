@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,7 +16,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
 
 @Component
 @RequiredArgsConstructor
@@ -33,34 +31,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(token) && jwtUtil.validateToken(token)) {
             String username = jwtUtil.getUsername(token);
+            String userType = jwtUtil.getUserType(token);
 
-            // 检查是否是求职者请求
-            if (isCandidateRequest(request)) {
-                // 求职者请求：创建简单的认证，不从数据库加载用户
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(username, null,
-                                Collections.singletonList(new SimpleGrantedAuthority("ROLE_CANDIDATE")));
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
-                // 员工请求：从数据库加载用户信息
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            // 兼容旧 token（无 userType 声明）：通过 URL 前缀回退判断
+            if (userType == null) {
+                String uri = request.getRequestURI();
+                String contextPath = request.getContextPath();
+                if (StringUtils.hasText(contextPath) && uri.startsWith(contextPath)) {
+                    uri = uri.substring(contextPath.length());
+                }
+                userType = uri.startsWith("/candidate") ? "CANDIDATE" : "EMPLOYEE";
             }
+
+            // 统一通过 userDetailsService 加载用户，CustomUserDetailsService 会自动查对应表
+            // 返回 LoginUser 对象作为 principal，@AuthenticationPrincipal LoginUser 可正确工作
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    /**
-     * 判断是否是求职者请求
-     */
-    private boolean isCandidateRequest(HttpServletRequest request) {
-        String uri = request.getRequestURI();
-        return uri.startsWith("/candidate/") || uri.startsWith("/recruit/");
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {

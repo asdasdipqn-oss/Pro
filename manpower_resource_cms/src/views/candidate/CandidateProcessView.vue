@@ -23,21 +23,22 @@
               <p>{{ formatTime(app.applyTime) }}</p>
             </div>
           </div>
-          <div class="timeline-line" :class="{ active: app.status >= 0 }"></div>
+          <div class="timeline-line" :class="{ active: app.status >= 1 }"></div>
 
-          <div class="timeline-item" :class="{ active: app.status >= 1 }">
+          <div class="timeline-item" :class="{ active: app.status >= 1, rejected: app.status === 5 }">
             <div class="timeline-icon">
               <el-icon><View /></el-icon>
             </div>
             <div class="timeline-content">
               <h4>简历筛选</h4>
               <p v-if="app.hrReviewTime">{{ formatTime(app.hrReviewTime) }}</p>
+              <p v-else-if="app.status === 5">未通过筛选</p>
               <p v-else>等待筛选</p>
             </div>
           </div>
-          <div class="timeline-line" :class="{ active: app.status >= 1 }"></div>
+          <div class="timeline-line" :class="{ active: app.status >= 2, rejected: app.status === 5 }"></div>
 
-          <div class="timeline-item" :class="{ active: app.status >= 2 }">
+          <div class="timeline-item" :class="{ active: app.status >= 2 }" v-if="app.status !== 5 && app.status !== 6">
             <div class="timeline-icon">
               <el-icon><Clock /></el-icon>
             </div>
@@ -47,19 +48,18 @@
               <p v-else>待安排</p>
             </div>
           </div>
-          <div class="timeline-line" :class="{ active: app.status >= 2 }"></div>
+          <div class="timeline-line" :class="{ active: app.status >= 3 }" v-if="app.status !== 5 && app.status !== 6"></div>
 
-          <div class="timeline-item" :class="{ active: app.status >= 3 }">
+          <div class="timeline-item" :class="{ active: app.status === 3, rejected: app.status === 5 }" v-if="app.status >= 2 || app.status === 5">
             <div class="timeline-icon">
               <el-icon><CircleCheck /></el-icon>
             </div>
             <div class="timeline-content">
               <h4>{{ getStatusText(app.status) }}</h4>
               <p v-if="app.completeTime">{{ formatTime(app.completeTime) }}</p>
-              <p v-else>待完成</p>
+              <p v-else>{{ app.status === 3 ? '已录用' : app.status === 5 ? '未通过' : '待完成' }}</p>
             </div>
           </div>
-          <div class="timeline-line" :class="{ active: app.status >= 3 }"></div>
         </div>
       </div>
     </div>
@@ -70,8 +70,7 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Document, View, Clock, CircleCheck } from '@element-plus/icons-vue'
-import { getMyApplications } from '@/api/recruit'
-import request from '@/utils/request'
+import { getMyApplications } from '@/api/candidate'
 
 const loading = ref(false)
 const applicationList = ref([])
@@ -79,19 +78,23 @@ const applicationList = ref([])
 const getStatusType = (status) => {
   const statusMap = {
     0: 'info',
-    1: 'success',
+    1: 'primary',
     2: 'warning',
-    3: 'success'
+    3: 'success',
+    5: 'danger',
+    6: 'info'
   }
   return statusMap[status] || 'info'
 }
 
 const getStatusText = (status) => {
   const statusMap = {
-    0: '已投递',
+    0: '待处理',
     1: '筛选中',
     2: '面试中',
-    3: '已通过'
+    3: '已录用',
+    5: '未通过',
+    6: '已放弃'
   }
   return statusMap[status] || '待处理'
 }
@@ -189,6 +192,14 @@ onMounted(fetchApplications)
 
 .timeline-line.active {
   background: #007AFF;
+}
+
+.timeline-line.rejected {
+  background: #F56C6C;
+}
+
+.timeline-item.rejected .timeline-icon {
+  background: #F56C6C;
 }
 
 .timeline-content {

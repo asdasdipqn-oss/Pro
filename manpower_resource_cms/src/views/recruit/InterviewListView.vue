@@ -30,6 +30,12 @@
       </el-form>
 
       <el-table :data="tableData" v-loading="loading" stripe>
+        <el-table-column label="候选人" min-width="120">
+          <template #default="{ row }">
+            <span>{{ row.candidateName || '-' }}</span>
+            <div v-if="row.candidatePhone" style="font-size:12px;color:#86868B;">{{ row.candidatePhone }}</div>
+          </template>
+        </el-table-column>
         <el-table-column prop="resumeId" label="简历ID" width="80" />
         <el-table-column prop="interviewRound" label="面试轮次" width="90" align="center">
           <template #default="{ row }">

@@ -1,0 +1,28 @@
+-- 求职者表
+CREATE TABLE IF NOT EXISTS `hr_candidate` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '求职者ID',
+    `username` VARCHAR(50) NOT NULL COMMENT '用户名',
+    `password` VARCHAR(255) NOT NULL COMMENT '密码（加密存储）',
+    `real_name` VARCHAR(50) DEFAULT NULL COMMENT '真实姓名',
+    `phone` VARCHAR(20) DEFAULT NULL COMMENT '手机号码',
+    `email` VARCHAR(100) DEFAULT NULL COMMENT '邮箱',
+    `gender` TINYINT DEFAULT 1 COMMENT '性别：0-女 1-男',
+    `id_card` VARCHAR(18) DEFAULT NULL COMMENT '身份证号',
+    `education` TINYINT DEFAULT NULL COMMENT '学历：1-高中 2-大专 3-本科 4-硕士 5-博士',
+    `graduate_school` VARCHAR(100) DEFAULT NULL COMMENT '毕业院校',
+    `major` VARCHAR(100) DEFAULT NULL COMMENT '专业',
+    `graduate_date` DATE DEFAULT NULL COMMENT '毕业日期',
+    `work_experience` INT DEFAULT 0 COMMENT '工作年限（年）',
+    `expected_salary` DECIMAL(10,2) DEFAULT NULL COMMENT '期望薪资',
+    `expected_position` VARCHAR(100) DEFAULT NULL COMMENT '期望岗位',
+    `resume_url` VARCHAR(500) DEFAULT NULL COMMENT '简历URL',
+    `status` TINYINT DEFAULT 1 COMMENT '状态：0-禁用 1-正常',
+    `last_login_time` DATETIME DEFAULT NULL COMMENT '最后登录时间',
+    `last_login_ip` VARCHAR(50) DEFAULT NULL COMMENT '最后登录IP',
+    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` TINYINT DEFAULT 0 COMMENT '逻辑删除：0-未删除 1-已删除',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_username` (`username`),
+    KEY `idx_deleted` (`deleted`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='求职者表';

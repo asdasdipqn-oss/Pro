@@ -29,6 +29,11 @@ public interface IRecruitCandidateService {
     void applyJob(JobApplicationRequest request, Long jobSeekerId);
 
     /**
+     * 根据用户名获取求职者ID
+     */
+    Long getCandidateIdByUsername(String username);
+
+    /**
      * 获取我的投递记录
      */
     List<RecruitApplicationVO> getMyApplications(Long jobSeekerId);

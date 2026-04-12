@@ -136,6 +136,12 @@ const handleCommand = async (command) => {
 }
 
 onMounted(() => {
+  // 求职者不应进入员工布局
+  const userType = localStorage.getItem('userType')
+  if (userType === 'candidate') {
+    router.replace('/candidate/jobs')
+    return
+  }
   fetchUnreadCount()
   // 初始化菜单（页面刷新时从后端重新获取最新菜单权限）
   menuStore.initMenus()

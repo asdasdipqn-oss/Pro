@@ -92,7 +92,7 @@ public class HrCandidateServiceImpl extends ServiceImpl<HrCandidateMapper, HrCan
         candidateMapper.updateById(candidate);
 
         // 生成JWT token
-        String token = jwtUtil.generateToken(candidate.getId(), candidate.getUsername());
+        String token = jwtUtil.generateToken(candidate.getId(), candidate.getUsername(), "CANDIDATE");
 
         return token;
     }

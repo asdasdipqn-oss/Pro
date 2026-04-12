@@ -73,6 +73,9 @@ public class NotificationController {
     public Result<List<NotificationVO>> getNotifications(
             @ApiParam(value = "当前登录用户", hidden = true)
             @AuthenticationPrincipal LoginUser loginUser) {
+        if ("CANDIDATE".equals(loginUser.getUserType())) {
+            return Result.success(Collections.emptyList());
+        }
         Long userId = loginUser.getUser().getId();
         Long employeeId = loginUser.getUser().getEmployeeId();
         return Result.success(buildNotifications(userId, employeeId));
@@ -84,6 +87,16 @@ public class NotificationController {
     public Result<Map<String, Object>> getUnreadCount(
             @ApiParam(value = "当前登录用户", hidden = true)
             @AuthenticationPrincipal LoginUser loginUser) {
+        if ("CANDIDATE".equals(loginUser.getUserType())) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("approvalCount", 0L);
+            data.put("leaveCount", 0L);
+            data.put("trainCount", 0L);
+            data.put("salaryCount", 0L);
+            data.put("assessCount", 0L);
+            data.put("totalCount", 0L);
+            return Result.success(data);
+        }
         Long userId = loginUser.getUser().getId();
         Long employeeId = loginUser.getUser().getEmployeeId();
         List<NotificationVO> notifications = buildNotifications(userId, employeeId);
@@ -116,6 +129,9 @@ public class NotificationController {
         if (request == null || !StringUtils.hasText(request.getType()) || request.getId() == null) {
             throw new BusinessException("参数错误");
         }
+        if ("CANDIDATE".equals(loginUser.getUserType())) {
+            return Result.success();
+        }
         Long userId = loginUser.getUser().getId();
         Set<String> readMarks = loadReadMarks(userId);
         readMarks.add(readKey(request.getType(), request.getId()));
@@ -129,6 +145,9 @@ public class NotificationController {
     public Result<Void> markAllRead(
             @ApiParam(value = "当前登录用户", hidden = true)
             @AuthenticationPrincipal LoginUser loginUser) {
+        if ("CANDIDATE".equals(loginUser.getUserType())) {
+            return Result.success();
+        }
         Long userId = loginUser.getUser().getId();
         Long employeeId = loginUser.getUser().getEmployeeId();
         List<NotificationVO> notifications = buildNotifications(userId, employeeId);

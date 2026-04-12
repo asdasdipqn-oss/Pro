@@ -25,4 +25,19 @@ public class JobApplicationRequest {
     @ApiModelProperty(value = "个人说明")
     @Size(max = 500, message = "个人说明不能超过500个字符")
     private String selfIntro;
+
+    @ApiModelProperty(value = "真实姓名")
+    private String name;
+
+    @ApiModelProperty(value = "手机号码")
+    private String phone;
+
+    @ApiModelProperty(value = "邮箱")
+    private String email;
+
+    @ApiModelProperty(value = "学历")
+    private Integer education;
+
+    @ApiModelProperty(value = "工作年限")
+    private Integer workYears;
 }

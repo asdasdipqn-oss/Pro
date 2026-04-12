@@ -16,40 +16,43 @@ const router = createRouter({
       component: () => import('@/views/RegisterView.vue'),
       meta: { title: '注册', public: true },
     },
+    // 求职者：登录/注册页（精确匹配 /candidate）
     {
       path: '/candidate',
       name: 'candidate',
       component: () => import('@/views/CandidateView.vue'),
       meta: { title: '求职者', public: true },
-    },
-    {
-      path: '/',
-      component: () => import('@/layout/MainLayout.vue'),
       children: [
+        // 求职者内部页面（使用 CandidateLayout）
         {
-          path: 'candidate/dashboard',
-          name: 'candidateDashboard',
-          component: () => import('@/views/candidate/CandidateDashboardView.vue'),
-          meta: { title: '求职者首页', requireCandidate: true },
+          path: 'dashboard',
+          redirect: '/candidate/jobs',
         },
         {
-          path: 'candidate/profile',
-          name: 'candidateProfile',
-          component: () => import('@/views/candidate/CandidateProfileView.vue'),
-          meta: { title: '求职者个人信息', requireCandidate: true },
-        },
-        {
-          path: 'candidate/jobs',
+          path: 'jobs',
           name: 'candidateJobs',
           component: () => import('@/views/candidate/CandidateJobsView.vue'),
-          meta: { title: '岗位招聘', requireCandidate: true },
+          meta: { title: '招聘岗位', requireCandidate: true },
         },
         {
-          path: 'candidate/process',
+          path: 'process',
           name: 'candidateProcess',
           component: () => import('@/views/candidate/CandidateProcessView.vue'),
           meta: { title: '招聘流程', requireCandidate: true },
         },
+        {
+          path: 'profile',
+          name: 'candidateProfile',
+          component: () => import('@/views/candidate/CandidateProfileView.vue'),
+          meta: { title: '个人信息', requireCandidate: true },
+        },
+      ],
+    },
+    // 员工页面（使用 MainLayout）
+    {
+      path: '/',
+      component: () => import('@/layout/MainLayout.vue'),
+      children: [
         {
           path: 'dashboard',
           name: 'dashboard',
@@ -131,13 +134,6 @@ const router = createRouter({
           component: () => import('@/views/attendance/AttDailyStatView.vue'),
           meta: { title: '日考勤统计' },
         },
-        // 月度考勤统计（暂时隐藏）
-        // {
-        //   path: 'attendance/monthly-stat',
-        //   name: 'attendanceMonthlyStat',
-        //   component: () => import('@/views/attendance/AttMonthlyStatView.vue'),
-        //   meta: { title: '月度考勤统计' },
-        // },
         // 假期管理
         {
           path: 'leave/apply',
@@ -378,21 +374,23 @@ const router = createRouter({
 
 // 路由守卫
 router.beforeEach((to, from, next) => {
-  const userStore = useUserStore()
+  const userType = localStorage.getItem('userType')
 
   if (to.meta.public) {
     next()
   } else if (to.meta.requireCandidate) {
-    // 求职者页面需要检查是否是求职者用户
-    const userType = localStorage.getItem('userType')
-    if (userType === 'candidate') {
+    // 求职者页面：需要 candidate token
+    const token = localStorage.getItem('token')
+    if (token && userType === 'candidate') {
       next()
     } else {
       next('/candidate')
     }
-  } else if (!userStore.isLoggedIn) {
+  } else if (!localStorage.getItem('token') || userType === 'candidate') {
+    // 员工页面：求职者不能访问，无 token 也不能访问
     next('/login')
   } else {
+    const userStore = useUserStore()
     // 检查是否需要管理员权限
     if (to.meta.requireAdmin) {
       const roles = userStore.roles || []
@@ -400,7 +398,7 @@ router.beforeEach((to, from, next) => {
         role && role.toUpperCase() && ['ADMIN', 'SUPER_ADMIN'].includes(role.toUpperCase())
       )
       if (!isAdmin) {
-        next('/profile') // 非管理员重定向到个人中心
+        next('/profile')
         return
       }
     }
@@ -408,10 +406,10 @@ router.beforeEach((to, from, next) => {
     if (to.meta.requireHR) {
       const roles = userStore.roles || []
       const hasHRPermission = roles.some(role =>
-        role && role.toUpperCase() && ['ADMIN', 'SUPER_ADMIN', 'admin', 'super_admin', 'HR'].includes(role.toUpperCase())
+        role && role.toUpperCase() && ['ADMIN', 'SUPER_ADMIN', 'HR'].includes(role.toUpperCase())
       )
       if (!hasHRPermission) {
-        next('/profile') // 非HR或管理员重定向到个人中心
+        next('/profile')
         return
       }
     }
@@ -421,7 +419,6 @@ router.beforeEach((to, from, next) => {
       const isAdmin = roles.some(role =>
         role && role.toUpperCase() && ['ADMIN', 'SUPER_ADMIN', 'HR'].includes(role.toUpperCase())
       )
-      // 管理员和 HR 跳转到工作台，普通员工跳转到个人中心
       next(isAdmin ? '/dashboard' : '/profile')
     } else {
       next()

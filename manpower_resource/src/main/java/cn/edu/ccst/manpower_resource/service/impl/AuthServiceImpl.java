@@ -29,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -50,38 +51,57 @@ public class AuthServiceImpl implements AuthService {
         );
 
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-        SysUser user = loginUser.getUser();
+        String userType = loginUser.getUserType();
 
-        // 更新最后登录时间和IP
-        user.setLastLoginTime(LocalDateTime.now());
-        user.setLastLoginIp(ip);
-        userMapper.updateById(user);
+        // 处理员工登录
+        if ("EMPLOYEE".equals(userType)) {
+            SysUser user = loginUser.getUser();
 
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
+            // 更新最后登录时间和IP
+            user.setLastLoginTime(LocalDateTime.now());
+            user.setLastLoginIp(ip);
+            userMapper.updateById(user);
 
-        // 获取用户部门信息
-        Long deptId = null;
-        String departmentName = null;
-        if (user.getEmployeeId() != null) {
-            EmpEmployee employee = empEmployeeMapper.selectById(user.getEmployeeId());
-            if (employee != null && employee.getDeptId() != null) {
-                deptId = employee.getDeptId();
-                OrgDepartment department = orgDepartmentMapper.selectById(deptId);
-                if (department != null) {
-                    departmentName = department.getDeptName();
+            String token = jwtUtil.generateToken(user.getId(), user.getUsername(), "EMPLOYEE");
+
+            // 获取用户部门信息
+            Long deptId = null;
+            String departmentName = null;
+            if (user.getEmployeeId() != null) {
+                EmpEmployee employee = empEmployeeMapper.selectById(user.getEmployeeId());
+                if (employee != null && employee.getDeptId() != null) {
+                    deptId = employee.getDeptId();
+                    OrgDepartment department = orgDepartmentMapper.selectById(deptId);
+                    if (department != null) {
+                        departmentName = department.getDeptName();
+                    }
                 }
             }
+
+            return LoginVO.builder()
+                    .token(token)
+                    .tokenType("Bearer")
+                    .userId(user.getId())
+                    .username(user.getUsername())
+                    .roles(loginUser.getRoles())
+                    .permissions(loginUser.getPermissions())
+                    .deptId(deptId)
+                    .departmentName(departmentName)
+                    .userType(userType)
+                    .build();
         }
 
+        // 处理求职者登录
         return LoginVO.builder()
-                .token(token)
+                .token(jwtUtil.generateToken(loginUser.getUserId(), loginUser.getUsername(), "CANDIDATE"))
                 .tokenType("Bearer")
-                .userId(user.getId())
-                .username(user.getUsername())
-                .roles(loginUser.getRoles())
-                .permissions(loginUser.getPermissions())
-                .deptId(deptId)
-                .departmentName(departmentName)
+                .userId(loginUser.getUserId())
+                .username(loginUser.getUsername())
+                .roles(List.of("CANDIDATE"))
+                .permissions(List.of())
+                .deptId(null)
+                .departmentName(null)
+                .userType(userType)
                 .build();
     }
 

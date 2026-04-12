@@ -32,6 +32,14 @@ public class JwtUtil {
         return createToken(claims, username);
     }
 
+    public String generateToken(Long userId, String username, String userType) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("username", username);
+        claims.put("userType", userType);
+        return createToken(claims, username);
+    }
+
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .claims(claims)
@@ -58,6 +66,11 @@ public class JwtUtil {
     public String getUsername(String token) {
         Claims claims = parseToken(token);
         return claims.getSubject();
+    }
+
+    public String getUserType(String token) {
+        Claims claims = parseToken(token);
+        return claims.get("userType", String.class);
     }
 
     public boolean isTokenExpired(String token) {

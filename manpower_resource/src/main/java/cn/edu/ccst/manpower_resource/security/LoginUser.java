@@ -1,5 +1,6 @@
 package cn.edu.ccst.manpower_resource.security;
 
+import cn.edu.ccst.manpower_resource.entity.HrCandidate;
 import cn.edu.ccst.manpower_resource.entity.SysUser;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,17 +15,30 @@ import java.util.stream.Collectors;
 public class LoginUser implements UserDetails {
 
     private SysUser user;
+    private HrCandidate candidate;
     private List<String> roles;
     private List<String> permissions;
+    private String userType;
 
+    // 员工用户构造器
     public LoginUser(SysUser user, List<String> roles, List<String> permissions) {
         this.user = user;
         this.roles = roles;
         this.permissions = permissions;
+        this.userType = "EMPLOYEE";
+    }
+
+    // 求职者用户构造器
+    public LoginUser(HrCandidate candidate) {
+        this.candidate = candidate;
+        this.userType = "CANDIDATE";
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        if ("CANDIDATE".equals(userType)) {
+            return List.of(new SimpleGrantedAuthority("ROLE_CANDIDATE"));
+        }
         List<GrantedAuthority> authorities = roles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList());
@@ -36,11 +50,17 @@ public class LoginUser implements UserDetails {
 
     @Override
     public String getPassword() {
+        if ("CANDIDATE".equals(userType)) {
+            return candidate.getPassword();
+        }
         return user.getPassword();
     }
 
     @Override
     public String getUsername() {
+        if ("CANDIDATE".equals(userType)) {
+            return candidate.getUsername();
+        }
         return user.getUsername();
     }
 
@@ -51,6 +71,9 @@ public class LoginUser implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
+        if ("CANDIDATE".equals(userType)) {
+            return candidate.getStatus() == 1;
+        }
         return user.getStatus() == 1;
     }
 
@@ -61,14 +84,28 @@ public class LoginUser implements UserDetails {
 
     @Override
     public boolean isEnabled() {
+        if ("CANDIDATE".equals(userType)) {
+            return candidate.getDeleted() == 0;
+        }
         return user.getDeleted() == 0;
     }
 
     public Long getUserId() {
+        if ("CANDIDATE".equals(userType)) {
+            return candidate.getId();
+        }
         return user.getId();
     }
 
     public SysUser getUser() {
         return user;
+    }
+
+    public HrCandidate getCandidate() {
+        return candidate;
+    }
+
+    public String getUserType() {
+        return userType;
     }
 }

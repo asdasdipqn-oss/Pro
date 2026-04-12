@@ -77,8 +77,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Search, OfficeBuilding, User, Money } from '@element-plus/icons-vue'
-import { listPublishedJobs, submitResume } from '@/api/recruit'
-import request from '@/utils/request'
+import { getPublishedJobs, applyJob, getCandidateProfile } from '@/api/candidate'
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -113,7 +112,7 @@ const applyRules = {
 const fetchJobs = async () => {
   loading.value = true
   try {
-    const res = await listPublishedJobs()
+    const res = await getPublishedJobs()
     jobList.value = res.data || []
     // 按发布时间倒序排列
     jobList.value.sort((a, b) => new Date(b.createTime) - new Date(a.createTime))
@@ -127,7 +126,7 @@ const fetchJobs = async () => {
 
 const handleApply = async (job) => {
   try {
-    const res = await request.get('/candidate/profile')
+    const res = await getCandidateProfile()
     const profile = res.data || {}
     applyForm.jobId = job.id
     applyForm.jobName = job.jobName
@@ -155,7 +154,7 @@ const handleSubmitApply = async () => {
   try {
     await applyFormRef.value.validate()
     submitting.value = true
-    await submitResume(applyForm)
+    await applyJob(applyForm)
     ElMessage.success('简历投递成功，请耐心等待HR审核')
     applyDialogVisible.value = false
   } catch (error) {

@@ -7,13 +7,14 @@ import cn.edu.ccst.manpower_resource.dto.PageQuery;
 import cn.edu.ccst.manpower_resource.service.IRecruitCandidateService;
 import cn.edu.ccst.manpower_resource.vo.RecruitJobVO;
 import cn.edu.ccst.manpower_resource.vo.RecruitApplicationVO;
-import cn.edu.ccst.manpower_resource.security.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import cn.edu.ccst.manpower_resource.security.LoginUser;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,25 +50,28 @@ public class RecruitController {
 
     @Operation(summary = "投递简历")
     @PostMapping("/applications")
+    @PreAuthorize("hasRole('CANDIDATE')")
     public Result<Void> applyJob(
             @Valid @RequestBody JobApplicationRequest request,
             @AuthenticationPrincipal LoginUser loginUser) {
-        Long jobSeekerId = loginUser.getUserId();
+        Long jobSeekerId = recruitService.getCandidateIdByUsername(loginUser.getUsername());
         recruitService.applyJob(request, jobSeekerId);
         return Result.success();
     }
 
     @Operation(summary = "获取我的投递记录")
     @GetMapping("/applications/my")
+    @PreAuthorize("hasRole('CANDIDATE')")
     public Result<java.util.List<RecruitApplicationVO>> getMyApplications(
             @AuthenticationPrincipal LoginUser loginUser) {
-        Long jobSeekerId = loginUser.getUserId();
+        Long jobSeekerId = recruitService.getCandidateIdByUsername(loginUser.getUsername());
         java.util.List<RecruitApplicationVO> list = recruitService.getMyApplications(jobSeekerId);
         return Result.success(list);
     }
 
     @Operation(summary = "获取投递申请详情")
     @GetMapping("/applications/{id}")
+    @PreAuthorize("hasRole('CANDIDATE')")
     public Result<cn.edu.ccst.manpower_resource.entity.RecruitApplication> getApplicationDetail(
             @Parameter(description = "申请ID") @PathVariable("id") Long id) {
         cn.edu.ccst.manpower_resource.entity.RecruitApplication application = recruitService.getApplicationDetail(id);

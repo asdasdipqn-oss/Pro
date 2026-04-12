@@ -34,4 +34,7 @@ public class LoginVO {
 
     @Schema(description = "部门名称")
     private String departmentName;
+
+    @Schema(description = "用户类型: EMPLOYEE-员工 CANDIDATE-求职者")
+    private String userType;
 }

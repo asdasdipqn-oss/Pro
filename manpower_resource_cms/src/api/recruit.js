@@ -107,3 +107,8 @@ export function cancelInterview(id) {
 export function deleteInterview(id) {
   return request.delete(`/recruit/interview/${id}`)
 }
+
+// 求职者相关 - 获取我的应聘记录
+export function getMyApplications() {
+  return request.get('/recruit/application/my')
+}
