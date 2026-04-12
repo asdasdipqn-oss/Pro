@@ -10,7 +10,7 @@
 
       <el-form :inline="true" class="search-form">
         <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="全部" clearable @change="fetchData">
+          <el-select v-model="searchForm.status" placeholder="全部" clearable size="large" style="width: 180px;" @change="fetchData">
             <el-option label="未开始" :value="0" />
             <el-option label="进行中" :value="1" />
             <el-option label="已结束" :value="2" />

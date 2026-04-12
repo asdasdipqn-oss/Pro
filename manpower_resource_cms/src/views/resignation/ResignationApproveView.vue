@@ -9,7 +9,7 @@
 
       <el-form :inline="true" class="search-form">
         <el-form-item label="状态">
-          <el-select v-model="searchStatus" placeholder="全部" clearable @change="fetchData">
+          <el-select v-model="searchStatus" placeholder="全部" clearable size="large" style="width: 180px;" @change="fetchData">
             <el-option label="待审批" :value="0" />
             <el-option label="已批准" :value="1" />
             <el-option label="已拒绝" :value="2" />

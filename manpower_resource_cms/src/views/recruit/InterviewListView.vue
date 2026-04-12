@@ -10,14 +10,14 @@
 
       <el-form :inline="true" class="search-form">
         <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="全部" clearable @change="fetchData">
+          <el-select v-model="searchForm.status" placeholder="全部" clearable size="large" style="width: 180px;" @change="fetchData">
             <el-option label="待面试" :value="0" />
             <el-option label="已完成" :value="1" />
             <el-option label="已取消" :value="2" />
           </el-select>
         </el-form-item>
         <el-form-item label="结果">
-          <el-select v-model="searchForm.result" placeholder="全部" clearable @change="fetchData">
+          <el-select v-model="searchForm.result" placeholder="全部" clearable size="large" style="width: 180px;" @change="fetchData">
             <el-option label="通过" :value="1" />
             <el-option label="待定" :value="2" />
             <el-option label="不通过" :value="3" />

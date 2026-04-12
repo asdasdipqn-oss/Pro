@@ -13,7 +13,7 @@
           <el-input v-model="searchForm.title" placeholder="请输入标题" clearable />
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="全部" clearable>
+          <el-select v-model="searchForm.status" placeholder="全部" clearable size="large" style="width: 180px;">
             <el-option label="草稿" :value="0" />
             <el-option label="已发布" :value="1" />
             <el-option label="已截止" :value="2" />

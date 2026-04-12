@@ -9,12 +9,12 @@
 
       <el-form :inline="true" class="search-form">
         <el-form-item label="考核任务">
-          <el-select v-model="searchForm.taskId" placeholder="全部任务" clearable filterable>
+          <el-select v-model="searchForm.taskId" placeholder="全部任务" clearable filterable size="large" style="width: 180px;">
             <el-option v-for="task in taskList" :key="task.id" :label="task.title" :value="task.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="全部" clearable>
+          <el-select v-model="searchForm.status" placeholder="全部" clearable size="large" style="width: 180px;">
             <el-option label="待评分" :value="0" />
             <el-option label="已评分" :value="1" />
             <el-option label="已退回" :value="2" />

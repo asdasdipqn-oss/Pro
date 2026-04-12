@@ -3,6 +3,7 @@ package cn.edu.ccst.manpower_resource.entity;
 import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import java.time.LocalDate;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
@@ -96,6 +97,10 @@ public class RecruitJob implements Serializable {
 
     @ApiModelProperty(value = "逻辑删除")
     private Integer deleted;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "部门名称")
+    private String deptName;
 
 
 }

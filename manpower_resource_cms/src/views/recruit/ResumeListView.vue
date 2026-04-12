@@ -9,12 +9,12 @@
       
       <el-form :inline="true" class="search-form">
         <el-form-item label="应聘岗位">
-          <el-select v-model="searchForm.jobId" placeholder="全部" clearable @change="fetchData">
+          <el-select v-model="searchForm.jobId" placeholder="全部" clearable size="large" style="width: 180px;" @change="fetchData">
             <el-option v-for="job in jobList" :key="job.id" :label="job.jobName" :value="job.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="全部" clearable @change="fetchData">
+          <el-select v-model="searchForm.status" placeholder="全部" clearable size="large" style="width: 180px;" @change="fetchData">
             <el-option label="待筛选" :value="1" />
             <el-option label="筛选通过" :value="2" />
             <el-option label="面试中" :value="3" />

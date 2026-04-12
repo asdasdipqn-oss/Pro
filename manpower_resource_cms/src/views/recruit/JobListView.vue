@@ -10,7 +10,7 @@
       
       <el-form :inline="true" class="search-form">
         <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="全部状态" clearable @change="fetchData" @clear="handleStatusClear">
+          <el-select v-model="searchForm.status" placeholder="全部状态" clearable size="large" style="width: 180px;" @change="fetchData" @clear="handleStatusClear">
             <el-option label="招聘中" :value="1" />
             <el-option label="已关闭" :value="2" />
           </el-select>
@@ -66,6 +66,15 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
+            <el-form-item label="所属部门" prop="deptId">
+              <el-select v-model="editForm.deptId" placeholder="请选择所属部门" filterable style="width: 100%;">
+                <el-option v-for="dept in deptList" :key="dept.id" :label="dept.deptName" :value="dept.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
             <el-form-item label="招聘人数" prop="headcount">
               <el-input-number v-model="editForm.headcount" :min="1" style="width: 100%;" />
             </el-form-item>
@@ -102,12 +111,14 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { pageJobs, publishJob, updateJob, closeJob } from '@/api/recruit'
+import { getDepartmentTree } from '@/api/department'
 
 const loading = ref(false)
 const submitting = ref(false)
 const dialogVisible = ref(false)
 const tableData = ref([])
 const formRef = ref(null)
+const deptList = ref([])
 
 const searchForm = reactive({ status: null })
 
@@ -120,6 +131,7 @@ const pagination = reactive({
 const editForm = reactive({
   id: null,
   jobName: '',
+  deptId: null,
   headcount: 1,
   salaryMin: null,
   salaryMax: null,
@@ -153,15 +165,28 @@ const fetchData = async () => {
 
 const handleAdd = () => {
   Object.assign(editForm, {
-    id: null, jobName: '', headcount: 1, salaryMin: null, salaryMax: null,
+    id: null, jobName: '', deptId: null, headcount: 1, salaryMin: null, salaryMax: null,
     jobDescription: '', requirements: ''
   })
   dialogVisible.value = true
+  fetchDepartments()
 }
 
 const handleEdit = (row) => {
   Object.assign(editForm, { ...row })
   dialogVisible.value = true
+  fetchDepartments()
+}
+
+const fetchDepartments = async () => {
+  try {
+    const res = await getDepartmentTree()
+    const tree = res.data || []
+    // 提取二级部门（根节点的children）
+    deptList.value = tree.flatMap(root => root.children || [])
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 const handleSubmit = async () => {
