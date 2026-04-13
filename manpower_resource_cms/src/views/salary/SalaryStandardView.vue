@@ -4,25 +4,27 @@
       <template #header>
         <div class="card-header">
           <span>薪资标准管理</span>
-          <el-button type="primary" @click="handleAdd">新增薪资标准</el-button>
+          <div>
+            <el-button type="success" @click="handleBatchSet" style="margin-right: 8px">批量设置</el-button>
+            <el-button type="primary" @click="handleAdd">新增薪资标准</el-button>
+          </div>
         </div>
       </template>
 
       <el-form :inline="true" class="search-form">
         <el-form-item label="员工">
-          <el-select v-model="searchForm.employeeId" placeholder="全部员工" clearable filterable>
+          <el-select v-model="searchForm.employeeId" placeholder="全部员工" clearable filterable style="width: 200px" @change="fetchData">
             <el-option v-for="emp in employeeList" :key="emp.id"
               :label="`${emp.empName} (${emp.empCode})`" :value="emp.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="薪资项目">
-          <el-select v-model="searchForm.itemId" placeholder="全部项目" clearable>
+          <el-select v-model="searchForm.itemId" placeholder="全部项目" clearable style="width: 180px" @change="fetchData">
             <el-option v-for="item in salaryItemList" :key="item.id"
               :label="item.itemName" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="fetchData">查询</el-button>
           <el-button @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
@@ -105,6 +107,47 @@
         <el-button type="primary" @click="handleSubmit" :loading="submitting">确定</el-button>
       </template>
     </el-dialog>
+
+    <!-- 批量设置对话框 -->
+    <el-dialog v-model="batchDialogVisible" title="批量设置员工薪资标准" width="700px" @close="resetBatchForm">
+      <el-form label-width="100px">
+        <el-form-item label="选择员工">
+          <el-select v-model="batchEmployeeId" placeholder="请选择员工" filterable style="width: 100%"
+            @change="handleBatchEmployeeChange">
+            <el-option v-for="emp in employeeList" :key="emp.id"
+              :label="`${emp.empName} (${emp.empCode})`" :value="emp.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="生效日期">
+          <el-date-picker v-model="batchEffectiveDate" type="date"
+            placeholder="选择生效日期" value-format="YYYY-MM-DD" style="width: 100%" />
+        </el-form-item>
+      </el-form>
+
+      <el-divider content-position="left">薪资项目金额</el-divider>
+      <div v-if="batchEmployeeId" v-loading="batchLoading">
+        <el-form label-width="140px">
+          <el-row :gutter="20" v-for="item in batchItems" :key="item.id">
+            <el-col :span="14">
+              <el-form-item :label="item.itemName">
+                <el-input-number v-model="item.amount" :min="0" :precision="2" style="width: 100%"
+                  :placeholder="item.calcType === 2 ? '基数' : '金额'" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="10" style="line-height: 32px; color: #909399; font-size: 13px">
+              {{ getItemTypeLabel(item) }}
+            </el-col>
+          </el-row>
+        </el-form>
+      </div>
+      <el-empty v-else description="请先选择员工" />
+
+      <template #footer>
+        <el-button @click="batchDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleBatchSubmit" :loading="batchSubmitting"
+          :disabled="!batchEmployeeId">保存</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -113,7 +156,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   pageSalaryStandard, addSalaryStandard, updateSalaryStandard, deleteSalaryStandard,
-  listSalaryItem
+  listSalaryItem, getEmployeeSalaryStandard, batchSaveSalaryStandard
 } from '@/api/salary'
 import { listEmployee } from '@/api/employee'
 
@@ -124,6 +167,14 @@ const formRef = ref()
 const tableData = ref([])
 const employeeList = ref([])
 const salaryItemList = ref([])
+
+// 批量设置相关
+const batchDialogVisible = ref(false)
+const batchEmployeeId = ref(null)
+const batchEffectiveDate = ref(null)
+const batchItems = ref([])
+const batchLoading = ref(false)
+const batchSubmitting = ref(false)
 
 const searchForm = reactive({ employeeId: null, itemId: null })
 const pagination = reactive({ pageNum: 1, pageSize: 10, total: 0 })
@@ -149,6 +200,18 @@ const getEmployeeName = (id) => {
 const getItemName = (id) => {
   const item = salaryItemList.value.find(i => i.id === id)
   return item ? item.itemName : id
+}
+
+const getItemTypeLabel = (item) => {
+  const typeMap = { 1: '固定收入', 2: '浮动收入', 3: '扣款', 4: '社保', 5: '公积金' }
+  const calcMap = { 1: '固定金额', 2: '按比例', 3: '系统计算' }
+  let label = typeMap[item.itemType] || ''
+  if (item.calcType === 2 && item.calcFormula) {
+    label += ` · 比例${item.calcFormula}`
+  } else {
+    label += ` · ${calcMap[item.calcType] || ''}`
+  }
+  return label
 }
 
 const fetchData = async () => {
@@ -227,6 +290,111 @@ const handleDelete = async (row) => {
   } catch (error) {
     if (error !== 'cancel') console.error(error)
   }
+}
+
+// ============ 批量设置 ============
+const handleBatchSet = () => {
+  batchEmployeeId.value = null
+  batchEffectiveDate.value = formatDateStr(new Date())
+  batchItems.value = salaryItemList.value
+    .filter(item => item.status === 1)
+    .map(item => ({ ...item, amount: 0, existingId: null }))
+  batchDialogVisible.value = true
+}
+
+const handleBatchEmployeeChange = async (empId) => {
+  if (!empId) return
+  batchLoading.value = true
+  try {
+    // 查询该员工已有的薪资标准
+    const res = await getEmployeeSalaryStandard(empId)
+    const existingList = res.data || []
+    const existingMap = {}
+    existingList.forEach(s => { existingMap[s.itemId] = s })
+
+    // 回填已有数据
+    batchItems.value = salaryItemList.value
+      .filter(item => item.status === 1)
+      .map(item => {
+        const existing = existingMap[item.id]
+        return {
+          ...item,
+          amount: existing ? existing.amount : 0,
+          existingId: existing ? existing.id : null
+        }
+      })
+  } catch (error) {
+    console.error(error)
+  } finally {
+    batchLoading.value = false
+  }
+}
+
+const resetBatchForm = () => {
+  batchEmployeeId.value = null
+  batchItems.value = []
+}
+
+const handleBatchSubmit = async () => {
+  if (!batchEmployeeId.value) return
+
+  // 过滤出有金额的项目
+  const items = batchItems.value.filter(item => item.amount > 0)
+  if (items.length === 0) {
+    ElMessage.warning('请至少填写一项薪资金额')
+    return
+  }
+
+  batchSubmitting.value = true
+  try {
+    // 分别处理：已有的用更新，新有的用批量新增
+    const toAdd = []
+    const toUpdate = []
+
+    for (const item of items) {
+      if (item.existingId) {
+        toUpdate.push({
+          id: item.existingId,
+          employeeId: batchEmployeeId.value,
+          itemId: item.id,
+          amount: item.amount,
+          effectiveDate: batchEffectiveDate.value,
+          updateTime: new Date().toISOString()
+        })
+      } else {
+        toAdd.push({
+          employeeId: batchEmployeeId.value,
+          itemId: item.id,
+          amount: item.amount,
+          effectiveDate: batchEffectiveDate.value,
+        })
+      }
+    }
+
+    // 批量新增
+    if (toAdd.length > 0) {
+      await batchSaveSalaryStandard(toAdd)
+    }
+    // 逐个更新
+    for (const std of toUpdate) {
+      await updateSalaryStandard(std)
+    }
+
+    ElMessage.success('薪资标准设置成功')
+    batchDialogVisible.value = false
+    fetchData()
+  } catch (error) {
+    console.error(error)
+  } finally {
+    batchSubmitting.value = false
+  }
+}
+
+const formatDateStr = (date) => {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
 }
 
 onMounted(() => {

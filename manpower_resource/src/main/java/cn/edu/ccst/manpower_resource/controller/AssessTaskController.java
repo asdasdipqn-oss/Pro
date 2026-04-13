@@ -39,7 +39,6 @@ public class AssessTaskController {
         LambdaQueryWrapper<AssessTask> wrapper = new LambdaQueryWrapper<>();
         wrapper.like(StringUtils.hasText(title), AssessTask::getTitle, title)
                 .eq(status != null, AssessTask::getStatus, status)
-                .eq(AssessTask::getDeleted, 0)
                 .orderByDesc(AssessTask::getCreateTime);
 
         Page<AssessTask> result = assessTaskService.page(page, wrapper);
@@ -55,7 +54,6 @@ public class AssessTaskController {
         Page<AssessTask> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<AssessTask> wrapper = new LambdaQueryWrapper<>();
         wrapper.in(AssessTask::getStatus, 1, 2)
-                .eq(AssessTask::getDeleted, 0)
                 .orderByDesc(AssessTask::getCreateTime);
 
         Page<AssessTask> result = assessTaskService.page(page, wrapper);
@@ -131,11 +129,7 @@ public class AssessTaskController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','HR')")
     public Result<Void> delete(@Parameter(description = "任务ID") @PathVariable Long id) {
-        AssessTask task = new AssessTask();
-        task.setId(id);
-        task.setDeleted(1);
-        task.setUpdateTime(LocalDateTime.now());
-        assessTaskService.updateById(task);
+        assessTaskService.removeById(id);
         return Result.success();
     }
 }

@@ -440,10 +440,8 @@ const handleSubmit = async () => {
       delete payload.id
     }
     if (payload.deadline) {
-      // 转换为 ISO 格式以兼容后端
-      const date = new Date(payload.deadline)
-      payload.deadline = date.toISOString()
-      console.log('Converted deadline to ISO format:', payload.deadline)
+      // value-format 已经是 "YYYY-MM-DD HH:mm:ss" 格式，直接使用
+      console.log('Deadline format:', payload.deadline)
     } else {
       delete payload.deadline
     }

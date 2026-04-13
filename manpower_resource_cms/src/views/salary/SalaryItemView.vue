@@ -46,7 +46,13 @@
             {{ calcTypeMap[row.calcType] }}
           </template>
         </el-table-column>
-        <el-table-column prop="calcFormula" label="计算公式" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="calcFormula" label="计算公式" width="120" show-overflow-tooltip />
+        <el-table-column label="映射字段" width="130">
+          <template #default="{ row }">
+            <el-tag v-if="row.recordField" type="info" size="small">{{ row.recordField }}</el-tag>
+            <span v-else style="color: #c0c4cc">未设置</span>
+          </template>
+        </el-table-column>
         <el-table-column label="是否计税" width="90" align="center">
           <template #default="{ row }">
             <el-tag :type="row.isTax === 1 ? 'warning' : 'info'" size="small">
@@ -99,13 +105,15 @@
         <el-form-item label="项目名称" prop="itemName">
           <el-input v-model="editForm.itemName" placeholder="如 基本工资" />
         </el-form-item>
+        <el-form-item label="项目类别" prop="itemType">
+          <el-radio-group v-model="category" @change="onCategoryChange">
+            <el-radio-button value="income">收入项</el-radio-button>
+            <el-radio-button value="deduction">扣款项</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="项目类型" prop="itemType">
           <el-select v-model="editForm.itemType" placeholder="请选择" style="width: 100%">
-            <el-option label="固定收入" :value="1" />
-            <el-option label="浮动收入" :value="2" />
-            <el-option label="扣款" :value="3" />
-            <el-option label="社保" :value="4" />
-            <el-option label="公积金" :value="5" />
+            <el-option v-for="t in currentSubTypes" :key="t.value" :label="t.label" :value="t.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="计算方式" prop="calcType">
@@ -117,6 +125,16 @@
         </el-form-item>
         <el-form-item label="计算公式">
           <el-input v-model="editForm.calcFormula" placeholder="如按比例时填写比例值" />
+        </el-form-item>
+        <el-form-item label="映射字段" prop="recordField">
+          <el-select v-model="editForm.recordField" placeholder="选择映射到薪资记录的字段" style="width: 100%">
+            <el-option-group label="收入项">
+              <el-option v-for="f in incomeFields" :key="f.value" :label="f.label" :value="f.value" />
+            </el-option-group>
+            <el-option-group label="扣款项">
+              <el-option v-for="f in deductionFields" :key="f.value" :label="f.label" :value="f.value" />
+            </el-option-group>
+          </el-select>
         </el-form-item>
         <el-row :gutter="20">
           <el-col :span="12">
@@ -156,7 +174,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { pageSalaryItem, addSalaryItem, updateSalaryItem, deleteSalaryItem } from '@/api/salary'
 
@@ -173,9 +191,50 @@ const itemTypeMap = { 1: '固定收入', 2: '浮动收入', 3: '扣款', 4: '社
 const itemTypeTagMap = { 1: 'success', 2: 'primary', 3: 'danger', 4: 'warning', 5: '' }
 const calcTypeMap = { 1: '固定金额', 2: '按比例', 3: '按公式' }
 
+// 大类：收入项/扣款项
+const categoryTypeMap = { income: '收入项', deduction: '扣款项' }
+const incomeItemTypes = [
+  { label: '固定收入', value: 1 },
+  { label: '浮动收入', value: 2 },
+]
+const deductionItemTypes = [
+  { label: '扣款', value: 3 },
+  { label: '社保', value: 4 },
+  { label: '公积金', value: 5 },
+]
+
+const category = ref('income')
+
+const onCategoryChange = (val) => {
+  // 切换大类时，自动选择第一个子类型
+  const types = val === 'income' ? incomeItemTypes : deductionItemTypes
+  editForm.itemType = types[0].value
+}
+
+const currentSubTypes = computed(() => {
+  return category.value === 'income' ? incomeItemTypes : deductionItemTypes
+})
+
+// 映射字段选项
+const incomeFields = [
+  { label: '基本工资 (baseSalary)', value: 'baseSalary' },
+  { label: '岗位工资 (positionSalary)', value: 'positionSalary' },
+  { label: '绩效工资 (performanceSalary)', value: 'performanceSalary' },
+  { label: '加班费 (overtimePay)', value: 'overtimePay' },
+  { label: '全勤奖 (fullAttendanceBonus)', value: 'fullAttendanceBonus' },
+  { label: '津贴 (allowance)', value: 'allowance' },
+  { label: '奖金 (bonus)', value: 'bonus' },
+]
+const deductionFields = [
+  { label: '社保扣款 (socialInsurance)', value: 'socialInsurance' },
+  { label: '公积金 (housingFund)', value: 'housingFund' },
+  { label: '个人所得税 (personalTax)', value: 'personalTax' },
+  { label: '其他扣款 (otherDeduction)', value: 'otherDeduction' },
+]
+
 const defaultForm = () => ({
   id: null, itemCode: '', itemName: '', itemType: 1, calcType: 1,
-  calcFormula: '', isTax: 0, isRequired: 0, sort: 0, status: 1, description: ''
+  calcFormula: '', recordField: '', isTax: 0, isRequired: 0, sort: 0, status: 1, description: ''
 })
 
 const editForm = reactive(defaultForm())
@@ -214,11 +273,14 @@ const handleReset = () => {
 
 const handleAdd = () => {
   Object.assign(editForm, defaultForm())
+  category.value = 'income'
+  editForm.itemType = 1
   dialogVisible.value = true
 }
 
 const handleEdit = (row) => {
   Object.assign(editForm, { ...row })
+  category.value = [1, 2].includes(row.itemType) ? 'income' : 'deduction'
   dialogVisible.value = true
 }
 

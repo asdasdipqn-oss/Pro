@@ -7,6 +7,7 @@ import cn.edu.ccst.manpower_resource.dto.SalaryGenerateDTO;
 import cn.edu.ccst.manpower_resource.entity.SalaryRecord;
 import cn.edu.ccst.manpower_resource.security.LoginUser;
 import cn.edu.ccst.manpower_resource.service.ISalaryRecordService;
+import cn.edu.ccst.manpower_resource.service.impl.SalaryRecordServiceImpl;
 import cn.edu.ccst.manpower_resource.vo.SalaryRecordVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -73,14 +74,21 @@ public class SalaryRecordController {
         return Result.success();
     }
 
-    @Operation(summary = "生成月度薪资", description = "根据考勤数据生成指定月份的薪资记录。基本工资3000元，全勤奖3000元（请假/缺勤一天扣100元，迟到/早退一次扣50元）")
+    @Operation(summary = "生成月度薪资", description = "根据薪资标准和考勤数据生成指定月份的薪资记录")
     @PostMapping("/generate")
     @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public Result<Map<String, Object>> generateMonthlySalary(@Validated @RequestBody SalaryGenerateDTO dto) {
         int count = salaryRecordService.generateMonthlySalary(dto);
+        List<String> noStandardEmployees = SalaryRecordServiceImpl.NoStandardHolder.get();
+        SalaryRecordServiceImpl.NoStandardHolder.clear();
+
         Map<String, Object> result = new HashMap<>();
         result.put("count", count);
         result.put("message", "成功生成 " + count + " 条薪资记录");
+        if (noStandardEmployees != null && !noStandardEmployees.isEmpty()) {
+            result.put("noStandardEmployees", noStandardEmployees);
+            result.put("warning", "以下员工未设置薪资标准，薪资项将为0：" + String.join("、", noStandardEmployees));
+        }
         return Result.success(result);
     }
 

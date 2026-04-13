@@ -37,24 +37,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SalaryRecordServiceImpl extends ServiceImpl<SalaryRecordMapper, SalaryRecord> implements ISalaryRecordService {
 
-    // 薪资常量 - 根据岗位级别设置不同基本工资
-    private static final Map<Integer, BigDecimal> POSITION_LEVEL_SALARY = Map.of(
-            1, new BigDecimal("3000"),   // 初级
-            2, new BigDecimal("5000"),   // 中级
-            3, new BigDecimal("8000"),   // 高级
-            4, new BigDecimal("12000")   // 专家
-    );
-    private static final BigDecimal DEFAULT_BASE_SALARY = new BigDecimal("3000");     // 默认基本工资
+    // 考勤扣款常量
     private static final BigDecimal FULL_ATTENDANCE_BONUS = new BigDecimal("500");    // 全勤奖
-    private static final BigDecimal UNPAID_LEAVE_DEDUCTION_PER_DAY = new BigDecimal("100");  // 无薪假每天扛100
-    private static final BigDecimal ABSENT_DEDUCTION_PER_DAY = new BigDecimal("200"); // 缺勤每天扣200(比请假严重)
-    private static final BigDecimal LATE_EARLY_DEDUCTION = new BigDecimal("50");      // 迟到/早退每次扛50
-    
-    // 社保公积金比例（个人部分）
-    private static final BigDecimal SOCIAL_INSURANCE_RATE = new BigDecimal("0.08");   // 社保个人8%
-    private static final BigDecimal HOUSING_FUND_RATE = new BigDecimal("0.12");       // 公积金个人12%
+    private static final BigDecimal UNPAID_LEAVE_DEDUCTION_PER_DAY = new BigDecimal("100");  // 无薪假每天扣100
+    private static final BigDecimal ABSENT_DEDUCTION_PER_DAY = new BigDecimal("200"); // 缺勤每天扣200
+    private static final BigDecimal LATE_EARLY_DEDUCTION = new BigDecimal("50");      // 迟到/早退每次扣50
     private static final BigDecimal TAX_THRESHOLD = new BigDecimal("5000");           // 个税起征点
-    private static final BigDecimal TAX_RATE_LEVEL1 = new BigDecimal("0.03");         // 第一档税率3%
 
     private final EmpEmployeeMapper employeeMapper;
     private final OrgDepartmentMapper departmentMapper;
@@ -64,6 +52,8 @@ public class SalaryRecordServiceImpl extends ServiceImpl<SalaryRecordMapper, Sal
     private final AttRuleMapper attRuleMapper;
     private final LeaveApplicationMapper leaveApplicationMapper;
     private final LeaveTypeMapper leaveTypeMapper;
+    private final SalaryStandardMapper salaryStandardMapper;
+    private final SalaryItemMapper salaryItemMapper;
 
     @Override
     public List<SalaryRecord> getByEmployee(Long employeeId, Integer year) {
@@ -151,6 +141,7 @@ public class SalaryRecordServiceImpl extends ServiceImpl<SalaryRecordMapper, Sal
         }
 
         int count = 0;
+        List<String> noStandardEmployees = new ArrayList<>();
         for (EmpEmployee emp : employees) {
             // 检查是否已存在该月薪资记录
             SalaryRecord existing = baseMapper.selectOne(new LambdaQueryWrapper<SalaryRecord>()
@@ -165,6 +156,13 @@ public class SalaryRecordServiceImpl extends ServiceImpl<SalaryRecordMapper, Sal
                     count++;
                 }
                 continue;
+            }
+
+            // 检查该员工是否有薪资标准
+            long stdCount = salaryStandardMapper.selectCount(new LambdaQueryWrapper<SalaryStandard>()
+                    .eq(SalaryStandard::getEmployeeId, emp.getId()));
+            if (stdCount == 0) {
+                noStandardEmployees.add(emp.getEmpName());
             }
 
             // 创建新的薪资记录
@@ -183,34 +181,90 @@ public class SalaryRecordServiceImpl extends ServiceImpl<SalaryRecordMapper, Sal
             count++;
         }
 
+        // 将未设置薪资标准的员工信息存入ThreadLocal供Controller获取
+        NoStandardHolder.set(noStandardEmployees);
+
         return count;
     }
 
     /**
-     * 计算薪资
+     * 计算薪资 - 从薪资标准取数
      */
     private void calculateSalary(SalaryRecord record, EmpEmployee emp, Integer year, Integer month) {
-        // 1. 根据岗位级别设置基本工资
-        BigDecimal baseSalary = DEFAULT_BASE_SALARY;
-        if (emp.getPositionId() != null) {
-            OrgPosition position = positionMapper.selectById(emp.getPositionId());
-            if (position != null && position.getPositionLevel() != null) {
-                baseSalary = POSITION_LEVEL_SALARY.getOrDefault(position.getPositionLevel(), DEFAULT_BASE_SALARY);
-            }
-        }
-        record.setBaseSalary(baseSalary);
+        LocalDate monthStart = LocalDate.of(year, month, 1);
+        LocalDate monthEnd = LocalDate.of(year, month, monthStart.lengthOfMonth());
 
-        // 2. 计算考勤数据
+        // 1. 从 salary_standard 查询该员工所有生效记录
+        List<SalaryStandard> standards = salaryStandardMapper.selectList(
+                new LambdaQueryWrapper<SalaryStandard>()
+                        .eq(SalaryStandard::getEmployeeId, emp.getId())
+                        .le(SalaryStandard::getEffectiveDate, monthEnd)
+                        .and(w -> w.isNull(SalaryStandard::getExpireDate)
+                                .or().ge(SalaryStandard::getExpireDate, monthStart)));
+
+        // 查询所有启用的薪资项目
+        List<SalaryItem> items = salaryItemMapper.selectList(
+                new LambdaQueryWrapper<SalaryItem>()
+                        .eq(SalaryItem::getStatus, 1)
+                        .eq(SalaryItem::getDeleted, 0)
+                        .orderByAsc(SalaryItem::getSort));
+        Map<Long, SalaryItem> itemMap = items.stream()
+                .collect(Collectors.toMap(SalaryItem::getId, i -> i));
+
+        // 构建 itemId -> amount 的映射
+        Map<Long, BigDecimal> standardAmountMap = new HashMap<>();
+        for (SalaryStandard std : standards) {
+            standardAmountMap.put(std.getItemId(), std.getAmount());
+        }
+
+        // 2. 按 record_field 分类计算各薪资项目
+        // 同一个 recordField 可能对应多个薪资项目（如餐补+交通+通讯→allowance），需要累加
+        Map<String, BigDecimal> fieldAmountMap = new LinkedHashMap<>();
+
+        for (SalaryItem item : items) {
+            BigDecimal amount = standardAmountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
+            String field = item.getRecordField();
+            if (field == null || field.isEmpty()) continue;
+
+            // 特殊处理：按比例计算的项目
+            if (item.getCalcType() == 2 && item.getCalcFormula() != null
+                    && ("socialInsurance".equals(field) || "housingFund".equals(field))) {
+                BigDecimal rate = new BigDecimal(item.getCalcFormula());
+                amount = amount.multiply(rate).setScale(2, RoundingMode.HALF_UP);
+            }
+
+            // 累加同一字段的金额
+            fieldAmountMap.merge(field, amount, BigDecimal::add);
+        }
+
+        // 基本工资默认5000
+        BigDecimal baseSalary = fieldAmountMap.getOrDefault("baseSalary", BigDecimal.ZERO);
+        if (baseSalary.compareTo(BigDecimal.ZERO) == 0) {
+            baseSalary = new BigDecimal("5000");
+        }
+
+        BigDecimal positionSalary = fieldAmountMap.getOrDefault("positionSalary", BigDecimal.ZERO);
+        BigDecimal performanceSalary = fieldAmountMap.getOrDefault("performanceSalary", BigDecimal.ZERO);
+        BigDecimal allowance = fieldAmountMap.getOrDefault("allowance", BigDecimal.ZERO);
+        BigDecimal bonus = fieldAmountMap.getOrDefault("bonus", BigDecimal.ZERO);
+        BigDecimal socialInsurance = fieldAmountMap.getOrDefault("socialInsurance", BigDecimal.ZERO);
+        BigDecimal housingFund = fieldAmountMap.getOrDefault("housingFund", BigDecimal.ZERO);
+
+        record.setBaseSalary(baseSalary);
+        record.setPositionSalary(positionSalary);
+        record.setPerformanceSalary(performanceSalary);
+        record.setAllowance(allowance);
+        record.setBonus(bonus);
+
+        // 3. 计算考勤数据
         YearMonth yearMonth = YearMonth.of(year, month);
         LocalDate startDate = yearMonth.atDay(1);
         LocalDate endDate = yearMonth.atEndOfMonth();
-        // 如果是当月，截止到今天
         LocalDate today = LocalDate.now();
         if (endDate.isAfter(today)) {
             endDate = today;
         }
 
-        // 获取考勤规则（上班时间、下班时间）
         AttRule attRule = attRuleMapper.selectOne(new LambdaQueryWrapper<AttRule>()
                 .eq(AttRule::getIsDefault, 1)
                 .eq(AttRule::getStatus, 1)
@@ -218,7 +272,6 @@ public class SalaryRecordServiceImpl extends ServiceImpl<SalaryRecordMapper, Sal
         LocalTime workStartTime = attRule != null ? attRule.getWorkStartTime() : LocalTime.of(9, 0);
         LocalTime workEndTime = attRule != null ? attRule.getWorkEndTime() : LocalTime.of(18, 0);
 
-        // 计算工作日列表（排除周末）
         List<LocalDate> workDayList = new ArrayList<>();
         LocalDate current = startDate;
         while (!current.isAfter(endDate)) {
@@ -231,159 +284,106 @@ public class SalaryRecordServiceImpl extends ServiceImpl<SalaryRecordMapper, Sal
         int workDays = workDayList.size();
         record.setWorkDays(workDays);
 
-        // 查询该月所有打卡记录
-        List<AttClockRecord> clockRecords = attClockRecordMapper.selectList(new LambdaQueryWrapper<AttClockRecord>()
-                .eq(AttClockRecord::getEmployeeId, emp.getId())
-                .ge(AttClockRecord::getClockDate, startDate)
-                .le(AttClockRecord::getClockDate, endDate));
-
-        // 按日期分组
+        List<AttClockRecord> clockRecords = attClockRecordMapper.selectList(
+                new LambdaQueryWrapper<AttClockRecord>()
+                        .eq(AttClockRecord::getEmployeeId, emp.getId())
+                        .ge(AttClockRecord::getClockDate, startDate)
+                        .le(AttClockRecord::getClockDate, endDate));
         Map<LocalDate, List<AttClockRecord>> clockByDate = clockRecords.stream()
                 .collect(Collectors.groupingBy(AttClockRecord::getClockDate));
 
-        // 3. 计算请假天数（已通过的请假）- 区分带薪假和无薪假
         LeaveStats leaveStats = calculateLeaveStats(emp.getId(), year, month);
         record.setLeaveDays(leaveStats.totalLeaveDays);
-
-        // 获取请假日期列表
         Set<LocalDate> leaveDates = getLeaveDates(emp.getId(), year, month);
 
-        // 统计考勤情况
-        int actualDays = 0;      // 实际出勤天数
-        int lateOnlyCount = 0;   // 只迟到次数
-        int earlyOnlyCount = 0;  // 只早退次数
-        int lateAndEarlyCount = 0; // 迟到+早退次数
-        int absentCount = 0;     // 缺勤天数
+        int actualDays = 0;
+        int lateOnlyCount = 0;
+        int earlyOnlyCount = 0;
+        int lateAndEarlyCount = 0;
+        int absentCount = 0;
 
         for (LocalDate workDay : workDayList) {
-            // 如果是请假日，跳过
-            if (leaveDates.contains(workDay)) {
-                continue;
-            }
-
+            if (leaveDates.contains(workDay)) continue;
             List<AttClockRecord> dayRecords = clockByDate.get(workDay);
             if (dayRecords == null || dayRecords.isEmpty()) {
-                // 没有任何打卡记录 = 缺勤
                 absentCount++;
                 continue;
             }
-
-            // 检查上班打卡
             AttClockRecord clockIn = dayRecords.stream()
-                    .filter(r -> r.getClockType() == 1)
-                    .findFirst().orElse(null);
-            // 检查下班打卡
+                    .filter(r -> r.getClockType() == 1).findFirst().orElse(null);
             AttClockRecord clockOut = dayRecords.stream()
-                    .filter(r -> r.getClockType() == 2)
-                    .findFirst().orElse(null);
-
+                    .filter(r -> r.getClockType() == 2).findFirst().orElse(null);
             if (clockIn == null && clockOut == null) {
-                // 有记录但没有上下班卡 = 缺勤
                 absentCount++;
                 continue;
             }
-
-            // 有打卡记录，算出勤
             actualDays++;
-
-            // 检查迟到（上班打卡时间晚于规定时间）
             boolean isLate = false;
             if (clockIn != null && clockIn.getClockTime() != null) {
-                LocalTime clockInTime = clockIn.getClockTime().toLocalTime();
-                isLate = clockInTime.isAfter(workStartTime);
+                isLate = clockIn.getClockTime().toLocalTime().isAfter(workStartTime);
             } else {
-                // 没有上班卡，算迟到
                 isLate = true;
             }
-
-            // 检查早退（下班打卡时间早于规定时间）
             boolean isEarly = false;
             if (clockOut != null && clockOut.getClockTime() != null) {
-                LocalTime clockOutTime = clockOut.getClockTime().toLocalTime();
-                isEarly = clockOutTime.isBefore(workEndTime);
+                isEarly = clockOut.getClockTime().toLocalTime().isBefore(workEndTime);
             } else {
-                // 没有下班卡，算早退
                 isEarly = true;
             }
-
-            // 统计迟到早退
-            if (isLate && isEarly) {
-                lateAndEarlyCount++;
-            } else if (isLate) {
-                lateOnlyCount++;
-            } else if (isEarly) {
-                earlyOnlyCount++;
-            }
+            if (isLate && isEarly) lateAndEarlyCount++;
+            else if (isLate) lateOnlyCount++;
+            else if (isEarly) earlyOnlyCount++;
         }
 
         record.setActualDays(actualDays);
         record.setLateCount(lateOnlyCount + earlyOnlyCount + lateAndEarlyCount);
 
-        // 4. 计算周末加班费（双倍工资）
-        BigDecimal dailyWage = baseSalary.divide(BigDecimal.valueOf(22), 2, RoundingMode.HALF_UP); // 日薪 = 基本工资/22
+        // 4. 加班费
+        BigDecimal dailyWage = baseSalary.compareTo(BigDecimal.ZERO) > 0
+                ? baseSalary.divide(BigDecimal.valueOf(22), 2, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO;
         BigDecimal overtimePay = calculateOvertimePay(emp.getId(), year, month, dailyWage);
         record.setOvertimePay(overtimePay);
 
-        // 5. 计算考勤扣款
-        // 扣款规则：
-        // - 无薪假一天扣100，带薪假不扣款
-        // - 缺勤一天扣200  
-        // - 只迟到扣%50
-        // - 只早退扣%50
-        // - 迟到+早退扣100（各%50）
-        BigDecimal unpaidLeaveDeduction = leaveStats.unpaidLeaveDays.multiply(UNPAID_LEAVE_DEDUCTION_PER_DAY);
-        BigDecimal absentDeduction = BigDecimal.valueOf(absentCount).multiply(ABSENT_DEDUCTION_PER_DAY);
-        BigDecimal lateOnlyDeduction = BigDecimal.valueOf(lateOnlyCount).multiply(LATE_EARLY_DEDUCTION);
-        BigDecimal earlyOnlyDeduction = BigDecimal.valueOf(earlyOnlyCount).multiply(LATE_EARLY_DEDUCTION);
-        BigDecimal lateAndEarlyDeduction = BigDecimal.valueOf(lateAndEarlyCount).multiply(LATE_EARLY_DEDUCTION.multiply(BigDecimal.valueOf(2)));
-        
-        BigDecimal totalAttendanceDeduction = unpaidLeaveDeduction
-                .add(absentDeduction)
-                .add(lateOnlyDeduction)
-                .add(earlyOnlyDeduction)
-                .add(lateAndEarlyDeduction);
-        
-        // 全勤奖：无缺勤、无迟到早退才有
+        // 5. 全勤奖
         BigDecimal actualFullAttendanceBonus = BigDecimal.ZERO;
         if (absentCount == 0 && lateOnlyCount == 0 && earlyOnlyCount == 0 && lateAndEarlyCount == 0) {
             actualFullAttendanceBonus = FULL_ATTENDANCE_BONUS;
         }
         record.setFullAttendanceBonus(actualFullAttendanceBonus);
 
-        // 6. 其他薪资项目（可扩展）
-        record.setPositionSalary(BigDecimal.ZERO);
-        record.setPerformanceSalary(BigDecimal.ZERO);
-        // overtimePay 已在上面计算
-        record.setAllowance(BigDecimal.ZERO);
-        record.setBonus(BigDecimal.ZERO);
+        // 6. 考勤扣款
+        BigDecimal unpaidLeaveDeduction = leaveStats.unpaidLeaveDays.multiply(UNPAID_LEAVE_DEDUCTION_PER_DAY);
+        BigDecimal absentDeduction = BigDecimal.valueOf(absentCount).multiply(ABSENT_DEDUCTION_PER_DAY);
+        BigDecimal lateOnlyDeduction = BigDecimal.valueOf(lateOnlyCount).multiply(LATE_EARLY_DEDUCTION);
+        BigDecimal earlyOnlyDeduction = BigDecimal.valueOf(earlyOnlyCount).multiply(LATE_EARLY_DEDUCTION);
+        BigDecimal lateAndEarlyDeduction = BigDecimal.valueOf(lateAndEarlyCount)
+                .multiply(LATE_EARLY_DEDUCTION.multiply(BigDecimal.valueOf(2)));
+        BigDecimal totalAttendanceDeduction = unpaidLeaveDeduction
+                .add(absentDeduction)
+                .add(lateOnlyDeduction)
+                .add(earlyOnlyDeduction)
+                .add(lateAndEarlyDeduction);
 
-        // 7. 计算应发工资（基本工资 + 全勤奖 + 加班费 + 其他）
+        // 7. 应发工资
         BigDecimal grossSalary = baseSalary
-                .add(actualFullAttendanceBonus)
-                .add(record.getPositionSalary())
-                .add(record.getPerformanceSalary())
-                .add(record.getOvertimePay())
-                .add(record.getAllowance())
-                .add(record.getBonus());
+                .add(positionSalary)
+                .add(performanceSalary)
+                .add(overtimePay)
+                .add(allowance)
+                .add(bonus)
+                .add(actualFullAttendanceBonus);
         record.setGrossSalary(grossSalary);
 
-        // 8. 扣款项目 - 社保公积金个税
-        // 社保基数以基本工资为准
-        BigDecimal socialInsurance = baseSalary.multiply(SOCIAL_INSURANCE_RATE).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal housingFund = baseSalary.multiply(HOUSING_FUND_RATE).setScale(2, RoundingMode.HALF_UP);
-        
-        // 个税计算：应纳税所得额 = 应发工资 - 社保 - 公积金 - 5000
+        // 8. 个税
         BigDecimal taxableIncome = grossSalary.subtract(socialInsurance).subtract(housingFund).subtract(TAX_THRESHOLD);
         BigDecimal personalTax = BigDecimal.ZERO;
         if (taxableIncome.compareTo(BigDecimal.ZERO) > 0) {
-            // 简化税率：超过5000的部分按%3%计算
-            personalTax = taxableIncome.multiply(TAX_RATE_LEVEL1).setScale(2, RoundingMode.HALF_UP);
+            personalTax = taxableIncome.multiply(new BigDecimal("0.03")).setScale(2, RoundingMode.HALF_UP);
         }
-        
         record.setSocialInsurance(socialInsurance);
         record.setHousingFund(housingFund);
         record.setPersonalTax(personalTax);
-        // 考勤扣款记录到其他扣款字段
         record.setOtherDeduction(totalAttendanceDeduction);
 
         BigDecimal totalDeduction = socialInsurance
@@ -392,26 +392,34 @@ public class SalaryRecordServiceImpl extends ServiceImpl<SalaryRecordMapper, Sal
                 .add(totalAttendanceDeduction);
         record.setTotalDeduction(totalDeduction);
 
-        // 9. 实发工资 = 应发 - 扣款
-        BigDecimal netSalary = grossSalary.subtract(totalDeduction);
-        record.setNetSalary(netSalary);
+        // 9. 实发工资
+        record.setNetSalary(grossSalary.subtract(totalDeduction));
 
-        // 备注
+        // 10. 备注
         StringBuilder remark = new StringBuilder();
         remark.append("基本工资:").append(baseSalary).append("元");
+        if (positionSalary.compareTo(BigDecimal.ZERO) > 0) {
+            remark.append(",岗位工资:").append(positionSalary).append("元");
+        }
+        if (performanceSalary.compareTo(BigDecimal.ZERO) > 0) {
+            remark.append(",绩效工资:").append(performanceSalary).append("元");
+        }
         if (actualFullAttendanceBonus.compareTo(BigDecimal.ZERO) > 0) {
             remark.append(",全勤奖:").append(actualFullAttendanceBonus).append("元");
+        }
+        if (overtimePay.compareTo(BigDecimal.ZERO) > 0) {
+            remark.append(",加班费:").append(overtimePay).append("元");
+        }
+        if (allowance.compareTo(BigDecimal.ZERO) > 0) {
+            remark.append(",津贴:").append(allowance).append("元");
+        }
+        if (bonus.compareTo(BigDecimal.ZERO) > 0) {
+            remark.append(",奖金:").append(bonus).append("元");
         }
         remark.append(",社保:").append(socialInsurance).append("元");
         remark.append(",公积金:").append(housingFund).append("元");
         if (personalTax.compareTo(BigDecimal.ZERO) > 0) {
             remark.append(",个税:").append(personalTax).append("元");
-        }
-        if (overtimePay.compareTo(BigDecimal.ZERO) > 0) {
-            remark.append(",周末加班费:").append(overtimePay).append("元");
-        }
-        if (leaveStats.paidLeaveDays.compareTo(BigDecimal.ZERO) > 0) {
-            remark.append(",带薪假").append(leaveStats.paidLeaveDays).append("天(不扣款)");
         }
         if (leaveStats.unpaidLeaveDays.compareTo(BigDecimal.ZERO) > 0) {
             remark.append(",无薪假").append(leaveStats.unpaidLeaveDays).append("天扣").append(unpaidLeaveDeduction).append("元");
@@ -781,6 +789,17 @@ public class SalaryRecordServiceImpl extends ServiceImpl<SalaryRecordMapper, Sal
         if (emp == null || emp.getDeptId() == null) return "";
         OrgDepartment dept = departmentMapper.selectById(emp.getDeptId());
         return dept != null ? dept.getDeptName() : "";
+    }
+
+    /**
+     * 存储未设置薪资标准的员工列表，供Controller层获取
+     */
+    public static class NoStandardHolder {
+        private static final ThreadLocal<List<String>> HOLDER = new ThreadLocal<>();
+
+        public static void set(List<String> names) { HOLDER.set(names); }
+        public static List<String> get() { return HOLDER.get(); }
+        public static void clear() { HOLDER.remove(); }
     }
 
     private String getStatusName(Integer status) {

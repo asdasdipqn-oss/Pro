@@ -116,74 +116,10 @@
         </el-row>
         <el-divider content-position="left">收入项</el-divider>
         <el-row :gutter="20">
-          <el-col :span="8">
-            <el-form-item label="基本工资">
+          <el-col :span="8" v-for="item in incomeItems" :key="item.code">
+            <el-form-item :label="item.name">
               <el-input-number
-                v-model="editForm.baseSalary"
-                :min="0"
-                :precision="2"
-                style="width: 100%"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="岗位工资">
-              <el-input-number
-                v-model="editForm.positionSalary"
-                :min="0"
-                :precision="2"
-                style="width: 100%"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="绩效工资">
-              <el-input-number
-                v-model="editForm.performanceSalary"
-                :min="0"
-                :precision="2"
-                style="width: 100%"
-              />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <el-form-item label="全勤奖">
-              <el-input-number
-                v-model="editForm.fullAttendanceBonus"
-                :min="0"
-                :precision="2"
-                style="width: 100%"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="加班费">
-              <el-input-number
-                v-model="editForm.overtimePay"
-                :min="0"
-                :precision="2"
-                style="width: 100%"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="补贴">
-              <el-input-number
-                v-model="editForm.allowance"
-                :min="0"
-                :precision="2"
-                style="width: 100%"
-              />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <el-form-item label="奖金">
-              <el-input-number
-                v-model="editForm.bonus"
+                v-model="editForm[item.field]"
                 :min="0"
                 :precision="2"
                 style="width: 100%"
@@ -193,42 +129,10 @@
         </el-row>
         <el-divider content-position="left">扣款项</el-divider>
         <el-row :gutter="20">
-          <el-col :span="8">
-            <el-form-item label="社保扣款">
+          <el-col :span="8" v-for="item in deductionItems" :key="item.code">
+            <el-form-item :label="item.name">
               <el-input-number
-                v-model="editForm.socialInsurance"
-                :min="0"
-                :precision="2"
-                style="width: 100%"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="公积金">
-              <el-input-number
-                v-model="editForm.housingFund"
-                :min="0"
-                :precision="2"
-                style="width: 100%"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="个人所得税">
-              <el-input-number
-                v-model="editForm.personalTax"
-                :min="0"
-                :precision="2"
-                style="width: 100%"
-              />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <el-form-item label="其他扣款">
-              <el-input-number
-                v-model="editForm.otherDeduction"
+                v-model="editForm[item.field]"
                 :min="0"
                 :precision="2"
                 style="width: 100%"
@@ -264,6 +168,7 @@ import {
   recalculateSalary,
   getSalaryDetail,
   updateSalaryRecord,
+  listSalaryItem,
 } from '@/api/salary'
 
 const userStore = useUserStore()
@@ -274,6 +179,43 @@ const editDialogVisible = ref(false)
 const tableData = ref([])
 const summary = ref({})
 const monthPicker = ref(new Date())
+
+// 所有启用的薪资项目
+const salaryItemList = ref([])
+
+// 收入项（itemType 1,2）且有 recordField 的去重列表
+const incomeItems = computed(() => {
+  const seen = new Set()
+  return salaryItemList.value
+    .filter(item => (item.itemType === 1 || item.itemType === 2) && item.recordField)
+    .filter(item => {
+      if (seen.has(item.recordField)) return false
+      seen.add(item.recordField)
+      return true
+    })
+    .map(item => ({
+      code: item.itemCode,
+      name: item.itemName,
+      field: item.recordField,
+    }))
+})
+
+// 扣款项（itemType 3,4,5）且有 recordField 的去重列表
+const deductionItems = computed(() => {
+  const seen = new Set()
+  return salaryItemList.value
+    .filter(item => (item.itemType === 3 || item.itemType === 4 || item.itemType === 5) && item.recordField)
+    .filter(item => {
+      if (seen.has(item.recordField)) return false
+      seen.add(item.recordField)
+      return true
+    })
+    .map(item => ({
+      code: item.itemCode,
+      name: item.itemName,
+      field: item.recordField,
+    }))
+})
 
 const editForm = reactive({
   id: null,
@@ -361,13 +303,19 @@ const handleMonthChange = () => {
 const handleGenerate = async () => {
   try {
     await ElMessageBox.confirm(
-      `确定要生成 ${year.value}年${month.value}月 的薪资吗？\n计算规则：基本工资3000元 + 全勤奖3000元（请假一天扣100元）`,
+      `确定要生成 ${year.value}年${month.value}月 的薪资吗？\n薪资将根据员工已设置的薪资标准进行计算，未设置薪资标准的员工各项金额将为0`,
       '生成薪资',
       { type: 'info' },
     )
     loading.value = true
     const res = await generateMonthlySalary({ year: year.value, month: month.value })
     ElMessage.success(res.data?.message || '生成成功')
+    // 如果有员工未设置薪资标准，给出警告提示
+    if (res.data?.warning) {
+      setTimeout(() => {
+        ElMessage.warning({ message: res.data.warning, duration: 6000 })
+      }, 500)
+    }
     fetchData()
   } catch (error) {
     if (error !== 'cancel') console.error(error)
@@ -496,7 +444,12 @@ const handleEditSubmit = async () => {
   }
 }
 
-onMounted(fetchData)
+onMounted(() => {
+  fetchData()
+  listSalaryItem().then(res => {
+    salaryItemList.value = (res.data || []).filter(i => i.status === 1)
+  }).catch(() => {})
+})
 </script>
 
 <style scoped>

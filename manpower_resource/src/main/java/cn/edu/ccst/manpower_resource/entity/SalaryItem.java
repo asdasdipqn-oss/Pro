@@ -47,6 +47,9 @@ public class SalaryItem implements Serializable {
     @ApiModelProperty(value = "计算公式")
     private String calcFormula;
 
+    @ApiModelProperty(value = "映射到salary_record的字段名")
+    private String recordField;
+
     @ApiModelProperty(value = "是否计税：0-否 1-是")
     private Integer isTax;
 
