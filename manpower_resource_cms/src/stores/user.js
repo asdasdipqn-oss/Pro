@@ -43,7 +43,8 @@ export const useUserStore = defineStore('user', () => {
     // 兼容两种返回格式：userInfo对象或直接的username
     userInfo.value = res.data.userInfo || {
       userId: res.data.userId,
-      username: res.data.username
+      username: res.data.username,
+      employeeName: res.data.employeeName
     }
     roles.value = res.data.roles || []
     permissions.value = res.data.permissions || []

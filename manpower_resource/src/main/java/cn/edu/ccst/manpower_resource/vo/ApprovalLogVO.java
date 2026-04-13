@@ -30,6 +30,12 @@ public class ApprovalLogVO {
     @Schema(description = "审批意见")
     private String comment;
 
+    @Schema(description = "审批状态：0-待审批 1-已通过 2-已驳回")
+    private Integer status;
+
+    @Schema(description = "申请人姓名")
+    private String applicantName;
+
     @Schema(description = "操作时间")
     private LocalDateTime createTime;
 }

@@ -118,36 +118,48 @@
         </div>
       </div>
 
-      <!-- 系统消息通知（使用与 NotificationView 相同的数据源） -->
+      <!-- 系统消息通知 -->
       <div class="module-card notice-card">
         <div class="module-header">
-          <h3>系统消息</h3>
-          <span class="view-all" @click="router.push('/notification')">查看全部</span>
+          <h3>系统消息 <el-badge v-if="unreadCount > 0" :value="unreadCount" :max="99" /></h3>
+          <div class="header-actions">
+            <el-button v-if="unreadCount > 0" type="primary" link size="small" @click="handleMarkAllRead">全部已读</el-button>
+            <span class="view-all" @click="router.push('/notification')">查看全部</span>
+          </div>
         </div>
         <div class="notice-list" v-loading="loading">
           <div
-            v-for="item in notifications"
+            v-for="item in displayNotifications"
             :key="`${item.type}-${item.id}`"
             class="notification-item"
             :class="{ unread: item.status === 0 }"
             @click="handleClick(item)"
           >
             <div class="notification-icon" :class="item.type">
-              <el-icon :size="20">
+              <el-icon :size="18">
                 <component :is="getIcon(item.type)" />
               </el-icon>
             </div>
-            <div class="notification-content">
+            <div class="notification-body">
               <div class="notification-title">
-                {{ item.title }}
+                <span class="title-text">{{ item.title }}</span>
                 <el-tag v-if="item.status === 0" type="danger" size="small">未读</el-tag>
               </div>
               <div class="notification-desc">{{ item.content }}</div>
               <div class="notification-time">{{ formatTime(item.createTime) }}</div>
-              <div class="arrow-icon"><ArrowRight /></div>
             </div>
           </div>
           <el-empty v-if="!loading && notifications.length === 0" description="暂无消息" />
+        </div>
+        <div class="notice-footer" v-if="notifications.length > pageSize">
+          <el-pagination
+            v-model:current-page="currentPage"
+            :page-size="pageSize"
+            :total="notifications.length"
+            layout="prev, pager, next"
+            small
+            @current-change="onPageChange"
+          />
         </div>
       </div>
     </div>
@@ -169,6 +181,17 @@ const userStore = useUserStore()
 const loading = ref(false)
 const notifications = ref([])
 const unreadCount = ref(0)
+const currentPage = ref(1)
+const pageSize = 5
+
+const displayNotifications = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return notifications.value.slice(start, start + pageSize)
+})
+
+const onPageChange = () => {
+  // 分页切换，无需额外操作，computed 自动更新
+}
 
 const stats = ref({
   employees: 0,
@@ -478,6 +501,12 @@ onMounted(fetchData)
   grid-column: span 3;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .view-all {
   font-size: 13px;
   color: #007aff;
@@ -489,17 +518,19 @@ onMounted(fetchData)
 }
 
 .notice-list {
-  min-height: 200px;
+  min-height: 100px;
+  max-height: 380px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .notification-item {
   display: flex;
   align-items: flex-start;
-  padding: 12px;
-  border-radius: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -509,54 +540,68 @@ onMounted(fetchData)
 }
 
 .notification-item.unread {
-  background: rgba(237, 108, 233, 0.06);
+  background: rgba(0, 122, 255, 0.05);
 }
 
 .notification-icon {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 12px;
-  color: #007aff;
+  border-radius: 8px;
+  color: #fff;
 }
 
-.notification-content {
+.notification-icon.approval { background: #e6a23c; }
+.notification-icon.leave { background: #409eff; }
+.notification-icon.train { background: #67c23a; }
+.notification-icon.salary { background: #f56c6c; }
+.notification-icon.assess { background: #909399; }
+
+.notification-body {
   flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  min-width: 0;
 }
 
 .notification-title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   color: #303133;
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex: 1;
+  gap: 6px;
+}
+
+.title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .notification-desc {
   font-size: 13px;
   color: #606266;
   line-height: 1.4;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .notification-time {
   font-size: 12px;
   color: #909399;
+  margin-top: 2px;
 }
 
-.arrow-icon {
-  width: 16px;
-  height: 24px;
-  color: #c0c4cc;
+.notice-footer {
   display: flex;
-  align-items: center;
   justify-content: center;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
 }
 </style>

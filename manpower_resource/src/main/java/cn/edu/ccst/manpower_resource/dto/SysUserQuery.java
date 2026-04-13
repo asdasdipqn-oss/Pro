@@ -17,4 +17,7 @@ public class SysUserQuery extends PageQuery {
 
     @Schema(description = "角色ID")
     private Long roleId;
+
+    @Schema(description = "关联员工ID")
+    private Long employeeId;
 }

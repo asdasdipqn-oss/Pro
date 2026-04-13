@@ -4,7 +4,7 @@ import cn.edu.ccst.manpower_resource.common.Result;
 import cn.edu.ccst.manpower_resource.exception.BusinessException;
 import cn.edu.ccst.manpower_resource.entity.*;
 import cn.edu.ccst.manpower_resource.mapper.*;
-import cn.edu.ccst.manpower_resource.security.LoginUser;
+import cn.edu.ccst.manpower_resource.entity.*;import cn.edu.ccst.manpower_resource.security.LoginUser;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -45,6 +45,7 @@ public class NotificationController {
     private final AssessSubmissionMapper assessSubmissionMapper;
     private final AssessTaskMapper assessTaskMapper;
     private final SysConfigMapper sysConfigMapper;
+    private final SysRoleMapper sysRoleMapper;
 
     @Data
     public static class NotificationVO {
@@ -162,13 +163,22 @@ public class NotificationController {
     private List<NotificationVO> buildNotifications(Long userId, Long employeeId) {
         Set<String> readMarks = loadReadMarks(userId);
         List<NotificationVO> notifications = new ArrayList<>();
+        LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);
 
-        List<ApprovalRecord> pendingApprovals = approvalRecordMapper.selectList(
-                new LambdaQueryWrapper<ApprovalRecord>()
-                        .eq(ApprovalRecord::getApproverId, userId)
-                        .eq(ApprovalRecord::getStatus, 0)
-                        .orderByDesc(ApprovalRecord::getCreateTime)
-                        .last("LIMIT 10"));
+        // 判断是否为管理员角色
+        boolean isAdmin = isAdminUser(userId);
+
+        // 待审批通知：管理员看所有待审批，普通用户只看自己的
+        LambdaQueryWrapper<ApprovalRecord> approvalWrapper = new LambdaQueryWrapper<ApprovalRecord>()
+                .eq(ApprovalRecord::getStatus, 0)
+                .ge(ApprovalRecord::getCreateTime, threeDaysAgo)
+                .orderByDesc(ApprovalRecord::getCreateTime)
+                .last("LIMIT 10");
+        if (!isAdmin) {
+            approvalWrapper.eq(ApprovalRecord::getApproverId, userId);
+        }
+
+        List<ApprovalRecord> pendingApprovals = approvalRecordMapper.selectList(approvalWrapper);
 
         for (ApprovalRecord record : pendingApprovals) {
             NotificationVO vo = new NotificationVO();
@@ -190,6 +200,7 @@ public class NotificationController {
                     new LambdaQueryWrapper<LeaveApplication>()
                             .eq(LeaveApplication::getEmployeeId, employeeId)
                             .in(LeaveApplication::getStatus, 2, 3)
+                            .ge(LeaveApplication::getUpdateTime, threeDaysAgo)
                             .orderByDesc(LeaveApplication::getUpdateTime)
                             .last("LIMIT 5"));
             for (LeaveApplication leave : myLeaves) {
@@ -217,6 +228,7 @@ public class NotificationController {
                                 .in(TrainPlan::getId, myTrainPlanIds)
                                 .eq(TrainPlan::getDeleted, 0)
                                 .in(TrainPlan::getStatus, 0, 1)
+                                .ge(TrainPlan::getCreateTime, threeDaysAgo)
                                 .orderByDesc(TrainPlan::getCreateTime)
                                 .last("LIMIT 5"));
                 for (TrainPlan train : trains) {
@@ -235,6 +247,7 @@ public class NotificationController {
                     new LambdaQueryWrapper<SalaryRecord>()
                             .eq(SalaryRecord::getEmployeeId, employeeId)
                             .eq(SalaryRecord::getStatus, 2)
+                            .ge(SalaryRecord::getPayTime, threeDaysAgo)
                             .orderByDesc(SalaryRecord::getPayTime)
                             .last("LIMIT 3"));
             for (SalaryRecord salary : salaries) {
@@ -252,6 +265,7 @@ public class NotificationController {
                     new LambdaQueryWrapper<AssessSubmission>()
                             .eq(AssessSubmission::getUserId, userId)
                             .in(AssessSubmission::getStatus, 1, 2)
+                            .ge(AssessSubmission::getUpdateTime, threeDaysAgo)
                             .orderByDesc(AssessSubmission::getUpdateTime)
                             .last("LIMIT 10"));
             if (!assessSubmissions.isEmpty()) {
@@ -390,5 +404,11 @@ public class NotificationController {
             case 4: return "有新的离职申请待审批";
             default: return "有新的审批待处理";
         }
+    }
+
+    private boolean isAdminUser(Long userId) {
+        List<SysRole> roles = sysRoleMapper.selectRolesByUserId(userId);
+        return roles.stream().anyMatch(r ->
+                "ADMIN".equalsIgnoreCase(r.getRoleCode()) || "SUPER_ADMIN".equalsIgnoreCase(r.getRoleCode()));
     }
 }

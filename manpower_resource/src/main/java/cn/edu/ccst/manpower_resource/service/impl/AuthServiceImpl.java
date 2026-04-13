@@ -67,13 +67,17 @@ public class AuthServiceImpl implements AuthService {
             // 获取用户部门信息
             Long deptId = null;
             String departmentName = null;
+            String employeeName = null;
             if (user.getEmployeeId() != null) {
                 EmpEmployee employee = empEmployeeMapper.selectById(user.getEmployeeId());
-                if (employee != null && employee.getDeptId() != null) {
-                    deptId = employee.getDeptId();
-                    OrgDepartment department = orgDepartmentMapper.selectById(deptId);
-                    if (department != null) {
-                        departmentName = department.getDeptName();
+                if (employee != null) {
+                    employeeName = employee.getEmpName();
+                    if (employee.getDeptId() != null) {
+                        deptId = employee.getDeptId();
+                        OrgDepartment department = orgDepartmentMapper.selectById(deptId);
+                        if (department != null) {
+                            departmentName = department.getDeptName();
+                        }
                     }
                 }
             }
@@ -83,6 +87,7 @@ public class AuthServiceImpl implements AuthService {
                     .tokenType("Bearer")
                     .userId(user.getId())
                     .username(user.getUsername())
+                    .employeeName(employeeName)
                     .roles(loginUser.getRoles())
                     .permissions(loginUser.getPermissions())
                     .deptId(deptId)
@@ -153,6 +158,7 @@ public class AuthServiceImpl implements AuthService {
         if (user.getEmployeeId() != null) {
             EmpEmployee employee = empEmployeeMapper.selectById(user.getEmployeeId());
             if (employee != null) {
+                vo.setEmployeeName(employee.getEmpName());
                 vo.setDeptId(employee.getDeptId());
                 if (employee.getDeptId() != null) {
                     OrgDepartment department = orgDepartmentMapper.selectById(employee.getDeptId());

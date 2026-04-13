@@ -43,7 +43,6 @@ public class AttDailyStatServiceImpl extends ServiceImpl<AttDailyStatMapper, Att
     private final EmpEmployeeMapper employeeMapper;
 
     @Override
-    @Transactional
     public int generateDailyStats(LocalDate startDate, LocalDate endDate, Long employeeId) {
         // 获取默认考勤规则
         AttRule rule = ruleMapper.selectOne(new LambdaQueryWrapper<AttRule>()
@@ -65,121 +64,124 @@ public class AttDailyStatServiceImpl extends ServiceImpl<AttDailyStatMapper, Att
         LocalDate currentDate = startDate != null ? startDate : LocalDate.now().minusDays(30);
         LocalDate end = endDate != null ? endDate : LocalDate.now();
 
+        List<AttDailyStat> batchList = new java.util.ArrayList<>();
+        int batchSize = 100;
+
         while (!currentDate.isAfter(end)) {
+            // 批量查询当天已存在的记录
+            List<AttDailyStat> existingStats = baseMapper.selectList(
+                    new LambdaQueryWrapper<AttDailyStat>()
+                            .eq(AttDailyStat::getStatDate, currentDate)
+                            .in(AttDailyStat::getEmployeeId, employeeIds));
+            Map<Long, AttDailyStat> existingMap = existingStats.stream()
+                    .collect(Collectors.toMap(AttDailyStat::getEmployeeId, s -> s, (a, b) -> a));
+
+            // 批量查询当天所有打卡记录
+            List<AttClockRecord> allClockRecords = clockRecordMapper.selectList(
+                    new LambdaQueryWrapper<AttClockRecord>()
+                            .eq(AttClockRecord::getClockDate, currentDate)
+                            .in(AttClockRecord::getEmployeeId, employeeIds)
+                            .orderByAsc(AttClockRecord::getClockTime));
+            Map<Long, List<AttClockRecord>> clockMap = allClockRecords.stream()
+                    .collect(Collectors.groupingBy(AttClockRecord::getEmployeeId));
+
+            // 批量查询当天所有已通过的请假记录
+            List<LeaveApplication> allLeaves = leaveMapper.selectList(
+                    new LambdaQueryWrapper<LeaveApplication>()
+                            .in(LeaveApplication::getEmployeeId, employeeIds)
+                            .le(LeaveApplication::getStartTime, currentDate.atTime(23, 59, 59))
+                            .ge(LeaveApplication::getEndTime, currentDate.atStartOfDay())
+                            .eq(LeaveApplication::getStatus, 2));
+            Map<Long, LeaveApplication> leaveMap = allLeaves.stream()
+                    .collect(Collectors.toMap(LeaveApplication::getEmployeeId, l -> l, (a, b) -> a));
+
             for (Long empId : employeeIds) {
-                if (generateDayStat(currentDate, empId, rule)) {
+                if (existingMap.containsKey(empId)) continue;
+                AttDailyStat stat = buildDayStat(currentDate, empId, rule,
+                        clockMap.getOrDefault(empId, List.of()),
+                        leaveMap.get(empId));
+                if (stat != null) {
+                    batchList.add(stat);
                     count++;
+                    if (batchList.size() >= batchSize) {
+                        saveBatch(batchList);
+                        batchList.clear();
+                    }
                 }
             }
             currentDate = currentDate.plusDays(1);
         }
 
+        // 保存剩余
+        if (!batchList.isEmpty()) {
+            saveBatch(batchList);
+        }
+
         return count;
     }
 
-    private boolean generateDayStat(LocalDate statDate, Long employeeId, AttRule rule) {
-        // 检查是否已存在
-        Long existCount = baseMapper.selectCount(new LambdaQueryWrapper<AttDailyStat>()
-                .eq(AttDailyStat::getEmployeeId, employeeId)
-                .eq(AttDailyStat::getStatDate, statDate));
-        if (existCount > 0) {
-            return false;
-        }
-
-        // 获取当日打卡记录
-        List<AttClockRecord> clockRecords = clockRecordMapper.selectList(
-                new LambdaQueryWrapper<AttClockRecord>()
-                        .eq(AttClockRecord::getEmployeeId, employeeId)
-                        .eq(AttClockRecord::getClockDate, statDate)
-                        .orderByAsc(AttClockRecord::getClockTime));
-
-        // 检查是否请假
-        LeaveApplication leave = leaveMapper.selectOne(new LambdaQueryWrapper<LeaveApplication>()
-                .eq(LeaveApplication::getEmployeeId, employeeId)
-                .le(LeaveApplication::getStartTime, statDate.atTime(23, 59, 59))
-                .ge(LeaveApplication::getEndTime, statDate.atStartOfDay())
-                .eq(LeaveApplication::getStatus, 2) // 已通过
-                .last("LIMIT 1"));
+    private AttDailyStat buildDayStat(LocalDate statDate, Long employeeId, AttRule rule,
+                                       List<AttClockRecord> clockRecords, LeaveApplication leave) {
+        int dayOfWeek = statDate.getDayOfWeek().getValue();
+        int isWorkday = (dayOfWeek >= 1 && dayOfWeek <= 5) ? 1 : 0;
 
         if (leave != null) {
-            // 请假状态
             AttDailyStat stat = new AttDailyStat();
             stat.setEmployeeId(employeeId);
             stat.setStatDate(statDate);
-            stat.setStatus(6); // 请假
+            stat.setStatus(6);
             stat.setIsWorkday(1);
             stat.setRemark(leave.getReason());
             stat.setCreateTime(LocalDateTime.now());
             stat.setUpdateTime(LocalDateTime.now());
-            baseMapper.insert(stat);
-            return true;
+            return stat;
         }
 
-        // 没有打卡记录
         if (clockRecords.isEmpty()) {
-            // 检查是否是工作日（这里简化处理，周一到周五为工作日）
-            int dayOfWeek = statDate.getDayOfWeek().getValue();
-            int isWorkday = (dayOfWeek >= 1 && dayOfWeek <= 5) ? 1 : 0;
-
             AttDailyStat stat = new AttDailyStat();
             stat.setEmployeeId(employeeId);
             stat.setStatDate(statDate);
-            stat.setStatus(isWorkday == 1 ? 5 : 0); // 工作日缺勤或非工作日未打卡
+            stat.setStatus(isWorkday == 1 ? 5 : 0);
             stat.setIsWorkday(isWorkday);
             stat.setCreateTime(LocalDateTime.now());
             stat.setUpdateTime(LocalDateTime.now());
-            baseMapper.insert(stat);
-            return true;
+            return stat;
         }
 
-        // 有打卡记录，分析考勤状态
         LocalDateTime clockInTime = null;
         LocalDateTime clockOutTime = null;
         int lateMinutes = 0;
         int earlyMinutes = 0;
-        int status = 1; // 默认正常
+        int status = 1;
 
         for (AttClockRecord record : clockRecords) {
             if (record.getClockType() == 1) {
                 clockInTime = record.getClockTime();
-                // 计算迟到
                 if (rule != null && rule.getWorkStartTime() != null) {
-                    LocalTime workStart = rule.getWorkStartTime();
                     LocalTime actualStart = record.getClockTime().toLocalTime();
-                    if (actualStart.isAfter(workStart)) {
-                        lateMinutes = (int) ChronoUnit.MINUTES.between(workStart, actualStart);
+                    if (actualStart.isAfter(rule.getWorkStartTime())) {
+                        lateMinutes = (int) ChronoUnit.MINUTES.between(rule.getWorkStartTime(), actualStart);
                     }
                 }
             } else if (record.getClockType() == 2) {
                 clockOutTime = record.getClockTime();
-                // 计算早退
                 if (rule != null && rule.getWorkEndTime() != null) {
-                    LocalTime workEnd = rule.getWorkEndTime();
                     LocalTime actualEnd = record.getClockTime().toLocalTime();
-                    if (actualEnd.isBefore(workEnd)) {
-                        earlyMinutes = (int) ChronoUnit.MINUTES.between(actualEnd, workEnd);
+                    if (actualEnd.isBefore(rule.getWorkEndTime())) {
+                        earlyMinutes = (int) ChronoUnit.MINUTES.between(actualEnd, rule.getWorkEndTime());
                     }
                 }
             }
         }
 
-        // 判断考勤状态
-        if (lateMinutes > 0 && earlyMinutes > 0) {
-            status = 4; // 迟到+早退
-        } else if (lateMinutes > 0) {
-            status = 2; // 迟到
-        } else if (earlyMinutes > 0) {
-            status = 3; // 早退
-        }
+        if (lateMinutes > 0 && earlyMinutes > 0) status = 4;
+        else if (lateMinutes > 0) status = 2;
+        else if (earlyMinutes > 0) status = 3;
 
-        // 计算工作时长
         int workDuration = 0;
         if (clockInTime != null && clockOutTime != null) {
             workDuration = (int) ChronoUnit.MINUTES.between(clockInTime, clockOutTime);
         }
-
-        int dayOfWeek = statDate.getDayOfWeek().getValue();
-        int isWorkday = (dayOfWeek >= 1 && dayOfWeek <= 5) ? 1 : 0;
 
         AttDailyStat stat = new AttDailyStat();
         stat.setEmployeeId(employeeId);
@@ -193,7 +195,6 @@ public class AttDailyStatServiceImpl extends ServiceImpl<AttDailyStatMapper, Att
         stat.setIsWorkday(isWorkday);
         stat.setCreateTime(LocalDateTime.now());
         stat.setUpdateTime(LocalDateTime.now());
-        baseMapper.insert(stat);
-        return true;
+        return stat;
     }
 }

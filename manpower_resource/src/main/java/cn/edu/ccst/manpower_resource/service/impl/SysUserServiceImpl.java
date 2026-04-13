@@ -52,6 +52,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
         wrapper.like(StringUtils.hasText(query.getUsername()), SysUser::getUsername, query.getUsername())
                 .eq(query.getStatus() != null, SysUser::getStatus, query.getStatus())
+                .eq(query.getEmployeeId() != null, SysUser::getEmployeeId, query.getEmployeeId())
                 .eq(SysUser::getDeleted, 0)
                 .orderByDesc(SysUser::getCreateTime);
 
@@ -112,6 +113,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             throw new BusinessException(ResultCode.USER_EXIST);
         }
 
+        // 校验员工是否已被其他用户关联
+        if (dto.getEmployeeId() != null) {
+            Long empCount = baseMapper.selectCount(new LambdaQueryWrapper<SysUser>()
+                    .eq(SysUser::getEmployeeId, dto.getEmployeeId()));
+            if (empCount > 0) {
+                throw new BusinessException("该员工已关联其他用户账号");
+            }
+        }
+
         SysUser user = new SysUser();
         user.setUsername(dto.getUsername());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -133,6 +143,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         SysUser user = baseMapper.selectById(dto.getId());
         if (user == null) {
             throw new BusinessException(ResultCode.USER_NOT_EXIST);
+        }
+
+        // 校验员工是否已被其他用户关联
+        if (dto.getEmployeeId() != null && !dto.getEmployeeId().equals(user.getEmployeeId())) {
+            Long empCount = baseMapper.selectCount(new LambdaQueryWrapper<SysUser>()
+                    .eq(SysUser::getEmployeeId, dto.getEmployeeId())
+                    .ne(SysUser::getId, dto.getId()));
+            if (empCount > 0) {
+                throw new BusinessException("该员工已关联其他用户账号");
+            }
         }
 
         if (StringUtils.hasText(dto.getUsername()) && !dto.getUsername().equals(user.getUsername())) {

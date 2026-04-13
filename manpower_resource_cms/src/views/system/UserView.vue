@@ -12,6 +12,16 @@
         <el-form-item label="用户名">
           <el-input v-model="queryForm.username" placeholder="请输入用户名" clearable style="width: 150px" />
         </el-form-item>
+        <el-form-item label="关联员工">
+          <el-select v-model="queryForm.employeeId" placeholder="全部" clearable filterable style="width: 200px">
+            <el-option
+              v-for="emp in employeeList"
+              :key="emp.id"
+              :label="`${emp.empName} (${emp.empCode})`"
+              :value="emp.id"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="角色">
           <el-select v-model="queryForm.roleId" placeholder="全部" clearable style="width: 150px">
             <el-option
@@ -22,7 +32,6 @@
             />
           </el-select>
         </el-form-item>
-        <div class="spacer"></div>
         <el-form-item label="状态">
           <el-select v-model="queryForm.status" placeholder="全部" clearable style="width: 150px">
             <el-option label="正常" :value="1" />
@@ -170,6 +179,7 @@ const formRef = ref(null)
 
 const queryForm = reactive({
   username: '',
+  employeeId: null,
   roleId: null,
   status: null,
   pageNum: 1,
@@ -221,6 +231,7 @@ const handleSearch = () => {
 
 const handleReset = () => {
   queryForm.username = ''
+  queryForm.employeeId = null
   queryForm.roleId = null
   queryForm.status = null
   queryForm.pageNum = 1
